@@ -43,7 +43,7 @@ export default function SubmitSheet({ gid, it, onClose, onDone }) {
         ))}
       </div>
       {err ? <div className="err">{err}</div> : null}
-      <Btn busy={busy} className="block ok" disabled={!(files[0] && files[1])} onClick={submit}>Submit both photos</Btn>
+      <Btn busy={busy} className="block" disabled={!(files[0] && files[1])} onClick={submit}>Submit both photos</Btn>
       <p className="muted" style={{ margin: "10px 0 0", textAlign: "center" }}>You can retake either photo before you submit.</p>
     </Sheet>
   );

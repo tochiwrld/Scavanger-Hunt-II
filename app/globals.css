@@ -56,7 +56,7 @@ html.light .brand .mk{box-shadow:3px 3px 0 0 var(--fg)}
 .brand .wm{font:800 21px/1 var(--font-head);letter-spacing:-.03em}
 .brand .wm em{font-style:normal;color:var(--primary)}
 html.light .brand .wm em{color:oklch(62% .16 85)}
-.top .acts{display:flex;align-items:center;gap:4px}
+.acts{display:flex;align-items:center;gap:4px;flex:none}
 .icon-btn{position:relative;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:none;border:0;color:var(--fg);cursor:pointer;text-decoration:none}
 .icon-btn:hover{background:var(--secondary)}
 .icon-btn .dot{position:absolute;top:3px;right:3px;min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:var(--danger);color:#fff;
@@ -85,7 +85,8 @@ main{max-width:680px;margin:0 auto;padding:18px 16px 8px;display:flex;flex-direc
 .sec-title a,.link{color:var(--primary);font-weight:700;font-size:14px;text-decoration:none}
 html.light .sec-title a,html.light .link{color:oklch(55% .15 80)}
 .card-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
-.card-title h2{display:flex;align-items:center;gap:10px}
+.card-title h2{display:flex;align-items:center;gap:10px;font-size:18px;min-width:0}
+.card-title .link{white-space:nowrap;flex:none}
 .muted{color:var(--muted-fg);font-size:14px}
 .row{display:flex;gap:10px;align-items:center}
 .between{justify-content:space-between}
@@ -142,7 +143,8 @@ details.rules .body{margin-top:12px;color:color-mix(in oklch,var(--fg) 82%,trans
 .bar{height:12px;border-radius:99px;background:color-mix(in oklch,var(--primary) 18%,var(--raised));overflow:hidden;margin:16px 0 18px}
 .bar i{display:block;height:100%;background:var(--primary);border-radius:99px;transition:width .9s cubic-bezier(.2,.9,.2,1)}
 .progress-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
-.progress-head .mono{color:var(--muted-fg);font-size:14px}
+.progress-head h2{font-size:18px;white-space:nowrap}
+.progress-head .mono{color:var(--muted-fg);font-size:13px;white-space:nowrap}
 
 /* ---------- buttons ---------- */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:1px solid transparent;background:var(--primary);color:var(--primary-fg);
@@ -316,7 +318,7 @@ html.light .hero-wrap::after{background:linear-gradient(to top,var(--bg) 0%,oklc
 .step .no{position:absolute;top:20px;right:20px;font:700 14px/1 var(--font-mono);color:var(--muted-fg)}
 .step h3{text-transform:none;font-size:21px;letter-spacing:-.03em;margin-bottom:8px}
 .step p{color:var(--muted-fg);font-size:15px;margin:0}
-.codebox{background:var(--raised);border-radius:16px;padding:16px 18px;font:500 15px/1.6 var(--font-mono);margin-top:16px}
+.codebox{background:var(--raised);border-radius:16px;padding:16px 18px;font:500 13px/1.7 var(--font-mono);margin-top:16px}
 .codebox .dim{color:var(--muted-fg)}
 .codebox .res{font-family:var(--font-body);font-weight:700;font-size:14px;margin-top:6px}
 .plist p{font-size:15px;color:var(--muted-fg);margin:0 0 14px}

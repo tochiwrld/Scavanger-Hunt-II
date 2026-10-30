@@ -23,7 +23,7 @@ function InviteBox() {
     <form className="glass" onSubmit={go}>
       <label htmlFor="invite"><Icon n="key" size={16} />Got an invite code?</label>
       <div className="join-row">
-        <input id="invite" value={v} onChange={(e) => setV(e.target.value)} placeholder="Paste your invite link" autoCapitalize="off" autoCorrect="off" spellCheck={false} />
+        <input id="invite" value={v} onChange={(e) => setV(e.target.value)} placeholder="Invite link or code" autoCapitalize="off" autoCorrect="off" spellCheck={false} />
         <button className="btn" type="submit" disabled={!v.trim()}>Join<Icon n="arrow" size={17} /></button>
       </div>
       <p className="hint">Hunt Week is invite-only. Ask your group admin for the link.</p>
