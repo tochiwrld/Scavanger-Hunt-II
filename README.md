@@ -34,8 +34,13 @@ In **Vercel > the project > Settings > Environment Variables**:
 | `SUPABASE_BUCKET` | no | Defaults to `hunt-photos`. |
 | `DB_SCHEMA` | no | Defaults to `hunt`. |
 | `APP_URL` | optional | Your site URL, used for buttons in emails. |
-| `RESEND_API_KEY` | optional | For emails (resend.com): alerts and password-reset links. |
-| `EMAIL_FROM` | optional | e.g. `Weekly Hunt <hunt@yourdomain.com>` (a domain verified in Resend). |
+| `SMTP_USER` | for email | A Gmail address the app sends from. |
+| `SMTP_PASS` | for email | A Google **app password** for that address (myaccount.google.com/apppasswords; needs 2-Step Verification). Not your normal password. |
+| `SMTP_HOST` / `SMTP_PORT` | no | Default `smtp.gmail.com` / `465`. Change only for a different mail provider. |
+| `RESEND_API_KEY` | optional | Alternative to SMTP (resend.com). Used instead of SMTP when set together with `EMAIL_FROM`. |
+| `EMAIL_FROM` | optional | e.g. `Weekly Hunt <hunt@yourdomain.com>`. Required for Resend (a domain verified there); for Gmail it defaults to `Weekly Hunt <SMTP_USER>`. |
+
+Without email, everything still works in the app, but nobody gets emailed alerts and **password-reset links can't be delivered**. Gmail allows about 500 emails a day, plenty for friend groups.
 
 Changing an environment variable takes effect on the next deploy, so redeploy after editing one.
 

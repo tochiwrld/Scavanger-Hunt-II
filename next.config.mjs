@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  serverExternalPackages: ["pg"],
+  serverExternalPackages: ["pg", "nodemailer"],
   poweredByHeader: false,
   async headers() {
     return [{ source: "/(.*)", headers: [
