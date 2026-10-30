@@ -11,10 +11,10 @@ export default function Page() {
   });
   return (
     <>
-      <div><h1>Join a group</h1><p className="muted">Paste the invitation link or code you were sent.</p></div>
+      <div className="page-head"><h1>Join a group</h1><p>Paste the invitation link or code you were sent.</p></div>
       <form className="card" onSubmit={form.onSubmit} noValidate>
         <ErrBox error={form.error} />
-        <div className="field"><label>Invitation link or code</label><input name="code" autoCapitalize="off" autoComplete="off" placeholder="https://…/join/8xK29LmQ" required /></div>
+        <div className="field"><label htmlFor="code">Invitation link or code</label><input id="code" name="code" style={{ fontFamily: "var(--font-mono)" }} autoCapitalize="off" autoComplete="off" placeholder="https://…/join/8xK29LmQ" required /></div>
         <Btn busy={form.busy} className="block" type="submit">Continue</Btn>
       </form>
     </>

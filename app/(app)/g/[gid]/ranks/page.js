@@ -1,5 +1,7 @@
 "use client";
 import { useParams } from "next/navigation";
+import { fmtDate } from "../../../../../lib/client.js";
+import Icon from "../../../../../components/icons.js";
 import { Async, Empty, LbRows, useApi } from "../../../../../components/ui.js";
 
 export default function Page() {
@@ -8,21 +10,28 @@ export default function Page() {
   return (
     <Async st={st}>{(d) => {
       if (d.phase === "none") return <Empty icon="🏆" title="No leaderboard yet" text="It appears when the first hunt goes live." />;
-      const m = d.me;
+      const m = d.me, c = d.challenge, live = d.phase === "active";
       return (
         <>
-          <div><h2>{d.phase === "active" ? "Weekly leaderboard" : "Final standings"}</h2><p className="muted">{d.challenge.title}{d.challenge.week_number ? ` · Week ${d.challenge.week_number}` : ""}. Resets when the next week starts.</p></div>
+          <div className="page-head"><h1>Leaderboard</h1><p>Weekly scores only — every new challenge starts everyone from zero.</p></div>
           {m ? (
-            <div className="card dark">
-              <div className="row between">
-                <div><div className="muted" style={{ color: "#c9c2b4" }}>Your rank</div><div className="bignum" style={{ fontSize: 44 }}>#{m.rank}</div></div>
-                <div style={{ textAlign: "right" }}><div className="pts" style={{ color: "var(--gc)" }}>{m.points} pts</div><div className="muted" style={{ color: "#c9c2b4" }}>{m.items} item{m.items === 1 ? "" : "s"} complete</div></div>
-              </div>
-              {m.above ? <p style={{ margin: "10px 0 0", color: "#e7e1d3" }}>{m.gap} more point{m.gap === 1 ? "" : "s"} to pass {m.above}</p> : <p style={{ margin: "10px 0 0", color: "var(--gc)", fontWeight: 700 }}>You're in front. Hold on to it.</p>}
+            <div className="tiles" style={{ marginTop: 0 }}>
+              <div className="tile score"><div className="label">Your rank</div><div className="n">#{m.rank}<small>/ {d.total}</small></div></div>
+              <div className="tile rank"><div className="label">Your points</div><div className="n">{m.points}<small>pts</small></div></div>
             </div>
           ) : null}
-          {d.rows.length ? <LbRows rows={d.rows} /> : <Empty icon="👥" title="No players yet" text="Share the invite link to get people in." />}
-          <p className="muted">⚖️ {d.challenge.tie_rule}</p>
+          {m ? <p className="gap-note" style={{ margin: 0 }}>{m.above ? <><b>{m.gap} point{m.gap === 1 ? "" : "s"}</b> to pass {m.above}</> : m.points > 0 ? <b style={{ color: "var(--primary)" }}>You're in front. Hold on to it.</b> : "Get your first item approved to get on the board."}</p> : null}
+          <section className="card">
+            <div className="card-title" style={{ alignItems: "flex-start" }}>
+              <div><div className={"eyebrow" + (live ? " live" : "")}>{live ? "Live" : "Final standings"}</div><h2 style={{ marginTop: 8 }}>{c.title}</h2></div>
+              <span className="muted" style={{ textAlign: "right", fontSize: 13 }}>{live ? "Closes" : "Closed"}<br />{fmtDate(c.end_at)}</span>
+            </div>
+            {d.rows.length ? <LbRows rows={d.rows} prize={live ? null : c.prize_amount} /> : <p className="muted" style={{ margin: 0 }}>No players yet. Share the invite link to get people in.</p>}
+          </section>
+          <section className="card">
+            <h2 style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}><Icon n="timer" size={20} className="c-primary" />The tie-breaker</h2>
+            <p className="prose" style={{ margin: 0 }}>{c.tie_rule}</p>
+          </section>
         </>
       );
     }}</Async>

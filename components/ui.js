@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { api, cap, colorFor, fmtLeft, medal, statusIcon, statusLabel, naira, zoom } from "../lib/client.js";
+import { api, cap, colorFor, fmtLeft, naira, pad2, TZ, zoom } from "../lib/client.js";
+import Icon from "./icons.js";
 import { useApp } from "./Providers.js";
 
 /** Fetch helper: { data, error, loading, reload }. Reloads when alerts arrive. */
@@ -26,7 +27,7 @@ export function useApi(path) {
 export const Skel = () => <><div className="skel" /><div className="skel" /><div className="skel" /></>;
 
 export function Empty({ icon, title, text, children }) {
-  return <div className="card empty"><div className="big">{icon}</div><h3>{title}</h3>{text ? <p className="muted">{text}</p> : null}{children}</div>;
+  return <div className="card empty"><div className="big">{icon}</div><h3>{title}</h3>{text ? <p className="muted" style={{ maxWidth: 420, margin: "0 auto 4px" }}>{text}</p> : null}{children ? <div style={{ marginTop: 14 }}>{children}</div> : null}</div>;
 }
 
 /** Renders loading / error states, then children(data). */
@@ -69,7 +70,7 @@ export function Sheet({ onClose, children }) {
 export function Avatar({ g }) {
   return <div className="av" style={{ "--gc": colorFor(g.id) }}>{g.has_image ? <img src={`/api/groups/${g.id}/image`} alt="" /> : (g.name || "?").trim().charAt(0).toUpperCase()}</div>;
 }
-export const RoleBadge = ({ g }) => <span className="role">{g.role === "owner" ? "ADMIN" : "PLAYER"}</span>;
+export const RoleBadge = ({ g }) => <span className={"role" + (g.role === "owner" ? " owner" : "")}>{g.role === "owner" ? "Admin" : "Player"}</span>;
 
 export function Countdown({ end, onDone }) {
   const { offset } = useApp();
@@ -104,60 +105,88 @@ export function CountUp({ to }) {
   return <>{v.toLocaleString()}</>;
 }
 
-export function LbRows({ rows }) {
+const reached = (d) => new Date(d).toLocaleString("en-NG", { timeZone: TZ, weekday: "short", hour: "numeric", minute: "2-digit" }).replace(/\s?([AP]M)$/i, (m, x) => " " + x.toLowerCase());
+
+/** Leaderboard rows. Shows "reached at" only where a tie makes it matter. */
+export function LbRows({ rows, prize }) {
   return (
     <div className="lb">
-      {rows.map((r, i) => (
-        <div key={i} className={`r ${r.me ? "me" : ""} ${r.points > 0 && r.rank <= 3 ? "top" + r.rank : ""}`} style={{ animation: "drop .35s both", animationDelay: Math.min(i, 12) * 35 + "ms" }}>
-          <div className="pos">{medal(r.rank, r.points)}</div>
-          <div className="nm">{r.nickname}{r.me ? " (you)" : ""}</div>
-          <div className="muted">{r.items} item{r.items === 1 ? "" : "s"}</div>
-          <div className="pt">{r.points}</div>
-        </div>
-      ))}
+      {rows.map((r, i) => {
+        const tied = r.points > 0 && r.reached_at && ((rows[i - 1] && rows[i - 1].points === r.points) || (rows[i + 1] && rows[i + 1].points === r.points));
+        const top = r.points > 0 && r.rank <= 3 ? " top" + r.rank : "";
+        return (
+          <div key={i} className={"r" + top + (r.me ? " me" : "")} style={{ animation: "rise .35s both", animationDelay: Math.min(i, 12) * 35 + "ms" }}>
+            <div className="pos">{r.rank}</div>
+            <div className="who">
+              <div className="nm"><span>{r.nickname}</span>{r.rank === 1 && r.points > 0 ? <Icon n="crown" size={16} /> : null}{r.me ? <span className="you">YOU</span> : null}</div>
+              <div className="sub"><span>{r.items} item{r.items === 1 ? "" : "s"} approved</span>{tied ? <span className="reach"><Icon n="timer" size={13} />reached {reached(r.reached_at)}</span> : null}</div>
+            </div>
+            <div className="score"><div className="pt">{r.points}</div><div className="unit">{prize && r.rank === 1 && r.points > 0 ? naira(prize) : "PTS"}</div></div>
+          </div>
+        );
+      })}
     </div>
   );
 }
 
-export function Plate({ children }) {
-  return <section className="plate"><div className="stripe" /><div className="in">{children}</div></section>;
+export function Plate({ children, className = "" }) {
+  return <section className={"plate " + className}><div className="stripe" /><div className="in">{children}</div></section>;
 }
 
-export function ChallengeHead({ c, countdown, onDone }) {
+const fmtShort = (d) => new Date(d).toLocaleString("en-NG", { timeZone: TZ, weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+
+export function ChallengeHead({ c, countdown, onDone, count }) {
   return (
-    <Plate>
-      <div className="muted" style={{ color: "#c9c2b4" }}>{c.week_number ? `Week ${String(c.week_number).padStart(2, "0")} · ` : ""}Prize {naira(c.prize_amount)}</div>
-      <div className="week">{c.title}</div>
+    <section className="card">
+      <div className="eyebrow">{c.week_number ? `Week ${pad2(c.week_number)} · ` : ""}{count != null ? `${count} item${count === 1 ? "" : "s"} · ` : ""}Prize {naira(c.prize_amount)}</div>
+      <h1 style={{ margin: "10px 0 12px", fontSize: "clamp(30px,8vw,40px)" }}>{c.title}</h1>
+      {c.description ? <p className="prose" style={{ margin: "0 0 8px" }}>{c.description}</p> : null}
+      <div className="muted" style={{ fontSize: 13 }}>{fmtShort(c.start_at)} → {fmtShort(c.end_at)} · Africa/Lagos</div>
       {countdown ? <Countdown end={c.end_at} onDone={onDone} /> : null}
-      {c.description ? <p style={{ margin: "10px 0 0", color: "#e7e1d3" }}>{c.description}</p> : null}
-      <details style={{ marginTop: 10 }}>
-        <summary style={{ cursor: "pointer", fontWeight: 700, color: "var(--gc)" }}>Rules</summary>
-        <p style={{ whiteSpace: "pre-wrap", margin: "8px 0 0", color: "#e7e1d3" }}>{c.rules || ""}</p>
-        <p style={{ margin: "8px 0 0", color: "#e7e1d3" }}>⚖️ {c.tie_rule}</p>
+      <details className="rules">
+        <summary><Icon n="scroll" size={18} />Challenge rules &amp; tie-breaker<Icon n="chevron" size={18} /></summary>
+        <div className="body">{c.rules ? c.rules + "\n\n" : ""}{c.tie_rule}</div>
       </details>
-    </Plate>
+    </section>
   );
+}
+
+const STATUS = {
+  not_submitted: ["dashed", "Not submitted"], pending: ["clock", "Pending review"],
+  approved: ["check", "Approved"], rejected: ["x", "Rejected"],
+};
+export function StatusPill({ status, label }) {
+  const [ic, l] = STATUS[status] || ["dashed", status];
+  return <span className={`st ${status}`}><Icon n={ic} size={13} />{label || l}</span>;
+}
+export function Difficulty({ d }) {
+  const bars = { easy: 1, medium: 2, hard: 3, extreme: 3 }[d] || 1;
+  return <span className={`chip ${d}`}><span className="sig">{[1, 2, 3].map((k) => <i key={k} className={k <= bars ? "on" : ""} />)}</span>{cap(d)}</span>;
 }
 
 export function ItemCard({ it, gid, preview, onSubmit }) {
   return (
-    <article className={`card item ${it.status}`}>
-      {it.status === "approved" ? <div className="stamp">+{it.points} PTS</div> : null}
-      <div className="row wrap"><span className="num">Item {it.number}</span><span className={`chip ${it.difficulty}`}>{cap(it.difficulty)}</span></div>
+    <article className={`card item ${it.status}`} style={{ animation: "rise .3s both" }}>
+      <div className="head"><span className="num">Item {pad2(it.number)}</span><StatusPill status={it.status} /></div>
       <h3>{it.title}</h3>
-      {it.description ? <p>{it.description}</p> : null}
-      {it.instructions ? <p className="muted">{it.instructions}</p> : null}
+      <div className="tags"><Difficulty d={it.difficulty} /><span className="pts">{it.points} PTS</span></div>
+      {it.description ? <p className="txt">{it.description}</p> : null}
+      {it.instructions ? <p className="txt">{it.instructions}</p> : null}
       {it.has_reference ? <img className="refimg" loading="lazy" src={`/api/groups/${gid}/items/${it.id}/reference`} alt="Reference" onClick={(e) => zoom(e.currentTarget.src)} /> : null}
-      {it.hint ? <details><summary>💡 Need a hint?</summary><p className="muted" style={{ marginTop: 6 }}>{it.hint}</p></details> : null}
-      <div className="row between" style={{ marginTop: 10 }}><span className="pts">{it.points} pts</span><span className={`st ${it.status}`}>{statusIcon[it.status]} {statusLabel[it.status]}</span></div>
-      {!preview && it.status === "not_submitted" ? <button className="btn block" onClick={() => onSubmit(it)}>📷 Submit photos</button> : null}
-      {!preview && it.status === "pending" ? <p className="muted" style={{ margin: "10px 0 0" }}>Both photos are in. Points arrive once the admin approves.</p> : null}
-      {!preview && it.status === "rejected" ? (
-        <>
-          <div className="reason"><b>Rejected:</b> {it.rejection_reason}</div>
-          <button className="btn block" style={{ marginTop: 10 }} onClick={() => onSubmit(it)}>📷 Submit new photos</button>
-        </>
-      ) : null}
+      {it.hint ? <details className="hint"><summary><Icon n="bulb" size={15} />Show hint</summary><p>{it.hint}</p></details> : null}
+      {preview ? null : (
+        <div className="foot">
+          {it.status === "not_submitted" ? <button className="btn block" onClick={() => onSubmit(it)}><Icon n="camera" size={18} />Submit photos</button> : null}
+          {it.status === "pending" ? <div className="state-box">{it.submitted_at ? "Submitted " + fmtShort(it.submitted_at) + " · " : ""}photos locked while in review</div> : null}
+          {it.status === "approved" ? <div className="state-box earned">+{it.points} points earned</div> : null}
+          {it.status === "rejected" ? (
+            <>
+              <div className="reason"><b>Rejected:</b> {it.rejection_reason}</div>
+              <button className="btn block" onClick={() => onSubmit(it)}><Icon n="camera" size={18} />Submit new photos</button>
+            </>
+          ) : null}
+        </div>
+      )}
     </article>
   );
 }

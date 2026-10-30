@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { api } from "../../../lib/client.js";
 import { useApp } from "../../../components/Providers.js";
+import Icon from "../../../components/icons.js";
 
 export default function Page() {
   const { me, setMe, toast } = useApp();
@@ -13,11 +14,21 @@ export default function Page() {
     setBusy(true);
     try { await api("/me/become-admin", { method: "POST" }); setMe({ ...me, can_create_groups: true }); router.push("/groups/new"); } catch (e) { toast(e.message, "bad"); setBusy(false); }
   };
+  const Choice = ({ icon, title, text, ...rest }) => (
+    <>
+      <span className="step" style={{ display: "contents" }} />
+      <span className="row" style={{ gap: 16, alignItems: "flex-start" }}>
+        <span className="ico" style={{ width: 46, height: 46, borderRadius: 13, background: "var(--primary)", color: "var(--primary-fg)", display: "grid", placeItems: "center", flex: "none" }}><Icon n={icon} size={22} /></span>
+        <span className="grow"><span style={{ display: "block", font: "800 20px/1.1 var(--font-head)", letterSpacing: "-.03em" }}>{title}</span><span className="muted" style={{ display: "block", marginTop: 6 }}>{text}</span></span>
+        <Icon n="arrow" size={20} className="c-mute" />
+      </span>
+    </>
+  );
   return (
     <>
-      <div><h1>What do you want to do?</h1><p className="muted">One account works for both. You can do the other later.</p></div>
-      <button className={"btn block" + (busy ? " spin" : "")} disabled={busy} onClick={admin} style={{ padding: 22 }}>🛡️ Create an admin account<br /><small style={{ fontWeight: 500 }}>Run groups and weekly hunts</small></button>
-      <Link className="btn block ghost" href="/join" style={{ padding: 22 }}>🎯 Join as a player<br /><small style={{ fontWeight: 500 }}>Use an invitation link or code</small></Link>
+      <div className="page-head"><h1>What do you want to do?</h1><p>One account works for both. You can do the other later.</p></div>
+      <button className="card gcard" style={{ textAlign: "left", cursor: "pointer", width: "100%", opacity: busy ? 0.6 : 1 }} disabled={busy} onClick={admin}><Choice icon="shield" title="Create an admin account" text="Run groups, publish weekly hunts and review photos." /></button>
+      <Link className="card gcard" href="/join"><Choice icon="key" title="Join as a player" text="Use the invitation link or code your admin sent you." /></Link>
     </>
   );
 }

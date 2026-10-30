@@ -1,7 +1,7 @@
 "use client";
 import { useParams } from "next/navigation";
-import { fmtDate, statusIcon, statusLabel, zoom } from "../../../../../lib/client.js";
-import { Async, Empty, useApi } from "../../../../../components/ui.js";
+import { fmtDate, zoom } from "../../../../../lib/client.js";
+import { Async, Empty, useApi, StatusPill } from "../../../../../components/ui.js";
 
 export default function Page() {
   const { gid } = useParams();
@@ -12,7 +12,7 @@ export default function Page() {
         <h2>My submissions</h2>
         {d.submissions.map((s) => (
           <div key={s.id} className="card flat">
-            <div className="row between"><b>{s.title}</b><span className={`st ${s.status}`}>{statusIcon[s.status]} {statusLabel[s.status]}</span></div>
+            <div className="row between"><b>{s.title}</b><StatusPill status={s.status} /></div>
             <div className="muted">{s.week_number ? `Week ${s.week_number} · ` : ""}{fmtDate(s.submitted_at)}{s.status === "approved" ? ` · +${s.points} pts` : ""}</div>
             {s.status === "rejected" && s.rejection_reason ? <div className="reason"><b>Reason:</b> {s.rejection_reason}</div> : null}
             <div className="photos2">

@@ -1,8 +1,9 @@
 "use client";
 import { useState } from "react";
-import { api, burst, cap, fmtDate, statusIcon, zoom } from "../lib/client.js";
+import { api, burst, fmtDate, zoom } from "../lib/client.js";
 import { useApp } from "./Providers.js";
-import { Btn } from "./ui.js";
+import { Btn, StatusPill } from "./ui.js";
+import Icon from "./icons.js";
 
 /** One submission with both photos and Approve / Reject (reason required). */
 export default function ReviewCard({ s, gid, actions = true, onChanged }) {
@@ -25,10 +26,10 @@ export default function ReviewCard({ s, gid, actions = true, onChanged }) {
   };
   return (
     <article className={"card review" + (gone ? " gone" : "")}>
-      <div className="row between wrap"><b>{s.nickname}</b><span className={`st ${s.status}`}>{statusIcon[s.status]} {cap(s.status)}</span></div>
-      <div style={{ marginTop: 4 }}><b>{s.item_title}</b> · {s.points} pts</div>
-      <div className="muted">{s.challenge_title} · {fmtDate(s.submitted_at)}</div>
-      {s.instructions ? <p className="muted" style={{ margin: "6px 0 0" }}>{s.instructions}</p> : null}
+      <div className="row between wrap"><span className="lb" style={{ display: "contents" }}><span className="nm" style={{ font: "800 19px/1.1 var(--font-head)", textTransform: "uppercase", letterSpacing: "-.02em" }}>{s.nickname}</span></span><StatusPill status={s.status} /></div>
+      <h3 style={{ margin: "12px 0 8px", fontSize: 18, textTransform: "none", letterSpacing: "-.02em" }}>{s.item_title}</h3>
+      <div className="row wrap" style={{ gap: 8 }}><span className="pts">{s.points} PTS</span><span className="muted">{s.challenge_title} · {fmtDate(s.submitted_at)}</span></div>
+      {s.instructions ? <p className="muted" style={{ margin: "10px 0 0" }}>{s.instructions}</p> : null}
       <div className="photos">
         <img loading="lazy" src={`/api/photo/${s.id}/1`} alt="Photo 1" onClick={(e) => zoom(e.currentTarget.src)} />
         <img loading="lazy" src={`/api/photo/${s.id}/2`} alt="Photo 2" onClick={(e) => zoom(e.currentTarget.src)} />
@@ -37,7 +38,7 @@ export default function ReviewCard({ s, gid, actions = true, onChanged }) {
       {(s.history || []).map((h, i) => <div key={i} className="hist">Earlier rejection: {h.reason}</div>)}
       {actions && s.status === "pending" ? (
         <>
-          <div className="acts"><Btn busy={busy} className="ok" onClick={approve}>✅ Approve</Btn><button className="btn bad" disabled={busy} onClick={() => setRejecting((r) => !r)}>❌ Reject</button></div>
+          <div className="acts"><Btn busy={busy} className="ok" onClick={approve}><Icon n="check" size={18} />Approve</Btn><button className="btn ghost" disabled={busy} onClick={() => setRejecting((r) => !r)}><Icon n="x" size={18} />Reject</button></div>
           {rejecting ? (
             <div className="stack" style={{ marginTop: 10 }}>
               <textarea autoFocus value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Why is it rejected? The player will see this." maxLength={300} />
