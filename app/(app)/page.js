@@ -1,0 +1,44 @@
+"use client";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { api, colorFor, fmtDate, naira } from "../../lib/client.js";
+import { useApp } from "../../components/Providers.js";
+import { Avatar, Btn, Empty, RoleBadge, Skel } from "../../components/ui.js";
+
+export default function GroupsHome() {
+  const { me, groups, setMe, toast } = useApp();
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  if (!groups) return <Skel />;
+  const phase = (c) => (!c ? "No challenge yet" : c.phase === "active" ? "Live now" : c.phase === "upcoming" ? "Starts " + fmtDate(c.start_at) : "Week finished");
+  const becomeAdmin = async () => {
+    setBusy(true);
+    try { await api("/me/become-admin", { method: "POST" }); setMe({ ...me, can_create_groups: true }); router.push("/groups/new"); } catch (e) { toast(e.message, "bad"); setBusy(false); }
+  };
+  return (
+    <>
+      <div><h1>My groups</h1><p className="muted">Each group has its own players, hunts and leaderboard.</p></div>
+      {groups.length ? groups.map((g) => (
+        <Link key={g.id} href={`/g/${g.id}`} className="card gcard" style={{ "--gc": colorFor(g.id) }}>
+          <Avatar g={g} />
+          <div className="grow">
+            <div className="row between"><h3>{g.name}</h3><RoleBadge g={g} /></div>
+            <div className="muted">{g.challenge ? `${g.challenge.week_number ? "Week " + String(g.challenge.week_number).padStart(2, "0") + ": " : ""}${g.challenge.title} · ${phase(g.challenge)}` : "No challenge yet"}</div>
+            <div className="muted">{g.members} player{g.members === 1 ? "" : "s"}</div>
+            {g.role === "player" && g.my_rank ? <div className="pts" style={{ marginTop: 4 }}>#{g.my_rank} · {g.my_points} points</div> : null}
+            {g.role === "owner" ? (
+              <div className="row wrap" style={{ marginTop: 6, gap: 6 }}>
+                {g.pending ? <span className="st pending">⏳ {g.pending} to review</span> : <span className="st approved">✅ All reviewed</span>}
+                {g.leader ? <span className="chip">👑 {g.leader}</span> : null}
+                {g.prize ? <span className="chip">{naira(g.prize.amount)} {g.prize.status === "paid" ? "paid" : "pending"}</span> : null}
+              </div>
+            ) : null}
+          </div>
+        </Link>
+      )) : <Empty icon="🎯" title="You're not in a group yet" text="Join one with an invitation link, or create your own." />}
+      <Link className="btn block" href="/join">🎟️ Join {groups.length ? "another" : "a"} group</Link>
+      {me.can_create_groups ? <Link className="btn block dark" href="/groups/new">＋ Create new group</Link> : <Btn busy={busy} className="block ghost" onClick={becomeAdmin}>🛡️ Want to run your own group? Become an admin</Btn>}
+    </>
+  );
+}
