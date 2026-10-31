@@ -17,6 +17,8 @@ Live site: https://weekly-hunt.vercel.app — owner's real group is "Ghetto Sear
 - `app/(app)/` signed-in pages, wrapped by `components/AppShell.js`; group pages under `app/(app)/g/[gid]/…`
 - `components/ui.js` shared pieces (ItemCard, LbRows, ChallengeHead, Plate, StatusPill, Difficulty, Countdown, useApi, useForm)
 - `components/icons.js` inline Lucide-style icons (`<Icon n="trophy" />`); `components/Brand.js` logo + theme toggle
+- `lib/duel.js` 1v1 phases, scoring and finishing; 1v1 routes are at the end of `lib/router.js`; pages `app/(app)/duels`, `app/(app)/duel/[id]`, `app/(public)/vs/[token]`
+- `components/GlobalSearch.js` public groups + global leaderboard on the home page (`GET /global`, `POST /global/:gid/join`; admins toggle `groups.is_public` in Settings)
 - `lib/game.js` scoring, leaderboard, tie-break, weekly results; `lib/notify.js` notifications + `runLifecycle()`; `lib/client.js` browser helpers
 
 ## Rules that must hold
@@ -26,6 +28,12 @@ Live site: https://weekly-hunt.vercel.app — owner's real group is "Ghetto Sear
 - Tie-break: equal points → whoever reached that score first (time of the approved submission that got them there).
 - Exactly 2 photos per submission; immutable once sent; refused after the deadline. Rejection needs a reason.
 - Published challenges are locked. Times are entered and shown in Africa/Lagos (UTC+1, no DST). Default week: Monday 00:00 → Sunday 23:59:59.
+
+## 1v1 and Global Search rules
+- A 1v1 link (`/vs/<token>`) seats only the first person to accept (atomic UPDATE); afterwards it returns 410 to anyone else. Every `/duels/:id` route goes through `duelFor()`, which 404s for non-players.
+- Each player's list stays hidden from the other until both tap Done; the timer starts when the second player is ready. Only the item's writer judges its photos; 1v1 photos are served only to the two players (`/api/duel-photo`).
+- Pending 1v1 photos are auto-approved 60 minutes after the timer ends (`REVIEW_GRACE_MINUTES`); `runDuelLifecycle()` (part of the cron) finishes duels and alerts both players. 1v1 notifications have `group_id` NULL.
+- Global ranking = all-time points from groups with `is_public = true`. Public groups can be joined without an invite; removed members still can't rejoin.
 
 ## Design system
 Matches the reference https://scavenger-hunt-website.netlify.app/ ("HUNTWEEK"). Dark by default, `html.light` for light mode (saved in `localStorage.theme`). Tokens and all styles are in `app/globals.css` (oklch colours, `--primary` yellow). Fonts: Bricolage Grotesque (headings, uppercase), Space Grotesk (body), JetBrains Mono (numbers). Floating pill nav at the bottom. Hero photo: `https://iwljafkilkizabmgczjn.supabase.co/storage/v1/object/public/site/hero.jpg` (public `site` bucket).

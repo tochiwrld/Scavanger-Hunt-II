@@ -49,6 +49,7 @@ function Inner({ mode }) {
   });
   const q = next ? "?next=" + encodeURIComponent(next) : "";
   const invited = next && next.startsWith("/join/");
+  const challenged = next && next.startsWith("/vs/");
   return (
     <div className="landing">
       <section className="hero-wrap">
@@ -62,7 +63,7 @@ function Inner({ mode }) {
           <span className="kicker">The weekly scavenger hunt</span>
           <h1 className="headline">Find it.<br />Snap it <em>twice.</em><br />Win the week.</h1>
           <p className="lede">A private, weekly scavenger hunt for your crew. New items every Monday, two photos per find, real points on a real leaderboard — and ₦3,000 for whoever finishes on top.</p>
-          {invited ? null : <InviteBox />}
+          {invited || challenged ? null : <InviteBox />}
           <div className="closes"><div className="label" style={{ color: "oklch(85% .015 275)" }}>Free to play</div><div className="v">No entry fees, ever. Just friends, phones and bragging rights.</div></div>
         </div>
       </section>
@@ -70,6 +71,7 @@ function Inner({ mode }) {
       <div className="auth-body">
         <section className="card" id="account">
           {invited ? <div className="card mist flat" style={{ marginBottom: 16 }}>You've been invited to a group. {mode === "login" ? "Log in" : "Create an account"} to join it.</div> : null}
+          {challenged ? <div className="card mist flat" style={{ marginBottom: 16 }}>You've been challenged to a 1v1. {mode === "login" ? "Log in" : "Create an account"} to accept it.</div> : null}
           <div className="tabs" style={{ marginBottom: 18 }}>
             <Link className={"tab" + (mode === "login" ? " on" : "")} href={"/login" + q}>Log in</Link>
             <Link className={"tab" + (mode === "register" ? " on" : "")} href={"/register" + q}>Create account</Link>

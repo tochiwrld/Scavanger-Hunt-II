@@ -6,7 +6,7 @@ import { Btn, StatusPill } from "./ui.js";
 import Icon from "./icons.js";
 
 /** One submission with both photos and Approve / Reject (reason required). */
-export default function ReviewCard({ s, gid, actions = true, onChanged }) {
+export default function ReviewCard({ s, gid, base = `/groups/${gid}`, photoBase = "/api/photo", actions = true, onChanged }) {
   const { toast, refreshGroups } = useApp();
   const [busy, setBusy] = useState(false);
   const [rejecting, setRejecting] = useState(false);
@@ -15,24 +15,24 @@ export default function ReviewCard({ s, gid, actions = true, onChanged }) {
   const done = () => { refreshGroups(); setGone(true); setTimeout(onChanged, 350); };
   const approve = async () => {
     setBusy(true);
-    try { await api(`/groups/${gid}/submissions/${s.id}/approve`, { method: "POST" }); toast("✅ Approved. Points awarded.", "good"); burst(); done(); }
+    try { await api(`${base}/submissions/${s.id}/approve`, { method: "POST" }); toast(s.points != null ? "Approved. Points awarded." : "Approved.", "good"); burst(); done(); }
     catch (e) { toast(e.message, "bad"); setBusy(false); }
   };
   const reject = async () => {
     if (reason.trim().length < 3) return toast("Give the player a reason", "bad");
     setBusy(true);
-    try { await api(`/groups/${gid}/submissions/${s.id}/reject`, { method: "POST", json: { reason } }); toast("Rejected. The player has been told."); done(); }
+    try { await api(`${base}/submissions/${s.id}/reject`, { method: "POST", json: { reason } }); toast("Rejected. The player has been told."); done(); }
     catch (e) { toast(e.message, "bad"); setBusy(false); }
   };
   return (
     <article className={"card review" + (gone ? " gone" : "")}>
       <div className="row between wrap"><span className="lb" style={{ display: "contents" }}><span className="nm" style={{ font: "800 19px/1.1 var(--font-head)", textTransform: "uppercase", letterSpacing: "-.02em" }}>{s.nickname}</span></span><StatusPill status={s.status} /></div>
       <h3 style={{ margin: "12px 0 8px", fontSize: 18, textTransform: "none", letterSpacing: "-.02em" }}>{s.item_title}</h3>
-      <div className="row wrap" style={{ gap: 8 }}><span className="pts">{s.points} PTS</span><span className="muted">{s.challenge_title} · {fmtDate(s.submitted_at)}</span></div>
+      <div className="row wrap" style={{ gap: 8 }}>{s.points != null ? <span className="pts">{s.points} PTS</span> : null}<span className="muted">{s.challenge_title ? `${s.challenge_title} · ` : ""}{fmtDate(s.submitted_at)}</span></div>
       {s.instructions ? <p className="muted" style={{ margin: "10px 0 0" }}>{s.instructions}</p> : null}
       <div className="photos">
-        <img loading="lazy" src={`/api/photo/${s.id}/1`} alt="Photo 1" onClick={(e) => zoom(e.currentTarget.src)} />
-        <img loading="lazy" src={`/api/photo/${s.id}/2`} alt="Photo 2" onClick={(e) => zoom(e.currentTarget.src)} />
+        <img loading="lazy" src={`${photoBase}/${s.id}/1`} alt="Photo 1" onClick={(e) => zoom(e.currentTarget.src)} />
+        <img loading="lazy" src={`${photoBase}/${s.id}/2`} alt="Photo 2" onClick={(e) => zoom(e.currentTarget.src)} />
       </div>
       {s.status === "rejected" && s.rejection_reason ? <div className="reason"><b>Reason:</b> {s.rejection_reason}</div> : null}
       {(s.history || []).map((h, i) => <div key={i} className="hist">Earlier rejection: {h.reason}</div>)}

@@ -6,7 +6,7 @@ import { useApp } from "../../../components/Providers.js";
 import Icon from "../../../components/icons.js";
 import { Async, Empty, useApi } from "../../../components/ui.js";
 
-const ICON = { approved: "check", rejected: "x", new_challenge: "live", ending: "clock", results: "trophy", submission: "camera" };
+const ICON = { approved: "check", rejected: "x", new_challenge: "live", ending: "clock", results: "trophy", submission: "camera", duel: "swords" };
 
 export default function Page() {
   const { setUnread } = useApp();

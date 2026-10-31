@@ -80,8 +80,8 @@ export default function AppShell({ children }) {
         ) : (
           <>
             <A href="/" icon="users" label="Groups" on={path === "/"} />
+            <A href="/duels" icon="swords" label="1v1" on={path.startsWith("/duel")} />
             <A href="/join" icon="key" label="Join" on={path === "/join"} />
-            <A href="/alerts" icon="bell" label="Alerts" on={path === "/alerts"} badge={dot(unread)} />
             <A href="/profile" icon="user" label="Profile" on={path === "/profile"} />
           </>
         )}

@@ -119,7 +119,7 @@ export function LbRows({ rows, prize }) {
             <div className="pos">{r.rank}</div>
             <div className="who">
               <div className="nm"><span>{r.nickname}</span>{r.rank === 1 && r.points > 0 ? <Icon n="crown" size={16} /> : null}{r.me ? <span className="you">YOU</span> : null}</div>
-              <div className="sub"><span>{r.items} item{r.items === 1 ? "" : "s"} approved</span>{tied ? <span className="reach"><Icon n="timer" size={13} />reached {reached(r.reached_at)}</span> : null}</div>
+              <div className="sub"><span>{r.tier ? r.tier : `${r.items} item${r.items === 1 ? "" : "s"} approved`}</span>{tied ? <span className="reach"><Icon n="timer" size={13} />reached {reached(r.reached_at)}</span> : null}</div>
             </div>
             <div className="score"><div className="pt">{r.points}</div><div className="unit">{prize && r.rank === 1 && r.points > 0 ? naira(prize) : "PTS"}</div></div>
           </div>

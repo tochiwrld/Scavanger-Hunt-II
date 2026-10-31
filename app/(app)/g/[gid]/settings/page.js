@@ -13,7 +13,12 @@ export default function Page() {
   const g = groups?.find((x) => String(x.id) === gid);
   const st = useApi(`/groups/${gid}/settings`);
   const [s, setS] = useState(null);
-  useEffect(() => { if (st.data) setS(st.data.settings); }, [st.data]);
+  const [pub, setPub] = useState(false);
+  useEffect(() => { if (st.data) { setS(st.data.settings); setPub(Boolean(st.data.is_public)); } }, [st.data]);
+  const setPublic = async (on) => {
+    setPub(on);
+    try { await api(`/groups/${gid}/public`, { method: "PUT", json: { is_public: on } }); toast(on ? "Listed in Global Search" : "Removed from Global Search", "good"); } catch (e) { toast(e.message, "bad"); st.reload(); }
+  };
   const save = async (patch) => {
     setS((o) => ({ ...o, ...patch }));
     try { await api(`/groups/${gid}/settings`, { method: "PUT", json: patch }); toast("Saved", "good"); } catch (e) { toast(e.message, "bad"); st.reload(); }
@@ -34,6 +39,10 @@ export default function Page() {
             <div className="field"><label>Group image</label><input type="file" accept="image/*" onChange={image} /></div>
             <Btn busy={edit.busy} className="block" type="submit">Save group</Btn></form>
         ) : null}
+        <div className="card"><h2 style={{ marginBottom: 6 }}>Global Search</h2>
+          <div className="sw"><div><b>List this group in Global Search</b><div className="muted">Anyone can find it on the home page and join without an invite. Points earned here count toward the global ranking.</div></div>
+            <input type="checkbox" checked={pub} onChange={(e) => setPublic(e.target.checked)} /></div>
+        </div>
         {s ? (
           <div className="card"><h2>Notifications</h2>
             {TOGGLES.map(([k, label, sub]) => <div key={k} className="sw"><div><b>{label}</b>{sub ? <div className="muted">{sub}</div> : null}</div><input type="checkbox" checked={!!s[k]} onChange={(e) => save({ [k]: e.target.checked })} /></div>)}
