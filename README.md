@@ -90,6 +90,10 @@ npm run dev
 
 **Global Search.** A group admin can tick *List this group in Global Search* in Settings. Listed groups appear in the Global Search section on the home page, where anyone can search for them and join with one tap (no invite needed). All-time points earned in listed groups make up the global leaderboard and rank tiers: Rookie, Bronze (50), Silver (150), Gold (400), Platinum (800), Diamond (1500), Legend (3000).
 
+**Feed.** Each group has a Feed tab. Once the admin approves a submission, both photos appear there for the group's players, who can comment on them. Only members of that group can see the feed. The player who posted it, or the admin, can take a post off the feed (points stay). Submissions approved before the feed existed stay private.
+
+**Active hunts.** The home page and sign-in page show one live number, e.g. "30 active hunts": weekly challenges running right now in any group plus live 1v1s. It never says which.
+
 **The week.** Default Monday 12:00 AM to Sunday 11:59 PM Lagos time (editable before publishing). Items and points stay hidden until the challenge is live, then locked. When it ends, submissions close, results are finalized, the winner gets a pending prize record, and the next week starts at zero.
 
 ## Rules enforced on the server

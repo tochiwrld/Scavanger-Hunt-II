@@ -8,8 +8,8 @@ import Icon from "./icons.js";
 import { Avatar, Empty, RoleBadge, Skel } from "./ui.js";
 import { colorFor, pad2 } from "../lib/client.js";
 
-const OWNER_TABS = [["", "Overview"], ["review", "Review"], ["challenges", "Challenges"], ["subs", "Submissions"], ["players", "Players"], ["invite", "Invite"], ["ranks", "Leaderboard"], ["weeks", "Past weeks"], ["prize", "Prize"], ["audit", "Log"], ["settings", "Settings"]];
-const PLAYER_TABS = [["", "Home"], ["hunt", "Hunt"], ["ranks", "Leaderboard"], ["mine", "My submissions"], ["weeks", "Past weeks"], ["people", "Players"]];
+const OWNER_TABS = [["", "Overview"], ["feed", "Feed"], ["review", "Review"], ["challenges", "Challenges"], ["subs", "Submissions"], ["players", "Players"], ["invite", "Invite"], ["ranks", "Leaderboard"], ["weeks", "Past weeks"], ["prize", "Prize"], ["audit", "Log"], ["settings", "Settings"]];
+const PLAYER_TABS = [["", "Home"], ["hunt", "Hunt"], ["feed", "Feed"], ["ranks", "Leaderboard"], ["mine", "My submissions"], ["weeks", "Past weeks"], ["people", "Players"]];
 
 export default function AppShell({ children }) {
   const { me, ready, groups, refreshGroups, unread } = useApp();
@@ -74,6 +74,7 @@ export default function AppShell({ children }) {
           <>
             <A href={`/g/${g.id}`} icon={owner ? "grid" : "home"} label={owner ? "Overview" : "Home"} on={sub === ""} />
             {owner ? <A href={`/g/${g.id}/review`} icon="inbox" label="Review" on={sub === "review"} badge={dot(g.pending)} /> : <A href={`/g/${g.id}/hunt`} icon="hunt" label="Hunt" on={sub === "hunt"} />}
+            <A href={`/g/${g.id}/feed`} icon="chat" label="Feed" on={sub === "feed"} />
             <A href={`/g/${g.id}/ranks`} icon="trophy" label="Ranks" on={sub === "ranks"} />
             <A href="/" icon="users" label="Groups" on={false} />
           </>

@@ -7,6 +7,7 @@ import { useApp } from "../../components/Providers.js";
 import { Avatar, Btn, Empty, RoleBadge, Skel } from "../../components/ui.js";
 import Icon from "../../components/icons.js";
 import GlobalSearch from "../../components/GlobalSearch.js";
+import ActiveHunts from "../../components/ActiveHunts.js";
 
 export default function GroupsHome() {
   const { me, groups, setMe, toast } = useApp();
@@ -20,6 +21,7 @@ export default function GroupsHome() {
   };
   return (
     <>
+      <ActiveHunts />
       <div className="page-head"><h1>My groups</h1><p>Each group has its own players, hunts and leaderboard.</p></div>
       {groups.length ? groups.map((g) => (
         <Link key={g.id} href={`/g/${g.id}`} className="card gcard" style={{ "--gc": colorFor(g.id) }}>

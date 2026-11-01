@@ -7,6 +7,7 @@ import { useApp } from "./Providers.js";
 import { Brand, ThemeToggle } from "./Brand.js";
 import Icon from "./icons.js";
 import { Btn, ErrBox, useForm } from "./ui.js";
+import ActiveHunts from "./ActiveHunts.js";
 
 export const HERO_IMG = "https://iwljafkilkizabmgczjn.supabase.co/storage/v1/object/public/site/hero.jpg";
 
@@ -60,7 +61,7 @@ function Inner({ mode }) {
           <div className="acts"><ThemeToggle />{mode === "login" ? <Link className="pill-btn" href={"/register" + q}>Sign up</Link> : <Link className="pill-btn" href={"/login" + q}>Log in</Link>}</div>
         </div>
         <div className="inner">
-          <span className="kicker">The weekly scavenger hunt</span>
+          <div className="row wrap" style={{ gap: 10 }}><span className="kicker">The weekly scavenger hunt</span><ActiveHunts hero /></div>
           <h1 className="headline">Find it.<br />Snap it <em>twice.</em><br />Win the week.</h1>
           <p className="lede">A private, weekly scavenger hunt for your crew. New items every Monday, two photos per find, real points on a real leaderboard — and ₦3,000 for whoever finishes on top.</p>
           {invited || challenged ? null : <InviteBox />}
@@ -103,7 +104,7 @@ function Inner({ mode }) {
         <section className="card plist">
           <h2 style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}><Icon n="lock" size={22} className="c-primary" />Your privacy</h2>
           <p><b>Email</b> — used only to log you in, reset your password and send game updates. It is never shown to other players.</p>
-          <p><b>Photos</b> — stored privately and only seen by you and the admin reviewing them. Other players never see your evidence.</p>
+          <p><b>Photos</b> — stored privately. While they wait for review, only you and your group admin can see them. Once approved, they appear in your group's feed so the players in that group can see them and comment — you can take your own find off the feed at any time. People outside your group never see them.</p>
           <p><b>Nickname</b> — the only thing that appears on leaderboards and results.</p>
           <p><b>No location tracking</b> — we never ask for GPS, phone numbers, real names or payment details.</p>
         </section>

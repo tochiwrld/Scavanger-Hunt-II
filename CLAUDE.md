@@ -19,11 +19,13 @@ Live site: https://weekly-hunt.vercel.app — owner's real group is "Ghetto Sear
 - `components/icons.js` inline Lucide-style icons (`<Icon n="trophy" />`); `components/Brand.js` logo + theme toggle
 - `lib/duel.js` 1v1 phases, scoring and finishing; 1v1 routes are at the end of `lib/router.js`; pages `app/(app)/duels`, `app/(app)/duel/[id]`, `app/(public)/vs/[token]`
 - `components/GlobalSearch.js` public groups + global leaderboard on the home page (`GET /global`, `POST /global/:gid/join`; admins toggle `groups.is_public` in Settings)
+- Group feed: `app/(app)/g/[gid]/feed/page.js`; routes `GET /groups/:gid/feed`, `POST /groups/:gid/feed/:sid/comments`, `DELETE /groups/:gid/comments/:cid`, `POST /groups/:gid/feed/:sid/remove` (table `feed_comments`). Comment alerts are in-app only (no email).
+- Active-hunts bar: `components/ActiveHunts.js` reads public `GET /stats` (live challenges in active groups + live 1v1s; a single number, no names).
 - `lib/game.js` scoring, leaderboard, tie-break, weekly results; `lib/notify.js` notifications + `runLifecycle()`; `lib/client.js` browser helpers
 
 ## Rules that must hold
 - Every `/groups/:gid/...` route goes through `membership()`; look up challenge/item/submission/member IDs **inside that group**.
-- Submission photos are visible only to the submitter and that group's owner. Emails are never shown to other users.
+- Submission photos: pending/rejected ones are visible only to the submitter and that group's owner. Approved ones with `in_feed = true` are also visible to that group's active members (group feed). Submissions from before the feed launched have `in_feed = false` and stay private. The poster or the admin can take a post off the feed (`in_feed = false`). Emails are never shown to other users.
 - Points come from the item row at approval time, never from the client. Unique indexes guarantee one approval payment per player per item.
 - Tie-break: equal points → whoever reached that score first (time of the approved submission that got them there).
 - Exactly 2 photos per submission; immutable once sent; refused after the deadline. Rejection needs a reason.
