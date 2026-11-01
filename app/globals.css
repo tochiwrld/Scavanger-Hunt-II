@@ -406,3 +406,5 @@ a.tab,a.btn{cursor:pointer}
 .post .post-head{align-items:flex-start}
 .post .post-head .pts{flex:none}
 .post .photos2{margin:14px 0 12px}
+/* photo boxes shimmer until the private photo arrives */
+.photos2 img,.review .photos img{background:linear-gradient(90deg,var(--raised) 0 40%,color-mix(in oklch,var(--raised) 70%,var(--fg) 8%) 50%,var(--raised) 60% 100%);background-size:200% 100%;animation:sk 1.2s infinite}
