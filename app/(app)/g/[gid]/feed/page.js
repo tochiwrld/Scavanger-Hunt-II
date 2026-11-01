@@ -1,7 +1,8 @@
 "use client";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { ago, api, pad2, zoom } from "../../../../../lib/client.js";
+import { ago, api, pad2 } from "../../../../../lib/client.js";
+import FindPost from "../../../../../components/FindPost.js";
 import { useApp } from "../../../../../components/Providers.js";
 import Icon from "../../../../../components/icons.js";
 import { Btn, Empty, Skel } from "../../../../../components/ui.js";
@@ -71,21 +72,8 @@ function Post({ gid, p, now, onChange, onRemoved }) {
     catch (ex) { toast(ex.message, "bad"); }
   };
   return (
-    <article className="card post" style={{ animation: "rise .3s both" }}>
-      <header className="post-head">
-        <span className="who-av" aria-hidden="true">{(p.nickname || "?").charAt(0).toUpperCase()}</span>
-        <div className="grow">
-          <div className="post-name">{p.nickname}{p.mine ? <span className="you" style={{ marginLeft: 8 }}>YOU</span> : null}</div>
-          <div className="muted" style={{ fontSize: 13 }}>found it · {ago(p.approved_at, now)}</div>
-        </div>
-        <span className="pts">+{p.points}</span>
-      </header>
-      <h3 className="post-title">{p.title}</h3>
-      <div className="muted" style={{ fontSize: 13 }}>{p.week_number ? `Week ${pad2(p.week_number)} · ` : ""}{p.challenge_title}</div>
-      <div className="photos2">
-        <img loading="lazy" src={`/api/photo/${p.id}/1`} alt={`${p.nickname}'s first photo of ${p.title}`} onClick={(e) => zoom(e.currentTarget.src)} />
-        <img loading="lazy" src={`/api/photo/${p.id}/2`} alt={`${p.nickname}'s second photo of ${p.title}`} onClick={(e) => zoom(e.currentTarget.src)} />
-      </div>
+    <FindPost id={p.id} photoBase="/api/photo" nickname={p.nickname} title={p.title} at={p.approved_at} now={now} mine={p.mine}
+      meta={`${p.week_number ? `Week ${pad2(p.week_number)} · ` : ""}${p.challenge_title}`} badge={<span className="pts">+{p.points}</span>}>
       <div className="post-meta">
         <span className="muted" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13 }}><Icon n="chat" size={15} />{p.comments.length} comment{p.comments.length === 1 ? "" : "s"}</span>
         {p.can_remove ? <button className="text-btn" onClick={remove}><Icon n="hide" size={14} />Remove from feed</button> : null}
@@ -104,6 +92,6 @@ function Post({ gid, p, now, onChange, onRemoved }) {
         <input value={msg} onChange={(e) => setMsg(e.target.value)} placeholder="Add a comment…" maxLength={500} aria-label={`Comment on ${p.nickname}'s find`} enterKeyHint="send" />
         <button className="send" type="submit" disabled={!msg.trim() || sending} aria-label="Post comment"><Icon n="send" size={17} /></button>
       </form>
-    </article>
+    </FindPost>
   );
 }

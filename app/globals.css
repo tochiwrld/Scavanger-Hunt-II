@@ -396,3 +396,13 @@ a.tab,a.btn{cursor:pointer}
 .comment-bar input{height:46px;border-radius:99px;padding:0 18px;font-size:15px}
 .comment-bar .send{width:46px;height:46px;border-radius:50%;flex:none;border:0;background:var(--primary);color:var(--primary-fg);display:grid;place-items:center;cursor:pointer}
 .comment-bar .send[disabled]{opacity:.4;cursor:default}
+
+/* facebook-style find header */
+.post-line{font-size:15px;line-height:1.35;min-width:0}
+.post-line .post-who{font-weight:700}
+.post-line .post-item{font-weight:700;overflow-wrap:anywhere}
+.post-line .you{display:inline-block;margin:0 6px;vertical-align:1px}
+.post-when{font-size:13px;color:var(--muted-fg);margin-top:3px}
+.post .post-head{align-items:flex-start}
+.post .post-head .pts{flex:none}
+.post .photos2{margin:14px 0 12px}

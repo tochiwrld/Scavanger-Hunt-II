@@ -34,6 +34,7 @@ Live site: https://weekly-hunt.vercel.app — owner's real group is "Ghetto Sear
 ## 1v1 and Global Search rules
 - A 1v1 link (`/vs/<token>`) seats only the first person to accept (atomic UPDATE); afterwards it returns 410 to anyone else. Every `/duels/:id` route goes through `duelFor()`, which 404s for non-players.
 - Each player's list stays hidden from the other until both tap Done; the timer starts when the second player is ready. Only the item's writer judges its photos; 1v1 photos are served only to the two players (`/api/duel-photo`).
+- The 1v1 room has a Finds section (`finds` in `GET /duels/:id`): approved photo pairs from both players, Facebook-style (`components/FindPost.js`, shared with the group feed). Players only.
 - Pending 1v1 photos are auto-approved 60 minutes after the timer ends (`REVIEW_GRACE_MINUTES`); `runDuelLifecycle()` (part of the cron) finishes duels and alerts both players. 1v1 notifications have `group_id` NULL.
 - Global ranking = all-time points from groups with `is_public = true`. Public groups can be joined without an invite; removed members still can't rejoin.
 

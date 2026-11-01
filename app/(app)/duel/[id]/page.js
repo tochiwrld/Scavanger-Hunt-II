@@ -7,6 +7,7 @@ import { useApp } from "../../../../components/Providers.js";
 import Icon from "../../../../components/icons.js";
 import ReviewCard from "../../../../components/ReviewCard.js";
 import SubmitSheet from "../../../../components/SubmitSheet.js";
+import FindPost from "../../../../components/FindPost.js";
 import { Async, Btn, Countdown, Empty, ErrBox, Plate, Sheet, StatusPill, useApi, useForm } from "../../../../components/ui.js";
 
 export default function Page() {
@@ -69,6 +70,11 @@ function Room({ d, reload }) {
 
       {started ? (
         <>
+          <div className="sec-title" style={{ flexDirection: "column", alignItems: "flex-start", gap: 6 }}><h2>Finds</h2><span className="muted">Every approved find from both of you. Only you and {them.nickname} can see these.</span></div>
+          {d.finds.length ? d.finds.map((f) => (
+            <FindPost key={f.id} id={f.id} photoBase="/api/duel-photo" nickname={f.nickname} title={f.title} at={f.found_at} now={d.now} mine={f.mine}
+              badge={<span className={"st " + (f.mine ? "approved" : "pending")} style={{ alignSelf: "flex-start" }}>{f.mine ? "+1 you" : `+1 ${them.nickname}`}</span>} />
+          )) : <div className="card empty" style={{ padding: "24px 18px" }}><div className="big">📸</div><h3>No finds yet</h3><p className="muted" style={{ margin: 0 }}>Approved photos from both of you show up here.</p></div>}
           <div className="sec-title"><h2>Your list for {them.nickname}</h2></div>
           {d.my_list.map((it) => <DuelItem key={it.id} it={it} theirs={them.nickname} />)}
         </>
