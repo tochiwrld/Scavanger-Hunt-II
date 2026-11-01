@@ -45,10 +45,10 @@ export default function SubmitSheet({ gid, it, endpoint = `/groups/${gid}/items/
         {slots.map((s, i) => (
           <div key={i} className="slot-wrap">
             <label className={"slot" + (s.url ? " filled" : "")}>
-              <span className="lbl">Photo {i + 1}{i === 0 ? "" : " · optional"}</span>
+              <span className="lbl">Photo {i + 1}</span>
               {s.prep ? <span style={{ padding: 8 }}>Preparing…</span>
                 : s.url ? <><img src={s.url} alt={`Photo ${i + 1} preview`} /><span className="retake">Tap to retake</span></>
-                : <span><Icon n="camera" size={30} className="cam" /><br />Add photo {i + 1}</span>}
+                : <span><Icon n="camera" size={30} className="cam" /><br />Add photo {i + 1}{i > 0 ? <><br /><span className="muted" style={{ fontSize: 12, fontWeight: 500 }}>optional</span></> : null}</span>}
               <input type="file" accept="image/*" onChange={(e) => pick(i, e.target.files[0])} />
             </label>
             {i > 0 ? <button type="button" className="slot-x" aria-label={`Remove photo ${i + 1}`} onClick={() => remove(i)}>×</button> : null}
