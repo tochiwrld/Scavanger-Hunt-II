@@ -1,5 +1,5 @@
 "use client";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api, shrink } from "../../../../../lib/client.js";
 import { useApp } from "../../../../../components/Providers.js";
@@ -24,6 +24,18 @@ export default function Page() {
     try { await api(`/groups/${gid}/settings`, { method: "PUT", json: patch }); toast("Saved", "good"); } catch (e) { toast(e.message, "bad"); st.reload(); }
   };
   const edit = useForm(async (v) => { await api(`/groups/${gid}`, { method: "PUT", json: v }); await refreshGroups(); toast("Saved", "good"); });
+  const router = useRouter();
+  const [confirm, setConfirm] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const remove = async () => {
+    setDeleting(true);
+    try {
+      await api(`/groups/${gid}`, { method: "DELETE", json: { confirm } });
+      await refreshGroups();
+      toast("Hunt deleted", "good");
+      router.replace("/");
+    } catch (e) { toast(e.message, "bad"); setDeleting(false); }
+  };
   const image = async (e) => {
     const f = e.target.files[0];
     if (!f) return;
@@ -48,6 +60,13 @@ export default function Page() {
             {TOGGLES.map(([k, label, sub]) => <div key={k} className="sw"><div><b>{label}</b>{sub ? <div className="muted">{sub}</div> : null}</div><input type="checkbox" checked={!!s[k]} onChange={(e) => save({ [k]: e.target.checked })} /></div>)}
             <div className="sw"><div><b>Reminder time</b><div className="muted">Hours before the week closes</div></div><input type="number" min={1} max={72} defaultValue={s.reminder_hours} style={{ width: 90 }} onBlur={(e) => +e.target.value !== s.reminder_hours && save({ reminder_hours: +e.target.value })} /></div>
             <div className="sw"><div><b>Send emails too</b><div className="muted">{d.email_configured ? "Email delivery is set up." : "Email isn't set up yet, so only in-app alerts go out. See the README."}</div></div><input type="checkbox" checked={!!s.email_enabled} onChange={(e) => save({ email_enabled: e.target.checked })} /></div>
+          </div>
+        ) : null}
+        {g ? (
+          <div className="card danger-zone"><h2 className="c-bad">Delete this hunt</h2>
+            <p className="muted" style={{ margin: "6px 0 12px" }}>This permanently deletes the hunt for everyone: all its challenges, submissions and photos, the feed, leaderboards, prize records and members. It can't be undone.</p>
+            <div className="field"><label>Type <b>{g.name}</b> to confirm</label><input value={confirm} onChange={(e) => setConfirm(e.target.value)} autoComplete="off" placeholder={g.name} /></div>
+            <Btn className="bad block" busy={deleting} disabled={confirm.trim() !== g.name.trim()} onClick={remove}>Delete hunt forever</Btn>
           </div>
         ) : null}
       </>

@@ -33,6 +33,7 @@ Live site: https://weekly-hunt.vercel.app — owner's real group is "Ghetto Sear
 - Points come from the item row at approval time, never from the client. Unique indexes guarantee one approval payment per player per item.
 - Tie-break: equal points → whoever reached that score first (time of the approved submission that got them there).
 - 1 to 4 photos per submission (`photo_1_key` required, `photo_2_key` optional, photos 3-4 in `extra_photo_keys`; form fields `photo1`..`photo4`; served as `/api/photo/:id/1..4`); immutable once sent; refused after the deadline. **Camera only**: `components/CameraCapture.js` opens a live in-app camera (getUserMedia) for every photo, with no gallery or file picker, and burns a stamp (HUNT WEEK · nickname · item · Lagos time) into the bottom. Browsers without getUserMedia fall back to `capture="environment"` (phone camera). This is client-side; the stamp plus admin review is the real check. Rejection needs a reason.
+- Deleting a hunt: `DELETE /groups/:gid` (owner only, body `confirm` must equal the hunt name; Settings → "Delete this hunt"). DB rows cascade from `groups`; photos (submissions, item references, hunt image) are removed from storage; other members get an in-app note with `group_id` NULL.
 - Published challenges are locked. Times are entered and shown in Africa/Lagos (UTC+1, no DST). Default week: Monday 00:00 → Sunday 23:59:59.
 
 ## 1v1 and Global Search rules

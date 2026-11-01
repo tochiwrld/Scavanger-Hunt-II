@@ -451,3 +451,4 @@ a.tab,a.btn{cursor:pointer}
 .cam-shutter[disabled]{opacity:.4}
 button.slot{width:100%;border:1.5px dashed color-mix(in oklch,var(--fg) 30%,transparent);font:inherit;color:var(--muted-fg);padding:0}
 button.slot.filled{border:1.5px solid var(--primary)}
+.danger-zone{border-color:color-mix(in oklch,var(--danger) 45%,var(--border))}
