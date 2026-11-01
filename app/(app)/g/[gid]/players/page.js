@@ -29,7 +29,7 @@ export default function Page() {
   const [q, setQ] = useState("");
   const [adj, setAdj] = useState(null);
   const remove = async (u) => {
-    if (!confirm(`Remove ${u.nickname} from this group? Their past results stay in the group's history.`)) return;
+    if (!confirm(`Remove ${u.nickname} from this hunt? Their past results stay in the hunt's history.`)) return;
     try { await api(`/groups/${gid}/members/${u.id}/remove`, { method: "POST" }); toast("Removed"); refreshGroups(); st.reload(); } catch (e) { toast(e.message, "bad"); }
   };
   return (

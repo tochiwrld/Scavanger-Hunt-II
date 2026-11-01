@@ -27,20 +27,20 @@ export default function Page() {
   const image = async (e) => {
     const f = e.target.files[0];
     if (!f) return;
-    try { const fd = new FormData(); fd.append("image", await shrink(f, 512), "g.jpg"); await api(`/groups/${gid}/image`, { method: "POST", form: fd }); await refreshGroups(); toast("Group image updated", "good"); } catch (err) { toast(err.message, "bad"); }
+    try { const fd = new FormData(); fd.append("image", await shrink(f, 512), "g.jpg"); await api(`/groups/${gid}/image`, { method: "POST", form: fd }); await refreshGroups(); toast("Hunt image updated", "good"); } catch (err) { toast(err.message, "bad"); }
   };
   return (
     <Async st={st}>{(d) => (
       <>
         {g ? (
-          <form className="card" onSubmit={edit.onSubmit} noValidate><h2>Group details</h2><ErrBox error={edit.error} />
-            <div className="field" style={{ marginTop: 10 }}><label>Group name</label><input name="name" defaultValue={g.name} maxLength={60} required /></div>
+          <form className="card" onSubmit={edit.onSubmit} noValidate><h2>Hunt details</h2><ErrBox error={edit.error} />
+            <div className="field" style={{ marginTop: 10 }}><label>Hunt name</label><input name="name" defaultValue={g.name} maxLength={60} required /></div>
             <div className="field"><label>Description</label><textarea name="description" defaultValue={g.description} maxLength={300} /></div>
-            <div className="field"><label>Group image</label><input type="file" accept="image/*" onChange={image} /></div>
-            <Btn busy={edit.busy} className="block" type="submit">Save group</Btn></form>
+            <div className="field"><label>Hunt image</label><input type="file" accept="image/*" onChange={image} /></div>
+            <Btn busy={edit.busy} className="block" type="submit">Save hunt</Btn></form>
         ) : null}
         <div className="card"><h2 style={{ marginBottom: 6 }}>Global Search</h2>
-          <div className="sw"><div><b>List this group in Global Search</b><div className="muted">Anyone can find it on the home page and join without an invite. Points earned here count toward the global ranking.</div></div>
+          <div className="sw"><div><b>List this hunt in Global Search</b><div className="muted">Anyone can find it on the home page and join without an invite. Points earned here count toward the global ranking.</div></div>
             <input type="checkbox" checked={pub} onChange={(e) => setPublic(e.target.checked)} /></div>
         </div>
         {s ? (

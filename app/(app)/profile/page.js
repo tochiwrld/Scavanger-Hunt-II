@@ -29,7 +29,7 @@ export default function Page() {
         <Btn busy={pw.busy} className="block" type="submit">Change password</Btn>
       </form>
       <div className="card"><h3>Account</h3>
-        <p className="muted">{me.can_create_groups ? "You can create and run groups, and still play in others." : "You're a player. You can switch on admin tools any time."}</p>
+        <p className="muted">{me.can_create_groups ? "You can create and run hunts, and still play in others." : "You're a player. You can switch on admin tools any time."}</p>
         {me.can_create_groups ? null : <Btn busy={busy} className="block ghost" onClick={admin}>🛡️ Create an admin account</Btn>}
       </div>
       <button className="btn block bad" onClick={logout}>Log out</button>

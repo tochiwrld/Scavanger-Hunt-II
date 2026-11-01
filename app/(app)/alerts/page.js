@@ -15,7 +15,7 @@ export default function Page() {
   return (
     <Async st={st}>{(d) => (
       <>
-        <div className="page-head"><h1>Notifications</h1><p>New challenges, approvals and reminders from all your groups.</p></div>
+        <div className="page-head"><h1>Notifications</h1><p>New challenges, approvals and reminders from all your hunts.</p></div>
         {d.notifications.length ? d.notifications.map((n) => (
           <Link key={n.id} href={(n.link || "/").replace(/^#/, "")} className={"card flat alert-row" + (n.read_at ? "" : " unread")}>
             <span className="ic"><Icon n={ICON[n.type] || "bell"} size={18} /></span>
@@ -24,7 +24,7 @@ export default function Page() {
               <div className="muted" style={{ marginTop: 3 }}>{n.message}</div>
             </div>
           </Link>
-        )) : <Empty icon="🔔" title="No alerts yet" text="New challenges, approvals and reminders from your groups land here." />}
+        )) : <Empty icon="🔔" title="No alerts yet" text="New challenges, approvals and reminders from your hunts land here." />}
       </>
     )}</Async>
   );

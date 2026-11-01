@@ -52,12 +52,12 @@ export default function AppShell({ children }) {
                 <div className="gname">{g.name}</div>
                 <div className="gmeta"><RoleBadge g={g} />{g.challenge?.week_number ? <span>Week {pad2(g.challenge.week_number)}</span> : null}<span>· {g.members} player{g.members === 1 ? "" : "s"}</span></div>
               </div>
-              <select aria-label="Switch group" value={g.id} onChange={(e) => router.push(e.target.value ? "/g/" + e.target.value : "/")}>
+              <select aria-label="Switch hunt" value={g.id} onChange={(e) => router.push(e.target.value ? "/g/" + e.target.value : "/")}>
                 {groups.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}
-                <option value="">All groups…</option>
+                <option value="">All hunts…</option>
               </select>
             </section>
-            <nav className="tabs" aria-label="Group sections">
+            <nav className="tabs" aria-label="Hunt sections">
               {tabs.map(([k, l]) => (
                 <Link key={k} className={"tab" + (sub === k || (k === "challenges" && (sub === "challenge" || sub === "preview")) || (k === "weeks" && sub === "week") ? " on" : "")} href={`/g/${g.id}${k ? "/" + k : ""}`}>
                   {l}{k === "review" && g.pending ? <span className="n hot">{g.pending}</span> : null}
@@ -66,7 +66,7 @@ export default function AppShell({ children }) {
             </nav>
           </>
         ) : null}
-        {gid && groups && !g ? <Empty icon="🔒" title="You don't have access to this group" text="Ask the group admin for an invite link."><Link className="btn" href="/">My groups</Link></Empty>
+        {gid && groups && !g ? <Empty icon="🔒" title="You don't have access to this hunt" text="Ask the hunt admin for an invite link."><Link className="btn" href="/">My hunts</Link></Empty>
           : gid && !groups ? <Skel /> : children}
       </main>
       <nav className="nav" aria-label="Main">
@@ -76,11 +76,11 @@ export default function AppShell({ children }) {
             {owner ? <A href={`/g/${g.id}/review`} icon="inbox" label="Review" on={sub === "review"} badge={dot(g.pending)} /> : <A href={`/g/${g.id}/hunt`} icon="hunt" label="Hunt" on={sub === "hunt"} />}
             <A href={`/g/${g.id}/feed`} icon="chat" label="Feed" on={sub === "feed"} />
             <A href={`/g/${g.id}/ranks`} icon="trophy" label="Ranks" on={sub === "ranks"} />
-            <A href="/" icon="users" label="Groups" on={false} />
+            <A href="/" icon="users" label="Hunts" on={false} />
           </>
         ) : (
           <>
-            <A href="/" icon="users" label="Groups" on={path === "/"} />
+            <A href="/" icon="users" label="Hunts" on={path === "/"} />
             <A href="/duels" icon="swords" label="1v1" on={path.startsWith("/duel")} />
             <A href="/join" icon="key" label="Join" on={path === "/join"} />
             <A href="/profile" icon="user" label="Profile" on={path === "/profile"} />

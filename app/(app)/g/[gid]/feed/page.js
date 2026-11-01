@@ -34,7 +34,7 @@ export default function Page() {
 
   return (
     <>
-      <div className="page-head"><h1>Feed</h1><p>Approved finds from {g ? g.name : "your group"}. Only members of this group can see them.</p></div>
+      <div className="page-head"><h1>Feed</h1><p>Approved finds from {g ? g.name : "your hunt"}. Only members of this hunt can see them.</p></div>
       {err ? <Empty icon="😵" title="Couldn't load the feed" text={err}><button className="btn" onClick={() => load(0)}>Try again</button></Empty>
         : posts === null ? <Skel />
         : posts.length ? (
@@ -42,7 +42,7 @@ export default function Page() {
             {posts.map((p) => <Post key={p.id} gid={gid} p={p} now={now} onChange={(fn) => update(p.id, fn)} onRemoved={() => drop(p.id)} />)}
             {more ? <Btn busy={busy} className="block ghost" onClick={() => load(next)}>Load older finds</Btn> : <p className="muted" style={{ textAlign: "center", margin: "4px 0 0" }}>That's everything so far.</p>}
           </>
-        ) : <Empty icon="📸" title="No finds yet" text="When the admin approves a submission, its photos show up here for everyone in the group to see and comment on." />}
+        ) : <Empty icon="📸" title="No finds yet" text="When the admin approves a submission, its photos show up here for everyone in the hunt to see and comment on." />}
     </>
   );
 }

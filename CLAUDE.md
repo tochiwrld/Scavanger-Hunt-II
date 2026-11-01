@@ -23,6 +23,10 @@ Live site: https://weekly-hunt.vercel.app — owner's real group is "Ghetto Sear
 - Active-hunts bar: `components/ActiveHunts.js` reads public `GET /stats` (live challenges in active groups + live 1v1s; a single number, no names).
 - `lib/game.js` scoring, leaderboard, tie-break, weekly results; `lib/notify.js` notifications + `runLifecycle()`; `lib/client.js` browser helpers
 
+## Naming
+- In the UI a group is called a **hunt** ("My hunts", "Create a hunt", "Join a hunt", bottom-nav "Hunts"). Code, routes and the database still say `group`. The weekly challenge inside a hunt is "the week"/"challenge" (the in-hunt "Hunt" tab lists its items).
+- Sign-in hero: "Hunt it. Snap it. Win the week."; the hero copy doesn't mention the cash prize.
+
 ## Rules that must hold
 - Every `/groups/:gid/...` route goes through `membership()`; look up challenge/item/submission/member IDs **inside that group**.
 - Submission photos: pending/rejected ones are visible only to the submitter and that group's owner. Approved ones with `in_feed = true` are also visible to that group's active members (group feed). Submissions from before the feed launched have `in_feed = false` and stay private. The poster or the admin can take a post off the feed (`in_feed = false`). Emails are never shown to other users.

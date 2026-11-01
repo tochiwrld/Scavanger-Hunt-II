@@ -3,7 +3,7 @@ import Providers from "../components/Providers.js";
 
 export const metadata = {
   title: "Hunt Week",
-  description: "The weekly scavenger hunt for your crew. Find it, snap it twice, win the week.",
+  description: "The weekly scavenger hunt for your crew. Hunt it. Snap it. Win the week.",
   icons: { icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23FFD21F'/%3E%3Ctext x='50' y='68' font-size='52' font-family='Arial Black,Arial' font-weight='900' text-anchor='middle' fill='%2316141f'%3EH%3C/text%3E%3C/svg%3E" },
 };
 export const viewport = {

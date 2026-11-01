@@ -63,7 +63,7 @@ export default function GlobalSearch() {
                   </div>
                 </div>
               </div>
-            )) : <div className="card empty"><div className="big">🌍</div><h3>{query ? "No open hunts match that" : "No open hunts yet"}</h3><p className="muted">{query ? "Try another word." : "Group admins can list their group here from Settings."}</p></div>}
+            )) : <div className="card empty"><div className="big">🌍</div><h3>{query ? "No open hunts match that" : "No open hunts yet"}</h3><p className="muted">{query ? "Try another word." : "Hunt admins can list their hunt here from Settings."}</p></div>}
 
             {d.top.length ? (
               <section className="card">

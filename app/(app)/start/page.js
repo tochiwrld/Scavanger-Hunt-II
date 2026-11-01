@@ -27,7 +27,7 @@ export default function Page() {
   return (
     <>
       <div className="page-head"><h1>What do you want to do?</h1><p>One account works for both. You can do the other later.</p></div>
-      <button className="card gcard" style={{ textAlign: "left", cursor: "pointer", width: "100%", opacity: busy ? 0.6 : 1 }} disabled={busy} onClick={admin}><Choice icon="shield" title="Create an admin account" text="Run groups, publish weekly hunts and review photos." /></button>
+      <button className="card gcard" style={{ textAlign: "left", cursor: "pointer", width: "100%", opacity: busy ? 0.6 : 1 }} disabled={busy} onClick={admin}><Choice icon="shield" title="Create an admin account" text="Create hunts, publish weekly challenges and review photos." /></button>
       <Link className="card gcard" href="/join"><Choice icon="key" title="Join as a player" text="Use the invitation link or code your admin sent you." /></Link>
     </>
   );

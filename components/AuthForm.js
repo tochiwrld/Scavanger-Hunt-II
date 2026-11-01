@@ -27,7 +27,7 @@ function InviteBox() {
         <input id="invite" value={v} onChange={(e) => setV(e.target.value)} placeholder="Invite code" autoCapitalize="off" autoCorrect="off" spellCheck={false} />
         <button className="btn" type="submit" disabled={!v.trim()}>Join<Icon n="arrow" size={17} /></button>
       </div>
-      <p className="hint">Hunt Week is invite-only. Ask your group admin for the link.</p>
+      <p className="hint">Hunt Week is invite-only. Ask your hunt admin for the link.</p>
     </form>
   );
 }
@@ -62,8 +62,8 @@ function Inner({ mode }) {
         </div>
         <div className="inner">
           <div className="row wrap" style={{ gap: 10 }}><span className="kicker">The weekly scavenger hunt</span><ActiveHunts hero /></div>
-          <h1 className="headline">Find it.<br />Snap it <em>twice.</em><br />Win the week.</h1>
-          <p className="lede">A private, weekly scavenger hunt for your crew. New items every Monday, photo proof for every find, real points on a real leaderboard — and ₦3,000 for whoever finishes on top.</p>
+          <h1 className="headline">Hunt it.<br />Snap <em>it.</em><br />Win the week.</h1>
+          <p className="lede">Your city is the game board. Race your crew to the wildest finds, snap the proof, and watch the leaderboard flip in real time. A fresh list drops every Monday — and by Sunday, someone owns the bragging rights.</p>
           {invited || challenged ? null : <InviteBox />}
           <div className="closes"><div className="label" style={{ color: "oklch(85% .015 275)" }}>Free to play</div><div className="v">No entry fees, ever. Just friends, phones and bragging rights.</div></div>
         </div>
@@ -71,7 +71,7 @@ function Inner({ mode }) {
 
       <div className="auth-body">
         <section className="card" id="account">
-          {invited ? <div className="card mist flat" style={{ marginBottom: 16 }}>You've been invited to a group. {mode === "login" ? "Log in" : "Create an account"} to join it.</div> : null}
+          {invited ? <div className="card mist flat" style={{ marginBottom: 16 }}>You've been invited to a hunt. {mode === "login" ? "Log in" : "Create an account"} to join it.</div> : null}
           {challenged ? <div className="card mist flat" style={{ marginBottom: 16 }}>You've been challenged to a 1v1. {mode === "login" ? "Log in" : "Create an account"} to accept it.</div> : null}
           <div className="tabs" style={{ marginBottom: 18 }}>
             <Link className={"tab" + (mode === "login" ? " on" : "")} href={"/login" + q}>Log in</Link>
@@ -104,12 +104,12 @@ function Inner({ mode }) {
         <section className="card plist">
           <h2 style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}><Icon n="lock" size={22} className="c-primary" />Your privacy</h2>
           <p><b>Email</b> — used only to log you in, reset your password and send game updates. It is never shown to other players.</p>
-          <p><b>Photos</b> — stored privately. While they wait for review, only you and your group admin can see them. Once approved, they appear in your group's feed so the players in that group can see them and comment — you can take your own find off the feed at any time. People outside your group never see them.</p>
+          <p><b>Photos</b> — stored privately. While they wait for review, only you and your hunt admin can see them. Once approved, they appear in your hunt's feed so the players in that hunt can see them and comment — you can take your own find off the feed at any time. People outside your hunt never see them.</p>
           <p><b>Nickname</b> — the only thing that appears on leaderboards and results.</p>
           <p><b>No location tracking</b> — we never ask for GPS, phone numbers, real names or payment details.</p>
         </section>
 
-        <div className="foot-brand"><Brand href="/login" /><div>A free social game among friends. Prizes are paid out personally by each group's admin.</div></div>
+        <div className="foot-brand"><Brand href="/login" /><div>A free social game among friends. Prizes are paid out personally by each hunt's admin.</div></div>
       </div>
     </div>
   );

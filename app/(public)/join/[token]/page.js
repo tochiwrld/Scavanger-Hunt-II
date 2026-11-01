@@ -20,7 +20,7 @@ export default function Page() {
     try {
       const r = await api(`/invite/${encodeURIComponent(token)}/join`, { method: "POST" });
       await refreshGroups();
-      toast(r.already ? "You're already in this group" : "You're in! Happy hunting.", "good");
+      toast(r.already ? "You're already in this hunt" : "You're in! Happy hunting.", "good");
       router.push("/g/" + r.group_id);
     } catch (e) { toast(e.message, "bad"); setBusy(false); }
   };
@@ -36,7 +36,7 @@ export default function Page() {
               {d.group.description ? <p className="prose">{d.group.description}</p> : null}
               <div className="muted">Hosted by <b style={{ color: "var(--fg)" }}>{d.host}</b></div>
             </div></section>
-            {!ready ? null : me ? <Btn busy={busy} className="block" onClick={join}>Join group<Icon n="arrow" size={18} /></Btn> : (
+            {!ready ? null : me ? <Btn busy={busy} className="block" onClick={join}>Join hunt<Icon n="arrow" size={18} /></Btn> : (
               <>
                 <Link className="btn block" href={`/register?next=${next}`}>Create account to join<Icon n="arrow" size={18} /></Link>
                 <Link className="btn block ghost" href={`/login?next=${next}`}>I already have an account</Link>

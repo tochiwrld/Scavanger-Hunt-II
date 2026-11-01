@@ -22,7 +22,7 @@ export default function GroupsHome() {
   return (
     <>
       <ActiveHunts />
-      <div className="page-head"><h1>My groups</h1><p>Each group has its own players, hunts and leaderboard.</p></div>
+      <div className="page-head"><h1>My hunts</h1><p>Each hunt has its own players, weekly challenges and leaderboard.</p></div>
       {groups.length ? groups.map((g) => (
         <Link key={g.id} href={`/g/${g.id}`} className="card gcard" style={{ "--gc": colorFor(g.id) }}>
           <Avatar g={g} />
@@ -40,9 +40,9 @@ export default function GroupsHome() {
             ) : null}
           </div>
         </Link>
-      )) : <Empty icon="🎯" title="You're not in a group yet" text="Join one with an invitation link, or create your own." />}
-      <Link className="btn block" href="/join"><Icon n="key" size={18} />Join {groups.length ? "another" : "a"} group</Link>
-      {me.can_create_groups ? <Link className="btn block ghost" href="/groups/new"><Icon n="plus" size={18} />Create new group</Link> : <Btn busy={busy} className="block ghost" onClick={becomeAdmin}><Icon n="shield" size={18} />Run your own group? Become an admin</Btn>}
+      )) : <Empty icon="🎯" title="You're not in a hunt yet" text="Join one with an invitation link, or create your own." />}
+      <Link className="btn block" href="/join"><Icon n="key" size={18} />Join {groups.length ? "another" : "a"} hunt</Link>
+      {me.can_create_groups ? <Link className="btn block ghost" href="/groups/new"><Icon n="plus" size={18} />Create a hunt</Link> : <Btn busy={busy} className="block ghost" onClick={becomeAdmin}><Icon n="shield" size={18} />Run your own hunt? Become an admin</Btn>}
       <Link href="/duels" className="plate" style={{ textDecoration: "none", color: "inherit", marginTop: 14 }}>
         <div className="stripe" />
         <div className="in row" style={{ gap: 16, alignItems: "flex-start" }}>
