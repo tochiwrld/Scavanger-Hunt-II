@@ -51,10 +51,12 @@ function Room({ d, reload }) {
           </div>
         ) : null}
         {duel.phase === "judging" ? <p className="gap-note">Time's up. Judge the last photos — anything not judged by <b>{fmtDate(new Date(new Date(duel.end_at).getTime() + duel.grace_minutes * 60000))}</b> is approved automatically.</p> : null}
+        {duel.phase === "finished" && duel.result === "won" ? <WinVideo className="win-inline" /> : null}
         {duel.phase === "finished" ? <div className="state-box earned" style={{ marginTop: 16, fontFamily: "var(--font-head)", textTransform: "uppercase", fontSize: 22, letterSpacing: "-.02em", ...(duel.result === "lost" ? { color: "var(--danger)", background: "color-mix(in oklch,var(--danger) 12%,var(--card))" } : duel.result === "tie" ? { color: "var(--warning)", background: "color-mix(in oklch,var(--warning) 12%,var(--card))" } : {}) }}>{duel.result === "won" ? "You won!" : duel.result === "lost" ? `${them.nickname} won` : "It's a tie"}</div> : null}
         <p className="muted" style={{ margin: "14px 0 0", fontSize: 13 }}>Most approved items wins. Tied? Whoever got there first wins.</p>
       </Plate>
 
+      {duel.phase === "finished" && duel.result === "won" ? <WinOverlay id={duel.id} them={them.nickname} me={me.score} total={duel.item_count} /> : null}
       {duel.phase === "waiting" ? <Waiting duel={duel} reload={reload} /> : null}
       {duel.phase === "setup" ? <Setup d={d} reload={reload} /> : null}
 
@@ -77,7 +79,8 @@ function Room({ d, reload }) {
                   {d.review.map((s) => <ReviewCard key={s.id} s={{ ...s, nickname: them.nickname, status: "pending" }} base={base} photoBase="/api/duel-photo" onChanged={reload} />)}
                 </>
               ) : null}
-              <div className="sec-title" style={{ flexDirection: "column", alignItems: "flex-start", gap: 6 }}><h2>Your hunt</h2><span className="muted">{them.nickname} wrote these for you. Send two photos for each; {them.nickname} judges them.</span></div>
+              <div className="sec-title" style={{ flexDirection: "column", alignItems: "flex-start", gap: 6 }}><h2>Your hunt</h2><span className="muted">{them.nickname} wrote these for you. Send at least one photo for each; {them.nickname} judges them. Find everything first to win.</span></div>
+              {duel.phase === "live" && me.score >= duel.item_count ? <div className="state-box earned" style={{ fontFamily: "var(--font-body)", fontSize: 15, lineHeight: 1.4 }}>You found everything! The 1v1 ends as soon as {them.nickname} finishes or time runs out.</div> : null}
               {d.hunt.map((it) => <DuelItem key={it.id} it={it} canSubmit={duel.phase === "live"} onSubmit={setHunting} />)}
               <div className="sec-title"><h2>Your list for {them.nickname}</h2></div>
               {d.my_list.map((it) => <DuelItem key={it.id} it={it} theirs={them.nickname} />)}
@@ -86,7 +89,7 @@ function Room({ d, reload }) {
             <>
               <p className="muted" style={{ margin: 0 }}>Every approved find from both of you. Only you and {them.nickname} can see these.</p>
               {d.finds.length ? d.finds.map((f) => (
-                <FindPost key={f.id} id={f.id} photoBase="/api/duel-photo" nickname={f.nickname} title={f.title} at={f.found_at} now={d.now} mine={f.mine}
+                <FindPost key={f.id} id={f.id} photos={f.photos} photoBase="/api/duel-photo" nickname={f.nickname} title={f.title} at={f.found_at} now={d.now} mine={f.mine}
                   badge={<span className={"st " + (f.mine ? "approved" : "pending")} style={{ alignSelf: "flex-start" }}>{f.mine ? "+1 you" : `+1 ${them.nickname}`}</span>} />
               )) : <div className="card empty" style={{ padding: "24px 18px" }}><div className="big">📸</div><h3>No finds yet</h3><p className="muted" style={{ margin: 0 }}>Approved photos from both of you show up here.</p></div>}
             </>
@@ -96,6 +99,43 @@ function Room({ d, reload }) {
 
       {hunting ? <SubmitSheet it={hunting} endpoint={`${base}/items/${hunting.id}/submit`} onClose={() => setHunting(null)} onDone={() => { setHunting(null); toast(`Sent! Waiting for ${them.nickname} to judge it.`, "good"); reload(); }} /> : null}
     </>
+  );
+}
+
+/** The "YOU WIN" animation (converted from the GIF to a small looping video). */
+function WinVideo({ className = "" }) {
+  return (
+    <video className={"win-video " + className} autoPlay muted loop playsInline poster="/img/you-win.jpg" aria-label="You win!">
+      <source src="/img/you-win.webm" type="video/webm" />
+      <source src="/img/you-win.mp4" type="video/mp4" />
+    </video>
+  );
+}
+
+/** Full-screen celebration the first time the winner opens a finished 1v1. Only ever rendered for the winner. */
+function WinOverlay({ id, them, me, total }) {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    let seen = false;
+    try { seen = localStorage.getItem("won:" + id) === "1"; localStorage.setItem("won:" + id, "1"); } catch {}
+    if (!seen) { setOpen(true); burst(); }
+  }, [id]);
+  useEffect(() => {
+    if (!open) return undefined;
+    const esc = (e) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("keydown", esc);
+    return () => document.removeEventListener("keydown", esc);
+  }, [open]);
+  if (!open) return null;
+  return (
+    <div className="win-overlay" role="dialog" aria-modal="true" aria-label="You won the 1v1" onClick={() => setOpen(false)}>
+      <div className="win-box" onClick={(e) => e.stopPropagation()}>
+        <WinVideo />
+        <h2>You beat {them}!</h2>
+        <p className="muted" style={{ margin: "6px 0 18px" }}>{me}/{total} found. First to finish takes the win.</p>
+        <button className="btn block" onClick={() => setOpen(false)}>Let's go<Icon n="arrow" size={18} /></button>
+      </div>
+    </div>
   );
 }
 

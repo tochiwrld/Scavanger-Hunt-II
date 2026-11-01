@@ -1,8 +1,9 @@
 "use client";
-import { ago, zoom } from "../lib/client.js";
+import { ago } from "../lib/client.js";
+import { Photos } from "./ui.js";
 
-/** Facebook-style find: "Tochi finds “A red umbrella”", time underneath, both photos. Children render below (comments etc.). */
-export default function FindPost({ nickname, title, at, now, mine, meta, badge, photoBase, id, children }) {
+/** Facebook-style find: "Tochi finds “A red umbrella”", time underneath, the photos. Children render below (comments etc.). */
+export default function FindPost({ nickname, title, at, now, mine, meta, badge, photoBase, id, photos, children }) {
   return (
     <article className="card post" style={{ animation: "rise .3s both" }}>
       <header className="post-head">
@@ -13,10 +14,7 @@ export default function FindPost({ nickname, title, at, now, mine, meta, badge, 
         </div>
         {badge || null}
       </header>
-      <div className="photos2">
-        <img loading="lazy" src={`${photoBase}/${id}/1`} alt={`${nickname}'s first photo of ${title}`} onClick={(e) => zoom(e.currentTarget.src)} />
-        <img loading="lazy" src={`${photoBase}/${id}/2`} alt={`${nickname}'s second photo of ${title}`} onClick={(e) => zoom(e.currentTarget.src)} />
-      </div>
+      <Photos base={photoBase} id={id} count={photos} who={nickname} />
       {children}
     </article>
   );

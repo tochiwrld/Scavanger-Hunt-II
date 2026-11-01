@@ -190,3 +190,15 @@ export function ItemCard({ it, gid, preview, onSubmit }) {
     </article>
   );
 }
+
+/** 1 to 4 photos of one submission, laid out like a social post. Tap to zoom. */
+export function Photos({ base = "/api/photo", id, count, who = "" }) {
+  const n = Math.max(1, Math.min(4, Number(count) || 2));
+  return (
+    <div className={"photo-grid n" + n}>
+      {Array.from({ length: n }, (_, i) => (
+        <img key={i} loading="lazy" src={`${base}/${id}/${i + 1}`} alt={`${who ? who + "'s " : ""}photo ${i + 1}`} onClick={(e) => zoom(e.currentTarget.src)} />
+      ))}
+    </div>
+  );
+}

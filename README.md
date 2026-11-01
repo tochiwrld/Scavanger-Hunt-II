@@ -86,11 +86,11 @@ npm run dev
 
 **Player.** Open an invite link or paste a code under *Join a group*, log in or sign up, tap Join. Switch groups from the header. Leaving a group keeps your account and other groups.
 
-**1v1.** From the 1v1 tab, pick a time limit (30 minutes to 7 days) and how many items each player writes (1-10), then send the private `/vs/<token>` link. Only the first person to accept it gets in; after that the link is locked to the two of you. Each player writes a list for the other to find and taps Done; the timer starts only once both lists are done (you can tap *Edit my list* until then). You hunt your opponent's list with two photos per item, and you judge the photos sent for the items you wrote. Most approved items wins; a tie on items goes to whoever got there first. After the timer, photos sent in time can still be judged for an hour; anything left after that is approved. Either player can call it off before the timer starts.
+**1v1.** From the 1v1 tab, pick a time limit (30 minutes to 7 days) and how many items each player writes (1-10), then send the private `/vs/<token>` link. Only the first person to accept it gets in; after that the link is locked to the two of you. Each player writes a list for the other to find and taps Done; the timer starts only once both lists are done (you can tap *Edit my list* until then). You hunt your opponent's list with at least one photo per item (up to four), and you judge the photos sent for the items you wrote. The 1v1 ends as soon as both players have found everything, or when time runs out. Most approved items wins; a tie goes to whoever finished first. The winner gets a "YOU WIN" celebration. After the timer, photos sent in time can still be judged for an hour; anything left after that is approved. Either player can call it off before the timer starts.
 
 **Global Search.** A group admin can tick *List this group in Global Search* in Settings. Listed groups appear in the Global Search section on the home page, where anyone can search for them and join with one tap (no invite needed). All-time points earned in listed groups make up the global leaderboard and rank tiers: Rookie, Bronze (50), Silver (150), Gold (400), Platinum (800), Diamond (1500), Legend (3000).
 
-**Feed.** Each group has a Feed tab. Once the admin approves a submission, both photos appear there for the group's players, who can comment on them. Only members of that group can see the feed. The player who posted it, or the admin, can take a post off the feed (points stay). Submissions approved before the feed existed stay private.
+**Feed.** Each group has a Feed tab. Once the admin approves a submission, its photos appear there for the group's players, who can comment on them. Only members of that group can see the feed. The player who posted it, or the admin, can take a post off the feed (points stay). Submissions approved before the feed existed stay private.
 
 **Active hunts.** The home page and sign-in page show one live number, e.g. "30 active hunts": weekly challenges running right now in any group plus live 1v1s. It never says which.
 
@@ -102,7 +102,7 @@ npm run dev
 - **Photos** open only for the player who took them and the admin of that group. Reference images show to members only after the challenge starts.
 - **Points** come from the item in the database at approval time; a unique index guarantees one payment per player per item.
 - **Tie-break:** equal points rank by the submission time of the player's latest scoring item; the rule is shown with every challenge and leaderboard.
-- **Submissions:** exactly 2 photos (JPEG/PNG/WebP checked by content, 2 MB each, shrunk on the phone first), immutable once sent, refused after the deadline.
+- **Submissions:** 1 to 4 photos (at least one required; JPEG/PNG/WebP checked by content, 2 MB each, shrunk on the phone first), immutable once sent, refused after the deadline.
 - **Auth:** scrypt password hashing, signed HttpOnly cookies, origin check on writes, rate limits on register, login, invites, resets and submissions. Emails are never shown to other users, including group admins.
 - **Score adjustments** are logged per group (previous, new, difference, reason, admin, time).
 

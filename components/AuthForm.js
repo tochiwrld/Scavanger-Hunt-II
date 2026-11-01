@@ -34,7 +34,7 @@ function InviteBox() {
 
 const STEPS = [
   ["hunt", "A new list every Monday", "Your admin drops a fresh list of real-world items at 12:00 AM Lagos time. Each one has its own point value."],
-  ["camera", "Find it, snap it twice", "Spot an item out in the world and send two photos as proof, straight from your phone camera."],
+  ["camera", "Find it, snap it", "Spot an item out in the world and send a photo as proof, straight from your phone camera. Add up to four if one shot doesn't tell the whole story."],
   ["check", "Get approved, earn points", "Every submission is reviewed by hand. Approved items add points to your weekly score."],
   ["trophy", "Top the board by Sunday", "The leaderboard locks at 11:59 PM Sunday. First place takes the weekly prize."],
 ];
@@ -63,7 +63,7 @@ function Inner({ mode }) {
         <div className="inner">
           <div className="row wrap" style={{ gap: 10 }}><span className="kicker">The weekly scavenger hunt</span><ActiveHunts hero /></div>
           <h1 className="headline">Find it.<br />Snap it <em>twice.</em><br />Win the week.</h1>
-          <p className="lede">A private, weekly scavenger hunt for your crew. New items every Monday, two photos per find, real points on a real leaderboard — and ₦3,000 for whoever finishes on top.</p>
+          <p className="lede">A private, weekly scavenger hunt for your crew. New items every Monday, photo proof for every find, real points on a real leaderboard — and ₦3,000 for whoever finishes on top.</p>
           {invited || challenged ? null : <InviteBox />}
           <div className="closes"><div className="label" style={{ color: "oklch(85% .015 275)" }}>Free to play</div><div className="v">No entry fees, ever. Just friends, phones and bragging rights.</div></div>
         </div>

@@ -42,7 +42,7 @@ export default function Page() {
             {posts.map((p) => <Post key={p.id} gid={gid} p={p} now={now} onChange={(fn) => update(p.id, fn)} onRemoved={() => drop(p.id)} />)}
             {more ? <Btn busy={busy} className="block ghost" onClick={() => load(next)}>Load older finds</Btn> : <p className="muted" style={{ textAlign: "center", margin: "4px 0 0" }}>That's everything so far.</p>}
           </>
-        ) : <Empty icon="📸" title="No finds yet" text="When the admin approves a submission, both photos show up here for everyone in the group to see and comment on." />}
+        ) : <Empty icon="📸" title="No finds yet" text="When the admin approves a submission, its photos show up here for everyone in the group to see and comment on." />}
     </>
   );
 }
@@ -72,7 +72,7 @@ function Post({ gid, p, now, onChange, onRemoved }) {
     catch (ex) { toast(ex.message, "bad"); }
   };
   return (
-    <FindPost id={p.id} photoBase="/api/photo" nickname={p.nickname} title={p.title} at={p.approved_at} now={now} mine={p.mine}
+    <FindPost id={p.id} photos={p.photos} photoBase="/api/photo" nickname={p.nickname} title={p.title} at={p.approved_at} now={now} mine={p.mine}
       meta={`${p.week_number ? `Week ${pad2(p.week_number)} · ` : ""}${p.challenge_title}`} badge={<span className="pts">+{p.points}</span>}>
       <div className="post-meta">
         <span className="muted" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13 }}><Icon n="chat" size={15} />{p.comments.length} comment{p.comments.length === 1 ? "" : "s"}</span>
