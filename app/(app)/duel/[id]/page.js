@@ -29,9 +29,13 @@ function Room({ d, reload }) {
   const { duel, me, them } = d;
   const { toast } = useApp();
   const [hunting, setHunting] = useState(null);
+  const [picked, setPicked] = useState(null);
   const base = `/duels/${duel.id}`;
   if (duel.phase === "cancelled") return <Empty icon="🚫" title="This 1v1 was called off" text="Start a new one whenever you're ready."><Link className="btn" href="/duels">Back to 1v1</Link></Empty>;
   const started = ["live", "judging", "finished"].includes(duel.phase);
+  // Your hunt while it's running; Finds once it's over. The player's own choice wins after that.
+  const tab = picked || (duel.phase === "finished" ? "finds" : "hunt");
+  const setTab = setPicked;
   return (
     <>
       <Link href="/duels" className="link" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><Icon n="back" size={16} />All 1v1s</Link>
@@ -54,29 +58,39 @@ function Room({ d, reload }) {
       {duel.phase === "waiting" ? <Waiting duel={duel} reload={reload} /> : null}
       {duel.phase === "setup" ? <Setup d={d} reload={reload} /> : null}
 
-      {d.review.length ? (
-        <>
-          <div className="sec-title"><h2>Judge {them.nickname}'s photos</h2></div>
-          {d.review.map((s) => <ReviewCard key={s.id} s={{ ...s, nickname: them.nickname, status: "pending" }} base={base} photoBase="/api/duel-photo" onChanged={reload} />)}
-        </>
-      ) : null}
-
-      {d.hunt.length ? (
-        <>
-          <div className="sec-title" style={{ flexDirection: "column", alignItems: "flex-start", gap: 6 }}><h2>Your hunt</h2><span className="muted">{them.nickname} wrote these for you. Send two photos for each; {them.nickname} judges them.</span></div>
-          {d.hunt.map((it) => <DuelItem key={it.id} it={it} canSubmit={duel.phase === "live"} onSubmit={setHunting} />)}
-        </>
-      ) : null}
-
       {started ? (
         <>
-          <div className="sec-title" style={{ flexDirection: "column", alignItems: "flex-start", gap: 6 }}><h2>Finds</h2><span className="muted">Every approved find from both of you. Only you and {them.nickname} can see these.</span></div>
-          {d.finds.length ? d.finds.map((f) => (
-            <FindPost key={f.id} id={f.id} photoBase="/api/duel-photo" nickname={f.nickname} title={f.title} at={f.found_at} now={d.now} mine={f.mine}
-              badge={<span className={"st " + (f.mine ? "approved" : "pending")} style={{ alignSelf: "flex-start" }}>{f.mine ? "+1 you" : `+1 ${them.nickname}`}</span>} />
-          )) : <div className="card empty" style={{ padding: "24px 18px" }}><div className="big">📸</div><h3>No finds yet</h3><p className="muted" style={{ margin: 0 }}>Approved photos from both of you show up here.</p></div>}
-          <div className="sec-title"><h2>Your list for {them.nickname}</h2></div>
-          {d.my_list.map((it) => <DuelItem key={it.id} it={it} theirs={them.nickname} />)}
+          <div className="tabs" role="tablist" aria-label="1v1 sections">
+            <button role="tab" aria-selected={tab === "hunt"} className={"tab" + (tab === "hunt" ? " on" : "")} onClick={() => setTab("hunt")}>
+              Your hunt{d.review.length ? <span className="n hot">{d.review.length}</span> : null}
+            </button>
+            <button role="tab" aria-selected={tab === "finds"} className={"tab" + (tab === "finds" ? " on" : "")} onClick={() => setTab("finds")}>
+              Finds<span className="n">{d.finds.length}</span>
+            </button>
+          </div>
+
+          {tab === "hunt" ? (
+            <>
+              {d.review.length ? (
+                <>
+                  <div className="sec-title"><h2>Judge {them.nickname}'s photos</h2></div>
+                  {d.review.map((s) => <ReviewCard key={s.id} s={{ ...s, nickname: them.nickname, status: "pending" }} base={base} photoBase="/api/duel-photo" onChanged={reload} />)}
+                </>
+              ) : null}
+              <div className="sec-title" style={{ flexDirection: "column", alignItems: "flex-start", gap: 6 }}><h2>Your hunt</h2><span className="muted">{them.nickname} wrote these for you. Send two photos for each; {them.nickname} judges them.</span></div>
+              {d.hunt.map((it) => <DuelItem key={it.id} it={it} canSubmit={duel.phase === "live"} onSubmit={setHunting} />)}
+              <div className="sec-title"><h2>Your list for {them.nickname}</h2></div>
+              {d.my_list.map((it) => <DuelItem key={it.id} it={it} theirs={them.nickname} />)}
+            </>
+          ) : (
+            <>
+              <p className="muted" style={{ margin: 0 }}>Every approved find from both of you. Only you and {them.nickname} can see these.</p>
+              {d.finds.length ? d.finds.map((f) => (
+                <FindPost key={f.id} id={f.id} photoBase="/api/duel-photo" nickname={f.nickname} title={f.title} at={f.found_at} now={d.now} mine={f.mine}
+                  badge={<span className={"st " + (f.mine ? "approved" : "pending")} style={{ alignSelf: "flex-start" }}>{f.mine ? "+1 you" : `+1 ${them.nickname}`}</span>} />
+              )) : <div className="card empty" style={{ padding: "24px 18px" }}><div className="big">📸</div><h3>No finds yet</h3><p className="muted" style={{ margin: 0 }}>Approved photos from both of you show up here.</p></div>}
+            </>
+          )}
         </>
       ) : null}
 
