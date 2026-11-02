@@ -53,6 +53,7 @@ function Room({ d, reload }) {
         {duel.phase === "judging" ? <p className="gap-note">Time's up. Judge the last photos — anything not judged by <b>{fmtDate(new Date(new Date(duel.end_at).getTime() + duel.grace_minutes * 60000))}</b> is approved automatically.</p> : null}
         {duel.phase === "finished" && duel.result === "won" ? <WinVideo className="win-inline" /> : null}
         {duel.phase === "finished" ? <div className="state-box earned" style={{ marginTop: 16, fontFamily: "var(--font-head)", textTransform: "uppercase", fontSize: 22, letterSpacing: "-.02em", ...(duel.result === "lost" ? { color: "var(--danger)", background: "color-mix(in oklch,var(--danger) 12%,var(--card))" } : duel.result === "tie" ? { color: "var(--warning)", background: "color-mix(in oklch,var(--warning) 12%,var(--card))" } : {}) }}>{duel.result === "won" ? "You won!" : duel.result === "lost" ? `${them.nickname} won` : "It's a tie"}</div> : null}
+        {duel.purged ? <p className="gap-note">The photos and lists from this 1v1 were deleted {duel.retain_days} days after it ended. The score card is kept.</p> : null}
         <p className="muted" style={{ margin: "14px 0 0", fontSize: 13 }}>Most approved items wins. Tied? Whoever got there first wins.</p>
       </Plate>
 

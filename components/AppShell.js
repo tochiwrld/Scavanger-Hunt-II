@@ -7,6 +7,7 @@ import { Brand, ThemeToggle } from "./Brand.js";
 import Icon from "./icons.js";
 import { Avatar, Empty, RoleBadge, Skel } from "./ui.js";
 import { colorFor, pad2 } from "../lib/client.js";
+import ConsentGate from "./Consent.js";
 
 const OWNER_TABS = [["", "Overview"], ["feed", "Feed"], ["review", "Review"], ["challenges", "Challenges"], ["subs", "Submissions"], ["players", "Players"], ["invite", "Invite"], ["ranks", "Leaderboard"], ["weeks", "Past weeks"], ["prize", "Prize"], ["audit", "Log"], ["settings", "Settings"]];
 const PLAYER_TABS = [["", "Home"], ["hunt", "Hunt"], ["feed", "Feed"], ["ranks", "Leaderboard"], ["mine", "My submissions"], ["weeks", "Past weeks"], ["people", "Players"]];
@@ -24,6 +25,7 @@ export default function AppShell({ children }) {
   useEffect(() => { if (me && (path === "/" || gid || groups === null)) refreshGroups(); }, [me, path]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!ready || !me) return <main style={{ paddingTop: 80 }}><Skel /></main>;
+  if (!me.privacy_ok) return <ConsentGate />;
 
   const owner = g?.role === "owner";
   const tabs = owner ? OWNER_TABS : PLAYER_TABS;

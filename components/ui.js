@@ -202,3 +202,16 @@ export function Photos({ base = "/api/photo", id, count, who = "" }) {
     </div>
   );
 }
+
+/** Password field with a show/hide eye. */
+export function PasswordInput(props) {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="pw-wrap">
+      <input {...props} type={show ? "text" : "password"} autoCapitalize="off" autoCorrect="off" spellCheck={false} />
+      <button type="button" className="pw-eye" onClick={() => setShow((v) => !v)} aria-label={show ? "Hide password" : "Show password"} aria-pressed={show}>
+        <Icon n={show ? "eyeoff" : "eye"} size={19} />
+      </button>
+    </div>
+  );
+}

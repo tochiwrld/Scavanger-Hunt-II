@@ -25,13 +25,15 @@ function stamp(ctx, w, h, label) {
   ctx.fillText(text, pad + tagW, h - barH / 2);
 }
 
-function toCanvas(src, sw, sh, label) {
+function toCanvas(src, sw, sh, label, mirror = false) {
   const s = Math.min(1, MAX_EDGE / Math.max(sw, sh));
   const c = document.createElement("canvas");
   c.width = Math.round(sw * s);
   c.height = Math.round(sh * s);
   const ctx = c.getContext("2d");
+  if (mirror) { ctx.save(); ctx.translate(c.width, 0); ctx.scale(-1, 1); } // selfies are saved the way they looked on screen
   ctx.drawImage(src, 0, 0, c.width, c.height);
+  if (mirror) ctx.restore();
   stamp(ctx, c.width, c.height, label);
   return new Promise((r) => c.toBlob(r, "image/jpeg", 0.85));
 }
@@ -55,10 +57,12 @@ export default function CameraCapture({ label, onShot, onClose }) {
     if (!navigator.mediaDevices?.getUserMedia) { setState("fallback"); return undefined; }
     let dead = false;
     setState("starting");
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: facing }, width: { ideal: 1920 }, height: { ideal: 1440 } }, audio: false })
+    stop(); // release the current camera first: most phones can't open the front and back cameras at once
+    const ask = (fm) => navigator.mediaDevices.getUserMedia({ video: { facingMode: fm, width: { ideal: 1920 }, height: { ideal: 1440 } }, audio: false });
+    // Try the exact camera first so the flip really switches; fall back to "ideal" on devices that report facing modes oddly.
+    ask({ exact: facing }).catch(() => ask({ ideal: facing }))
       .then((s) => {
         if (dead) { s.getTracks().forEach((t) => t.stop()); return; }
-        stop();
         stream.current = s;
         if (video.current) { video.current.srcObject = s; video.current.play().catch(() => {}); }
         setState("live");
@@ -83,7 +87,7 @@ export default function CameraCapture({ label, onShot, onClose }) {
     const v = video.current;
     if (!v || !v.videoWidth) return;
     setBusy(true);
-    const blob = await toCanvas(v, v.videoWidth, v.videoHeight, label);
+    const blob = await toCanvas(v, v.videoWidth, v.videoHeight, label, facing === "user");
     stop();
     onShot(blob);
   };
@@ -101,19 +105,20 @@ export default function CameraCapture({ label, onShot, onClose }) {
     <div className="cam-overlay" role="dialog" aria-modal="true" aria-label="Camera">
       {state === "live" || state === "starting" ? <video ref={video} className={"cam-video" + (facing === "user" ? " mirror" : "")} playsInline muted autoPlay /> : null}
       {state === "starting" ? <div className="cam-msg">Starting camera…</div> : null}
-      {state === "error" ? <div className="cam-msg"><Icon n="camera" size={34} /><p>{error}</p><button className="btn" onClick={() => { setError(""); setBusy(false); setAttempt((a) => a + 1); }}>Try again</button></div> : null}
+      {state === "error" ? <div className="cam-msg"><Icon n="camera" size={34} /><p>{error}</p><button className="btn" onClick={() => { setError(""); setBusy(false); setAttempt((a) => a + 1); }}>Try again</button><button className="btn ghost" onClick={() => { setError(""); setBusy(false); setFacing((f) => (f === "environment" ? "user" : "environment")); }}>Try the {facing === "user" ? "back" : "front"} camera</button></div> : null}
       {state === "fallback" ? (
         <div className="cam-msg">
           <Icon n="camera" size={34} />
           <p>Take the photo with your camera now.</p>
-          <label className="btn">Open camera<input type="file" accept="image/*" capture="environment" hidden onChange={(e) => fromPhoneCamera(e.target.files[0])} /></label>
+          <label className="btn">Back camera<input type="file" accept="image/*" capture="environment" hidden onChange={(e) => fromPhoneCamera(e.target.files[0])} /></label>
+          <label className="btn ghost">Front camera<input type="file" accept="image/*" capture="user" hidden onChange={(e) => fromPhoneCamera(e.target.files[0])} /></label>
         </div>
       ) : null}
       <div className="cam-top"><span className="cam-tag">Live camera · photos are taken now</span></div>
       <div className="cam-bar">
         <button className="cam-btn" onClick={close} aria-label="Close camera"><span aria-hidden="true" style={{ fontSize: 26, lineHeight: 1 }}>×</span></button>
         <button className="cam-shutter" onClick={shoot} disabled={state !== "live" || busy} aria-label="Take photo"><span /></button>
-        <button className="cam-btn" onClick={() => setFacing((f) => (f === "environment" ? "user" : "environment"))} disabled={state !== "live"} aria-label="Switch camera"><Icon n="flip" size={22} /></button>
+        <button className="cam-btn cam-flip" onClick={() => setFacing((f) => (f === "environment" ? "user" : "environment"))} disabled={state === "starting" || busy} aria-label={facing === "user" ? "Switch to back camera" : "Switch to front camera"}><Icon n="flip" size={22} /><small>{facing === "user" ? "Back" : "Front"}</small></button>
       </div>
     </div>
   );
