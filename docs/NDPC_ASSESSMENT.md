@@ -14,7 +14,7 @@ Under the NDPA (s.44) and the GAID 2025, controllers and processors of major imp
 | Extra-High Level (EHL) | 1,000 to 5,000 | ₦100,000 | Annual Compliance Audit Return (CAR) via a DPCO by 31 March |
 | Ultra-High Level (UHL) | over 5,000 | ₦250,000 | Annual CAR via a DPCO by 31 March |
 
-**Hunt Week today:** about 8 user accounts in total (2 November 2026), with no sector designation, no payments processed and no sensitive data collected on purpose. That is **well under 200**, so **registration is not required right now.**
+**Hunt Week today:** 17 user accounts in total, all created in the last six months (2 November 2026), with no sector designation, no payments processed and no sensitive data collected on purpose. That is **well under 200**, so **registration is not required right now.**
 
 ## When it becomes required
 As soon as Hunt Week processes data of **more than 200 people in any six-month window**. In practice: more than 200 accounts created or active in six months. Registration would then be at the **OHL** tier (₦10,000/year) until 1,000 people.
