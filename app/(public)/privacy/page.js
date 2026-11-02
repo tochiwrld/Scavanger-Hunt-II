@@ -40,6 +40,7 @@ export default function Page() {
             <tr><td><b>Consent record:</b> which version of this notice you accepted, every statement you ticked, and when</td><td>You, at sign-up or when the notice changes</td></tr>
             <tr><td><b>Security data:</b> a signed login cookie, short-lived rate-limit counters keyed to your network address, password-reset tokens (stored only as a hash), an admin action log per hunt</td><td>Generated automatically</td></tr>
             <tr><td><b>Notifications:</b> in-app alerts, and emails if the hunt admin turns them on</td><td>Generated automatically</td></tr>
+            <tr><td><b>Activity:</b> when you last opened the app, and when we last sent you a reminder email</td><td>Generated automatically</td></tr>
           </tbody>
         </table></div>
         <p>We do <b>not</b> collect your real name, phone number, GPS location, contacts, payment details or ID documents. We remove EXIF and other hidden metadata (including any location) from every image on our server before it is stored. We do not use advertising or tracking cookies, and we do not sell or rent your data.</p>
@@ -47,6 +48,7 @@ export default function Page() {
         <h2 id="s3">3. Why we use it (lawful basis)</h2>
         <ul>
           <li><b>To run the game you signed up for</b> (performance of a contract, NDPA s.25(1)(b)(i)): your account, hunts, photo review, scoring, leaderboards, 1v1s and notifications.</li>
+          <li><b>Reminder emails</b> (legitimate interests, NDPA s.25(1)(b)(v)): if you're in a live hunt and haven't opened the app for 3 days, or you've been away for 2 weeks, we may email you a reminder ("NO FORGET YOUR HUNT O!") with the number of hunts going on. At most one every few days, never at night, and no more than 3 in a row if you don't come back. Switch them off any time in your profile or with the link in the email.</li>
           <li><b>Your consent</b> (NDPA s.25(1)(a)): sharing approved photos in your hunt's feed, and storing your data with providers outside Nigeria (section 7). You can withdraw consent at any time by taking a post off the feed or deleting your account; this doesn't affect anything done before.</li>
           <li><b>Legitimate interests</b> (NDPA s.25(1)(b)(v)): keeping the service secure (rate limits, login protection, the admin action log) and preventing cheating.</li>
           <li><b>Legal obligations</b> (NDPA s.25(1)(b)(ii)): responding to lawful requests and reporting breaches to the Nigeria Data Protection Commission (NDPC).</li>

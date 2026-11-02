@@ -31,6 +31,11 @@ export default function Page() {
       setTimeout(() => URL.revokeObjectURL(url), 2000);
     } catch (e) { toast(e.message, "bad"); }
   };
+  const [rem, setRem] = useState(me.email_reminders !== false);
+  const toggleRem = async (on) => {
+    setRem(on);
+    try { await api("/me/reminders", { method: "PUT", json: { on } }); setMe({ ...me, email_reminders: on }); toast(on ? "Reminder emails on" : "Reminder emails off", "good"); } catch (e) { setRem(!on); toast(e.message, "bad"); }
+  };
   const admin = async () => { setBusy(true); try { await api("/me/become-admin", { method: "POST" }); await refreshMe(); toast("Admin tools are on", "good"); } finally { setBusy(false); } };
   return (
     <>
@@ -50,6 +55,10 @@ export default function Page() {
       <div className="card"><h3>Account</h3>
         <p className="muted">{me.can_create_groups ? "You can create and run hunts, and still play in others." : "You're a player. You can switch on admin tools any time."}</p>
         {me.can_create_groups ? null : <Btn busy={busy} className="block ghost" onClick={admin}>🛡️ Create an admin account</Btn>}
+      </div>
+      <div className="card"><h3>Emails</h3>
+        <div className="sw"><div><b>Reminder emails</b><div className="muted">"NO FORGET YOUR HUNT O!": a nudge when you're in a live hunt and haven't opened Hunt Week for a few days, or after a couple of weeks away.</div></div>
+          <input type="checkbox" checked={rem} onChange={(e) => toggleRem(e.target.checked)} aria-label="Reminder emails" /></div>
       </div>
       <div className="card"><h3>Your data</h3>
         <p className="muted">Photos, submissions, comments and 1v1 lists are deleted automatically {RETAIN_DAYS} days after each hunt ends. Only score cards are kept. <Link className="link" href="/privacy">Privacy Policy</Link></p>
