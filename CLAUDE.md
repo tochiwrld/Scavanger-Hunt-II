@@ -42,7 +42,7 @@ Live site: https://weekly-hunt.vercel.app — owner's real group is "Ghetto Sear
 - Rights: `GET /me/export` (JSON download), `DELETE /me` (password + "DELETE"; deletes photos first, then the user row, which cascades, including hunts they own and their 1v1s).
 - Retention: `lib/retention.js` `runRetention()` runs in the cron after `runLifecycle()`. 7 days after a challenge's `end_at` (or a 1v1's finish) it deletes submissions + photos + comments + reference images, and 1v1 submissions + items; keeps score cards (`point_transactions`, `weekly_results`, `prizes`, `duels.creator_items/opponent_items/*_reached_at`). Storage first, rows second. Also prunes notifications > 30 days, old resets and rate limits. `duelScores()` uses the saved score once a duel is finished.
 - Uploads: `lib/imagesafe.js` `sanitizeImage()` strips EXIF/XMP/comments (GPS) and rejects > 8000 px / 40 MP, without re-encoding. Photos served with `no-store`, `nosniff`, `CSP: sandbox`, `CORP: same-origin`.
-- Item points come from `DIFFICULTY_POINTS` (easy 10, medium 25, hard 50, extreme 100); the client only sends a difficulty.
+- Item points come from `DIFFICULTY_POINTS` (easy 5, medium 10, hard 15, extreme 20); the client only sends a difficulty.
 - Docs: `docs/BREACH_RESPONSE.md`, `docs/HOSTING_AND_TRANSFERS.md`, `docs/NDPC_ASSESSMENT.md`, `docs/PHOTO_DELETION_POLICY.md`. Update them with any new provider or data use.
 
 ## 1v1 and Global Search rules
@@ -51,6 +51,7 @@ Live site: https://weekly-hunt.vercel.app — owner's real group is "Ghetto Sear
 - The 1v1 room has two tabs once the timer starts: "Your hunt" (judging, your hunt, your list) and "Finds" (`finds` in `GET /duels/:id`): approved photo pairs from both players, Facebook-style (`components/FindPost.js`, shared with the group feed). Players only.
 - A 1v1 finishes when time is up and nothing is pending, or as soon as both players have every item approved. Winner: most approved items, ties to whoever finished first. Only the winner sees the "YOU WIN" animation (`public/img/you-win.mp4|webm|jpg`), full-screen once and then in the result card.
 - Pending 1v1 photos are auto-approved 60 minutes after the timer ends (`REVIEW_GRACE_MINUTES`); `runDuelLifecycle()` (part of the cron) finishes duels and alerts both players. 1v1 notifications have `group_id` NULL.
+- Players can join a hunt at any time, including mid-week: they can submit right away and appear on that week's leaderboard. The invite page and join responses include `live` so the UI says so.
 - Global ranking = all-time points from groups with `is_public = true`. Public groups can be joined without an invite; removed members still can't rejoin.
 
 ## Design system

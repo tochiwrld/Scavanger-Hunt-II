@@ -18,12 +18,12 @@ export default function GlobalSearch() {
   const st = useApi("/global" + (query ? "?q=" + encodeURIComponent(query) : ""));
   const join = async (g) => {
     setBusy(g.id);
-    try { await api(`/global/${g.id}/join`, { method: "POST" }); await refreshGroups(); toast(`You're in ${g.name}!`, "good"); router.push(`/g/${g.id}`); }
+    try { const r = await api(`/global/${g.id}/join`, { method: "POST" }); await refreshGroups(); toast(r.live ? `You're in ${g.name}! This week is live, so start hunting now.` : `You're in ${g.name}!`, "good"); router.push(`/g/${g.id}${r.live ? "/hunt" : ""}`); }
     catch (e) { toast(e.message, "bad"); setBusy(null); }
   };
   return (
     <section className="stack" style={{ gap: 14, marginTop: 14 }}>
-      <div className="page-head"><h1 style={{ display: "flex", alignItems: "center", gap: 12 }}><Icon n="globe" size={30} className="c-primary" />Global Search</h1><p>Open hunts anyone can join. Every point you earn in them counts toward your global rank.</p></div>
+      <div className="page-head"><h1 style={{ display: "flex", alignItems: "center", gap: 12 }}><Icon n="globe" size={30} className="c-primary" />Global Search</h1><p>Open hunts anyone can join, even mid-week. Every point you earn in them counts toward your global rank.</p></div>
       <Async st={st}>{(d) => {
         const t = tierFor(d.me.points);
         const pct = t.next ? Math.round(((d.me.points - t.min) / (t.next.at - t.min)) * 100) : 100;

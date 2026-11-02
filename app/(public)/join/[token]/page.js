@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { api } from "../../../../lib/client.js";
+import { api, fmtDate } from "../../../../lib/client.js";
 import { useApp } from "../../../../components/Providers.js";
 import { Brand, ThemeToggle } from "../../../../components/Brand.js";
 import Icon from "../../../../components/icons.js";
@@ -20,8 +20,8 @@ export default function Page() {
     try {
       const r = await api(`/invite/${encodeURIComponent(token)}/join`, { method: "POST" });
       await refreshGroups();
-      toast(r.already ? "You're already in this hunt" : "You're in! Happy hunting.", "good");
-      router.push("/g/" + r.group_id);
+      toast(r.already ? "You're already in this hunt" : r.live ? "You're in! This week is already live, so start hunting now." : "You're in! Happy hunting.", "good");
+      router.push("/g/" + r.group_id + (r.live && !r.already ? "/hunt" : ""));
     } catch (e) { toast(e.message, "bad"); setBusy(false); }
   };
   return (
@@ -35,6 +35,7 @@ export default function Page() {
               <h1 style={{ margin: "12px 0 12px" }}>{d.group.name}</h1>
               {d.group.description ? <p className="prose">{d.group.description}</p> : null}
               <div className="muted">Hosted by <b style={{ color: "var(--fg)" }}>{d.host}</b></div>
+              {d.live ? <div className="card mist flat" style={{ marginTop: 16, textAlign: "left" }}><b>{d.live.week_number ? `Week ${d.live.week_number}` : "This week's hunt"} is live now.</b> You can still join and start hunting straight away. It closes {fmtDate(d.live.end_at)}.</div> : <div className="muted" style={{ marginTop: 10 }}>Join any time, even mid-week.</div>}
             </div></section>
             {!ready ? null : me ? <Btn busy={busy} className="block" onClick={join}>Join hunt<Icon n="arrow" size={18} /></Btn> : (
               <>
