@@ -1,9 +1,9 @@
 /* ============ Hunt Week design system ============
    Dark by default; html.light switches the palette. Colour tokens follow the reference site. */
 :root{
-  --font-body:"Space Grotesk",ui-sans-serif,system-ui,sans-serif;
-  --font-head:"Bricolage Grotesque","Space Grotesk",ui-sans-serif,sans-serif;
-  --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --font-body:var(--nf-body),"Space Grotesk",ui-sans-serif,system-ui,sans-serif;
+  --font-head:var(--nf-head),"Bricolage Grotesque",var(--nf-body),ui-sans-serif,sans-serif;
+  --font-mono:var(--nf-mono),"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   --bg:oklch(15.5% .012 275); --fg:oklch(97% .01 90);
   --card:oklch(20.5% .015 275); --raised:oklch(25% .015 275); --secondary:oklch(26% .018 275);
   --muted-fg:oklch(72% .02 275); --border:oklch(30% .018 275);

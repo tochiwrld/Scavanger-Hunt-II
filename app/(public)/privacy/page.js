@@ -99,7 +99,7 @@ export default function Page() {
           <tbody>
             <tr><td>Supabase Inc. (USA), on Amazon Web Services</td><td>Database and private photo storage</td><td>Paris, France (eu-west-3)</td></tr>
             <tr><td>Vercel Inc. (USA)</td><td>Runs the website and app server</td><td>Paris, France (cdg1); pages pass through Vercel's global network</td></tr>
-            <tr><td>Google LLC (USA)</td><td>Sends emails (Gmail); serves the website's fonts to your browser</td><td>USA and Google's global network</td></tr>
+            <tr><td>Google LLC (USA)</td><td>Sends emails (Gmail)</td><td>USA and Google's global network</td></tr>
           </tbody>
         </table></div>
         <p>Your data is therefore transferred out of Nigeria, mainly to France, which is governed by the EU General Data Protection Regulation and an independent data protection authority. Each provider is also bound by its own data processing terms and security programme. Because the NDPC has not yet published adequacy decisions or approved transfer instruments, we also rely on <b>your informed consent</b> (NDPA s.43), which you give when you register. The risk is that foreign authorities could, in rare cases, request access to data held by these companies under their own laws. If you don't accept this, please don't create an account.</p>

@@ -1,6 +1,6 @@
 # Hosting providers and international data transfers
 
-Last reviewed: 2 November 2026. Shown to users in the Privacy Policy, section 7 (`app/(public)/privacy/page.js`).
+Last reviewed: 3 November 2026. Fonts are self-hosted (next/font) since 3 Nov 2026, so browsers no longer contact Google Fonts. Shown to users in the Privacy Policy, section 7 (`app/(public)/privacy/page.js`).
 
 Hunt Week has no infrastructure in Nigeria. All personal data leaves Nigeria.
 
@@ -11,7 +11,6 @@ Hunt Week has no infrastructure in Nigeria. All personal data leaves Nigeria.
 | **Supabase Inc.** (USA), on Amazon Web Services | Postgres database, private Storage bucket `hunt-photos`, public bucket `site` (hero image only), pg_cron | **eu-west-3, Paris, France** | Everything: accounts (nickname, email, password hash), game data, consent records, photos | Project ref `iwljafkilkizabmgczjn`. RLS on, no policies; only the server role reads data. Daily backups by Supabase (kept per plan). |
 | **Vercel Inc.** (USA) | Hosts the Next.js app and API (serverless functions), CDN, runtime logs | Functions in **cdg1, Paris, France**; requests pass through Vercel's global edge network | All data in transit; request logs (IP, path, time) | Project `weekly-hunt`, team `wsh8`. Logs retained per Vercel plan. |
 | **Google LLC** (USA) | Gmail SMTP for outgoing email (`SMTP_USER`) | USA / global | Recipient email address, email content (nickname, hunt names, game updates, password-reset links) | Only if emails are on. |
-| **Google LLC** (USA) | Google Fonts, loaded by the visitor's browser | Global | Visitor IP address and user agent (sent by the browser to Google) | Could be removed by self-hosting the fonts. |
 | **Resend** (USA), *optional* | Transactional email if `RESEND_API_KEY` is set | USA | Same as Gmail | Not configured today. |
 | **GitHub** (Microsoft, USA) | Source code (`tochiwrld/Scavanger-Hunt-II`, public) | USA | **None.** No user data or secrets in the repo. | Keep it that way. |
 
