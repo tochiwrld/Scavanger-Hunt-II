@@ -22,7 +22,7 @@ export default function AppShell({ children }) {
   const g = gid && groups ? groups.find((x) => String(x.id) === gid) : null;
 
   useEffect(() => { if (ready && !me) router.replace("/login?next=" + encodeURIComponent(path)); }, [ready, me, path, router]);
-  useEffect(() => { if (me && (path === "/" || gid || groups === null)) refreshGroups(); }, [me, path]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (me?.privacy_ok && (path === "/" || gid || groups === null)) refreshGroups(); }, [me, path]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!ready || !me) return <main style={{ paddingTop: 80 }}><Skel /></main>;
   if (!me.privacy_ok) return <ConsentGate />;

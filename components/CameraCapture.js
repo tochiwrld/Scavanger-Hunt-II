@@ -25,14 +25,16 @@ function stamp(ctx, w, h, label) {
   ctx.fillText(text, pad + tagW, h - barH / 2);
 }
 
-function toCanvas(src, sw, sh, label, mirror = false) {
-  const s = Math.min(1, MAX_EDGE / Math.max(sw, sh));
+/** crop > 1 keeps only the centre 1/crop of the frame (digital zoom), so the saved photo matches the zoomed preview. */
+function toCanvas(src, sw, sh, label, mirror = false, crop = 1) {
+  const cw = sw / crop, ch = sh / crop, cx = (sw - cw) / 2, cy = (sh - ch) / 2;
+  const s = Math.min(1, MAX_EDGE / Math.max(cw, ch));
   const c = document.createElement("canvas");
-  c.width = Math.round(sw * s);
-  c.height = Math.round(sh * s);
+  c.width = Math.round(cw * s);
+  c.height = Math.round(ch * s);
   const ctx = c.getContext("2d");
   if (mirror) { ctx.save(); ctx.translate(c.width, 0); ctx.scale(-1, 1); } // selfies are saved the way they looked on screen
-  ctx.drawImage(src, 0, 0, c.width, c.height);
+  ctx.drawImage(src, cx, cy, cw, ch, 0, 0, c.width, c.height);
   if (mirror) ctx.restore();
   stamp(ctx, c.width, c.height, label);
   return new Promise((r) => c.toBlob(r, "image/jpeg", 0.85));
@@ -50,6 +52,10 @@ export default function CameraCapture({ label, onShot, onClose }) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  // Zoom: the camera's own (optical/sensor) zoom when the browser exposes it, otherwise a centre crop.
+  const [zoom, setZoomState] = useState(1);
+  const [zr, setZr] = useState({ min: 1, max: 4, hw: false });
+  const pinch = useRef(null);
 
   const stop = useCallback(() => { stream.current?.getTracks().forEach((t) => t.stop()); stream.current = null; }, []);
 
@@ -65,6 +71,10 @@ export default function CameraCapture({ label, onShot, onClose }) {
         if (dead) { s.getTracks().forEach((t) => t.stop()); return; }
         stream.current = s;
         if (video.current) { video.current.srcObject = s; video.current.play().catch(() => {}); }
+        const caps = s.getVideoTracks()[0]?.getCapabilities?.() || {};
+        if (caps.zoom && caps.zoom.max > caps.zoom.min) setZr({ min: caps.zoom.min, max: Math.min(caps.zoom.max, 10), hw: true });
+        else setZr({ min: 1, max: 4, hw: false });
+        setZoomState(caps.zoom ? Math.max(caps.zoom.min, 1) : 1);
         setState("live");
       })
       .catch((e) => {
@@ -83,11 +93,26 @@ export default function CameraCapture({ label, onShot, onClose }) {
     return () => document.removeEventListener("keydown", esc);
   }, [onClose, stop]);
 
+  const setZoom = useCallback((z) => {
+    const v = Math.round(Math.min(zr.max, Math.max(zr.min, z)) * 10) / 10;
+    setZoomState(v);
+    if (zr.hw) {
+      const track = stream.current?.getVideoTracks()[0];
+      track?.applyConstraints({ advanced: [{ zoom: v }] }).catch(() => setZr((r) => ({ ...r, hw: false, min: 1, max: 4 })));
+    }
+  }, [zr]);
+  // Two-finger pinch anywhere on the preview.
+  const dist = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  const onTouchStart = (e) => { if (e.touches.length === 2) pinch.current = { d: dist(e.touches), z: zoom }; };
+  const onTouchMove = (e) => { if (e.touches.length === 2 && pinch.current) { e.preventDefault(); setZoom(pinch.current.z * (dist(e.touches) / pinch.current.d)); } };
+  const onTouchEnd = (e) => { if (e.touches.length < 2) pinch.current = null; };
+  const presets = [1, 2, 3, 5].filter((z) => z >= zr.min && z <= zr.max);
+
   const shoot = async () => {
     const v = video.current;
     if (!v || !v.videoWidth) return;
     setBusy(true);
-    const blob = await toCanvas(v, v.videoWidth, v.videoHeight, label, facing === "user");
+    const blob = await toCanvas(v, v.videoWidth, v.videoHeight, label, facing === "user", zr.hw ? 1 : zoom);
     stop();
     onShot(blob);
   };
@@ -102,8 +127,8 @@ export default function CameraCapture({ label, onShot, onClose }) {
   const close = () => { stop(); onClose(); };
 
   return (
-    <div className="cam-overlay" role="dialog" aria-modal="true" aria-label="Camera">
-      {state === "live" || state === "starting" ? <video ref={video} className={"cam-video" + (facing === "user" ? " mirror" : "")} playsInline muted autoPlay /> : null}
+    <div className="cam-overlay" role="dialog" aria-modal="true" aria-label="Camera" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
+      {state === "live" || state === "starting" ? <video ref={video} className="cam-video" style={{ transform: `${facing === "user" ? "scaleX(-1) " : ""}scale(${zr.hw ? 1 : zoom})` }} playsInline muted autoPlay /> : null}
       {state === "starting" ? <div className="cam-msg">Starting camera…</div> : null}
       {state === "error" ? <div className="cam-msg"><Icon n="camera" size={34} /><p>{error}</p><button className="btn" onClick={() => { setError(""); setBusy(false); setAttempt((a) => a + 1); }}>Try again</button><button className="btn ghost" onClick={() => { setError(""); setBusy(false); setFacing((f) => (f === "environment" ? "user" : "environment")); }}>Try the {facing === "user" ? "back" : "front"} camera</button></div> : null}
       {state === "fallback" ? (
@@ -115,10 +140,16 @@ export default function CameraCapture({ label, onShot, onClose }) {
         </div>
       ) : null}
       <div className="cam-top"><span className="cam-tag">Live camera · photos are taken now</span></div>
+      {state === "live" ? (
+        <div className="cam-zoom" role="group" aria-label="Zoom">
+          {presets.map((z) => <button key={z} className={Math.abs(zoom - z) < 0.05 ? "on" : ""} onClick={() => setZoom(z)} aria-label={`Zoom ${z}x`}>{z}×</button>)}
+          {!presets.some((z) => Math.abs(zoom - z) < 0.05) ? <span className="cam-zoom-now">{zoom.toFixed(1)}×</span> : null}
+        </div>
+      ) : null}
       <div className="cam-bar">
         <button className="cam-btn" onClick={close} aria-label="Close camera"><span aria-hidden="true" style={{ fontSize: 26, lineHeight: 1 }}>×</span></button>
         <button className="cam-shutter" onClick={shoot} disabled={state !== "live" || busy} aria-label="Take photo"><span /></button>
-        <button className="cam-btn cam-flip" onClick={() => setFacing((f) => (f === "environment" ? "user" : "environment"))} disabled={state === "starting" || busy} aria-label={facing === "user" ? "Switch to back camera" : "Switch to front camera"}><Icon n="flip" size={22} /><small>{facing === "user" ? "Back" : "Front"}</small></button>
+        <button className="cam-btn cam-flip" onClick={() => { setZoomState(1); setFacing((f) => (f === "environment" ? "user" : "environment")); }} disabled={state === "starting" || busy} aria-label={facing === "user" ? "Switch to back camera" : "Switch to front camera"}><Icon n="flip" size={22} /><small>{facing === "user" ? "Back" : "Front"}</small></button>
       </div>
     </div>
   );

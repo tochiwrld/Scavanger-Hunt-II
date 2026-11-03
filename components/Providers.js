@@ -44,7 +44,7 @@ export default function Providers({ children }) {
       if (document.hidden) return;
       try {
         const m = await api("/me");
-        if (!m.user) return;
+        if (!m.user || !m.user.privacy_ok) return; // nothing else loads until the privacy notice is accepted
         setUnread(m.unread);
         if (!m.unread) return;
         const d = await api("/notifications");
