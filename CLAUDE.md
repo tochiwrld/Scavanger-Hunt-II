@@ -73,6 +73,7 @@ Matches the reference https://scavenger-hunt-website.netlify.app/ ("HUNTWEEK"). 
 - Local: `npm install`, put the env vars above in `.env.local`, `npm run dev`.
 - 428 handling: never reload inside the app (AppShell renders the consent gate; nothing else fetches until `me.privacy_ok`). Only `/join/*` and `/vs/*` hop to `/?next=`. A reload there once caused an endless loop.
 - `lib/db.js` `q()` checks out a client and awaits `SET search_path` once per connection before querying.
+- Connections: the session pooler caps ALL instances at 15 connections. `lib/db.js` keeps `max: 2`, `idleTimeoutMillis: 5000` and calls `attachDatabasePool()` (`@vercel/functions`) so sleeping instances release them. On 2026-11-04 idle connections from sleeping instances filled the pooler (`EMAXCONNSESSION`) and blocked logins; quick relief is `pg_terminate_backend` on idle `Supavisor` backends.
 - Quick compile/import check without a full build: bundle every page with esbuild (`--loader:.js=jsx --jsx=automatic`, externals for next/react/pg/nodemailer). A missing named import fails the bundle.
 - Smoke-test against production by running fetch() calls from the site's own origin (cookies + origin check work). Prefix any test accounts/groups with `zz` and delete them afterwards — never touch other groups.
 - Health check: `GET /api/invite/anything` returns 404 JSON when the database is reachable, 500 when it isn't. Runtime errors: Vercel runtime logs.
