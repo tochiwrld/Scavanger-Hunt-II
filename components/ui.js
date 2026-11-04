@@ -155,7 +155,7 @@ const fmtShort = (d) => new Date(d).toLocaleString("en-NG", { timeZone: TZ, week
 export function ChallengeHead({ c, countdown, onDone, count }) {
   return (
     <section className="card">
-      <div className="eyebrow">{c.week_number ? `Week ${pad2(c.week_number)} · ` : ""}{count != null ? `${count} item${count === 1 ? "" : "s"} · ` : ""}Prize {naira(c.prize_amount)}</div>
+      <div className="eyebrow">{c.week_number ? `Week ${pad2(c.week_number)} · ` : ""}{count != null ? `${count} item${count === 1 ? "" : "s"}` : ""}{c.prize_amount > 0 ? `${count != null ? " · " : ""}Prize ${naira(c.prize_amount)}` : ""}</div>
       <h1 style={{ margin: "10px 0 12px", fontSize: "clamp(30px,8vw,40px)" }}>{c.title}</h1>
       {c.description ? <p className="prose" style={{ margin: "0 0 8px" }}>{c.description}</p> : null}
       <div className="muted" style={{ fontSize: 13 }}>{fmtShort(c.start_at)} → {fmtShort(c.end_at)} · Africa/Lagos</div>
@@ -211,6 +211,7 @@ export function ItemCard({ it, gid, preview, onSubmit }) {
 /** 1 to 4 photos of one submission, laid out like a social post. Tap to zoom. */
 /** Photo grid. thumb=true shows the small copies (feed, finds, my submissions) and opens the full photo on tap; admin review passes thumb={false}. */
 export function Photos({ base = "/api/photo", id, count, who = "", thumb = true }) {
+  if (Number(count) === 0) return <p className="muted" style={{ margin: "8px 0" }}>📷 Photos deleted automatically 7 days after review. The points stay.</p>;
   const n = Math.max(1, Math.min(4, Number(count) || 2));
   return (
     <div className={"photo-grid n" + n}>

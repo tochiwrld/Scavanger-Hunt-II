@@ -9,7 +9,8 @@ import { Async, Btn, ErrBox, Sheet, Skel, useApi, useForm } from "../../../../..
 
 function ChallengeForm({ gid, c, isNew, draft, onSaved }) {
   const router = useRouter();
-  const { toast } = useApp();
+  const { toast, groups } = useApp();
+  const official = Boolean(groups?.find((x) => String(x.id) === String(gid))?.official);
   const form = useForm(async (v) => {
     const body = { ...v, start_at: fromLagosInput(v.start_at), end_at: fromLagosInput(v.end_at) };
     const r = await api(isNew ? `/groups/${gid}/challenges` : `/groups/${gid}/challenges/${c.id}`, { method: isNew ? "POST" : "PUT", json: body });
@@ -20,14 +21,14 @@ function ChallengeForm({ gid, c, isNew, draft, onSaved }) {
     <form className="card" onSubmit={form.onSubmit} noValidate>
       <h2>{isNew ? "New challenge" : draft ? "Edit draft" : c.title}</h2>
       {draft ? <p className="muted">Draft: only you can see it. Times are Lagos time.</p>
-        : <div className="card mist">🔒 {c.phase === "upcoming" ? "Scheduled. Items and points are locked. Unpublish to edit." : c.phase === "active" ? "Live. Items and points are locked." : "This challenge has finished."}</div>}
+        : <div className="card mist">🔒 {official && c.phase !== "closed" ? "Published. Existing items are locked, but you can keep adding new ones." : c.phase === "upcoming" ? "Scheduled. Items and points are locked. Unpublish to edit." : c.phase === "active" ? "Live. Items and points are locked." : "This challenge has finished."}</div>}
       <fieldset disabled={!draft} style={{ border: 0, padding: 0, margin: "12px 0 0" }}>
         <div className="field"><label>Challenge title</label><input name="title" defaultValue={c.title} maxLength={120} placeholder="The City Hunt" required /></div>
         <div className="field"><label>Description</label><textarea name="description" defaultValue={c.description} maxLength={2000} /></div>
         <div className="field"><label>Rules</label><textarea name="rules" defaultValue={c.rules} maxLength={4000} /><div className="muted">The tie-breaker rule is added automatically.</div></div>
         <div className="field"><label>Starts (Lagos time)</label><input type="datetime-local" name="start_at" defaultValue={toLagosInput(c.start_at)} required /></div>
         <div className="field"><label>Ends (Lagos time)</label><input type="datetime-local" name="end_at" defaultValue={toLagosInput(c.end_at)} required /><div className="muted">Default: Monday 12:00 AM to Sunday 11:59 PM.</div></div>
-        <div className="field"><label>Weekly prize (₦)</label><input name="prize_amount" type="number" inputMode="numeric" min={0} defaultValue={c.prize_amount} /></div>
+        {official ? <input type="hidden" name="prize_amount" value="0" /> : <div className="field"><label>Weekly prize (₦)</label><input name="prize_amount" type="number" inputMode="numeric" min={0} defaultValue={c.prize_amount} /></div>}
       </fieldset>
       <ErrBox error={form.error} />
       {draft ? <Btn busy={form.busy} className="block" type="submit">{isNew ? "Save draft" : "Save changes"}</Btn> : null}
@@ -37,8 +38,10 @@ function ChallengeForm({ gid, c, isNew, draft, onSaved }) {
 
 function Editor({ gid, d, reload }) {
   const router = useRouter();
-  const { toast, refreshGroups } = useApp();
+  const { toast, refreshGroups, groups } = useApp();
   const c = d.challenge, items = d.items, draft = c.status === "draft";
+  // PRIMAHUNT OFFICIAL runs for a year: its admins can keep adding items after publishing (existing ones stay locked).
+  const growing = !draft && c.status === "published" && c.phase !== "closed" && Boolean(groups?.find((x) => String(x.id) === String(gid))?.official);
   const [itemForm, setItemForm] = useState(null); // {it} or {}
   const [confirmPublish, setConfirmPublish] = useState(false);
   const [busy, setBusy] = useState("");
@@ -75,7 +78,8 @@ function Editor({ gid, d, reload }) {
           </div></div>
         )) : <p className="muted">No items yet.</p>}
       </div>
-      {draft ? <button className="btn block ghost" onClick={() => setItemForm({})}>＋ Add item</button> : null}
+      {draft || growing ? <button className="btn block ghost" onClick={() => setItemForm({})}>＋ Add item</button> : null}
+      {growing ? <p className="muted" style={{ margin: "6px 0 0", textAlign: "center", fontSize: 13 }}>New items go live straight away and players get an in-app alert.</p> : null}
       <div className="card stack">
         <Link className="btn block ghost" href={`/g/${gid}/preview/${c.id}`}>👀 Preview as a player</Link>
         {draft ? <button className="btn block ok" onClick={() => setConfirmPublish(true)}>🚀 Publish challenge</button> : null}

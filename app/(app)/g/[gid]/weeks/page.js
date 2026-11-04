@@ -15,7 +15,7 @@ export default function Page() {
           <Link key={r.id} href={`/g/${gid}/week/${r.id}`} className="card" style={{ textDecoration: "none", display: "block" }}>
             <h3>{r.week_number ? `Week ${String(r.week_number).padStart(2, "0")}: ` : ""}{r.title}</h3>
             <p className="muted" style={{ margin: "4px 0 8px" }}>Ended {fmtDate(r.end_at)}</p>
-            <div className="row between wrap"><span>{r.winner ? `🥇 ${r.winner} · ${naira(r.prize_amount)}` : "No winner"}</span>{r.prize_status ? <span className={`st ${r.prize_status === "paid" ? "approved" : "pending"}`}>{r.prize_status === "paid" ? "Paid" : "Prize pending"}</span> : null}</div>
+            <div className="row between wrap"><span>{r.winner ? `🥇 ${r.winner}${r.prize_amount > 0 ? ` · ${naira(r.prize_amount)}` : ""}` : "No winner"}</span>{r.prize_status ? <span className={`st ${r.prize_status === "paid" ? "approved" : "pending"}`}>{r.prize_status === "paid" ? "Paid" : "Prize pending"}</span> : null}</div>
             {r.my_rank ? <div className="muted" style={{ marginTop: 6 }}>You: #{r.my_rank} · {r.my_points} pts</div> : null}
           </Link>
         ))}

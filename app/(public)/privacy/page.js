@@ -62,7 +62,7 @@ export default function Page() {
           <li><b>Pending or rejected photos</b>: only you and that hunt's admins (its admin and, if it has one, its co-admin).</li>
           <li><b>Approved photos</b>: the active players of that hunt, in its feed. You or the admin can take a post off the feed at any time.</li>
           <li><b>1v1 photos</b>: only you and your opponent.</li>
-          <li><b>PRIMAHUNT OFFICIAL</b>: every account is a player in the site's official public hunt, so your nickname can appear on its leaderboard and the global ranking once you score there. You can leave it any time from its Players tab.</li>
+          <li><b>PRIMAHUNT OFFICIAL</b>: every account is a player in the site's official public hunt, so your nickname can appear on its leaderboard and the global ranking once you score there. It has no cash prize and runs as one long hunt, so its photos, thumbnails and comments are deleted 7 days after each photo is reviewed rather than after the hunt ends. You can leave it any time from its Players tab.</li>
           <li><b>Admins</b> can only see and act on their own hunt. The server checks every request against your membership in that hunt; there is no way for an admin to reach another hunt's players, photos or data.</li>
           <li><b>Our providers</b> (section 7) process data only to run the service, under their own security and confidentiality terms.</li>
           <li>We disclose data to authorities only when the law requires it.</li>
