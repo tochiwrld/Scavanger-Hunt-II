@@ -30,7 +30,7 @@ export default function ReviewCard({ s, gid, base = `/groups/${gid}`, photoBase 
       <h3 style={{ margin: "12px 0 8px", fontSize: 18, textTransform: "none", letterSpacing: "-.02em" }}>{s.item_title}</h3>
       <div className="row wrap" style={{ gap: 8 }}>{s.points != null ? <span className="pts">{s.points} PTS</span> : null}<span className="muted">{s.challenge_title ? `${s.challenge_title} · ` : ""}{fmtDate(s.submitted_at)}</span></div>
       {s.instructions ? <p className="muted" style={{ margin: "10px 0 0" }}>{s.instructions}</p> : null}
-      <Photos base={photoBase} id={s.id} count={s.photos} who={s.nickname} />
+      <Photos base={photoBase} id={s.id} count={s.photos} who={s.nickname} thumb={false} />
       {s.status === "rejected" && s.rejection_reason ? <div className="reason"><b>Reason:</b> {s.rejection_reason}</div> : null}
       {(s.history || []).map((h, i) => <div key={i} className="hist">Earlier rejection: {h.reason}</div>)}
       {actions && s.status === "pending" ? (

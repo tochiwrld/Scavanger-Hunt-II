@@ -62,7 +62,7 @@ export default function Page() {
             <div className="sw"><div><b>Send emails too</b><div className="muted">{d.email_configured ? "Email delivery is set up." : "Email isn't set up yet, so only in-app alerts go out. See the README."}</div></div><input type="checkbox" checked={!!s.email_enabled} onChange={(e) => save({ email_enabled: e.target.checked })} /></div>
           </div>
         ) : null}
-        {g ? (
+        {g?.founder ? (
           <div className="card danger-zone"><h2 className="c-bad">Delete this hunt</h2>
             <p className="muted" style={{ margin: "6px 0 12px" }}>This permanently deletes the hunt for everyone: all its challenges, submissions and photos, the feed, leaderboards, prize records and members. It can't be undone.</p>
             <div className="field"><label>Type <b>{g.name}</b> to confirm</label><input value={confirm} onChange={(e) => setConfirm(e.target.value)} autoComplete="off" placeholder={g.name} /></div>

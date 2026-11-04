@@ -147,7 +147,7 @@ function Waiting({ duel, reload }) {
   if (!duel.mine) return <Empty icon="⏳" title="Waiting to start" text="Hang tight." />;
   const link = `${window.location.origin}/vs/${duel.token}`;
   const copy = async () => { try { await navigator.clipboard.writeText(link); toast("1v1 link copied", "good"); } catch { window.prompt("Copy this link:", link); } };
-  const share = async () => { if (navigator.share) { try { await navigator.share({ title: "1v1 on Hunt Week", text: "I challenge you to a 1v1 hunt!", url: link }); } catch {} } else copy(); };
+  const share = async () => { if (navigator.share) { try { await navigator.share({ title: "1v1 on PrimaHunt", text: "I challenge you to a 1v1 hunt!", url: link }); } catch {} } else copy(); };
   const cancel = async () => {
     if (!confirm("Call off this 1v1? The link will stop working.")) return;
     setBusy(true);

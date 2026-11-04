@@ -57,7 +57,7 @@ export default function Page() {
         {me.can_create_groups ? null : <Btn busy={busy} className="block ghost" onClick={admin}>🛡️ Create an admin account</Btn>}
       </div>
       <div className="card"><h3>Emails</h3>
-        <div className="sw"><div><b>Reminder emails</b><div className="muted">"NO FORGET YOUR HUNT O!": a nudge when you're in a live hunt and haven't opened Hunt Week for a few days, or after a couple of weeks away.</div></div>
+        <div className="sw"><div><b>Reminder emails</b><div className="muted">"NO FORGET YOUR HUNT O!": a nudge when you're in a live hunt and haven't opened PrimaHunt for a few days, or after a couple of weeks away.</div></div>
           <input type="checkbox" checked={rem} onChange={(e) => toggleRem(e.target.checked)} aria-label="Reminder emails" /></div>
       </div>
       <div className="card"><h3>Your data</h3>

@@ -18,12 +18,12 @@ export default function Page() {
               <div key={r.rank + r.nickname} className="row between"><span style={{ font: "800 19px/1.2 var(--font-head)", textTransform: "uppercase", letterSpacing: "-.02em" }}>{["🥇", "🥈", "🥉"][r.rank - 1]} {["1st", "2nd", "3rd"][r.rank - 1]} · {r.nickname}</span><span className="pts">{r.points} PTS</span></div>
             )) : <p>Nobody scored this week.</p>}
           </div>
-          <div className={"card" + (p.winner ? " mist" : "")}>
+          {p.amount > 0 ? <div className={"card" + (p.winner ? " mist" : "")}>
             <h3>🏆 {naira(p.amount)} prize</h3>
             <p style={{ margin: "6px 0 0" }}>{p.winner ? <>Winner: <b>{p.winner}</b></> : "No winner this week."}</p>
             {p.winner ? <span className={`st ${p.status === "paid" ? "approved" : "pending"}`} style={{ marginTop: 8 }}>{p.status === "paid" ? "✅ Paid" + (p.paid_at ? " · " + fmtDate(p.paid_at) : "") : "⏳ Pending: the admin pays manually"}</span> : null}
             {p.payout_note ? <p className="muted" style={{ margin: "8px 0 0" }}>Note: {p.payout_note}</p> : null}
-          </div>
+          </div> : null}
           {m ? (
             <div className="card"><h2>Your week</h2>
               <dl className="kv" style={{ marginTop: 10 }}><dt>Final rank</dt><dd>#{m.rank}</dd><dt>Final score</dt><dd>{m.points} points</dd><dt>Items completed</dt><dd>{d.completed.length}</dd><dt>Items missed</dt><dd>{d.missed.length}</dd><dt>Approved submissions</dt><dd>{d.approved.length}</dd></dl>

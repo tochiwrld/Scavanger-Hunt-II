@@ -21,7 +21,7 @@ export default function Page() {
     <Async st={st}>{(d) => (
       <>
         <h2>Players</h2>
-        <div className="stack">{d.members.map((m, i) => <div key={i} className="card flat row between"><b>{m.nickname}</b><span className="muted">{m.role === "owner" ? "Admin" : "Player"}</span></div>)}</div>
+        <div className="stack">{d.members.map((m, i) => <div key={i} className="card flat row between"><b>{m.nickname}</b><span className="muted">{m.role === "owner" ? "Admin" : m.role === "admin" ? "Co-admin" : "Player"}</span></div>)}</div>
         {g?.role === "player" ? <><Btn busy={busy} className="block bad" onClick={leave}>Leave this hunt</Btn><p className="muted" style={{ textAlign: "center" }}>Your account and your other hunts stay as they are.</p></> : null}
       </>
     )}</Async>

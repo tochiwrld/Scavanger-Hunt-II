@@ -73,12 +73,13 @@ export default function AppShell({ children }) {
       </main>
       <nav className="nav" aria-label="Main">
         {g ? (
+          // Overview/Home, Review and Leaderboard already sit in the hunt's tab row above, so the pill skips them.
           <>
-            <A href={`/g/${g.id}`} icon={owner ? "grid" : "home"} label={owner ? "Overview" : "Home"} on={sub === ""} />
-            {owner ? <A href={`/g/${g.id}/review`} icon="inbox" label="Review" on={sub === "review"} badge={dot(g.pending)} /> : <A href={`/g/${g.id}/hunt`} icon="hunt" label="Hunt" on={sub === "hunt"} />}
+            {owner ? null : <A href={`/g/${g.id}/hunt`} icon="hunt" label="Hunt" on={sub === "hunt"} />}
             <A href={`/g/${g.id}/feed`} icon="chat" label="Feed" on={sub === "feed"} />
-            <A href={`/g/${g.id}/ranks`} icon="trophy" label="Ranks" on={sub === "ranks"} />
             <A href="/" icon="users" label="Hunts" on={false} />
+            <A href="/duels" icon="swords" label="1v1" on={false} />
+            <A href="/profile" icon="user" label="Profile" on={false} />
           </>
         ) : (
           <>

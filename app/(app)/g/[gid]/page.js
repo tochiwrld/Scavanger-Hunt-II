@@ -32,7 +32,7 @@ function PlayerHome({ gid }) {
           <Plate>
             <div className="eyebrow">{c.week_number ? `Week ${pad2(c.week_number)} · ` : ""}{active ? "Live now" : "Final results"}</div>
             <div className="week">{c.title}</div>
-            <div className="meta">{active ? "Ends" : "Ended"} {ends(c.end_at)} (Lagos time) · Prize <b>{naira(c.prize_amount)}</b></div>
+            <div className="meta">{active ? "Ends" : "Ended"} {ends(c.end_at)} (Lagos time){c.prize_amount > 0 ? <> · Prize <b>{naira(c.prize_amount)}</b></> : null}</div>
             {active ? <Countdown end={c.end_at} onDone={st.reload} /> : <div className="cd">Challenge closed</div>}
             <div className="tiles">
               <div className="tile score"><div className="label">Your score</div><div className="n"><CountUp to={d.score} /><small>pts</small></div></div>

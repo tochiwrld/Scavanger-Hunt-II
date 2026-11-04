@@ -1,4 +1,4 @@
-/* ============ Hunt Week design system ============
+/* ============ PrimaHunt design system ============
    Dark by default; html.light switches the palette. Colour tokens follow the reference site. */
 :root{
   --font-body:var(--nf-body),"Space Grotesk",ui-sans-serif,system-ui,sans-serif;
