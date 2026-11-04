@@ -14,7 +14,7 @@ export default function FindPost({ nickname, title, at, now, mine, meta, badge, 
         </div>
         {badge || null}
       </header>
-      <Photos base={photoBase} id={id} count={photos} who={nickname} />
+      {Number(photos) === 0 ? null : <Photos base={photoBase} id={id} count={photos} who={nickname} />}
       {children}
     </article>
   );

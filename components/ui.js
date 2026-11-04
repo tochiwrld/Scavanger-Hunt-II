@@ -211,7 +211,7 @@ export function ItemCard({ it, gid, preview, onSubmit }) {
 /** 1 to 4 photos of one submission, laid out like a social post. Tap to zoom. */
 /** Photo grid. thumb=true shows the small copies (feed, finds, my submissions) and opens the full photo on tap; admin review passes thumb={false}. */
 export function Photos({ base = "/api/photo", id, count, who = "", thumb = true }) {
-  if (Number(count) === 0) return <p className="muted" style={{ margin: "8px 0" }}>📷 Photos deleted automatically 7 days after review. The points stay.</p>;
+  if (Number(count) === 0) return <p className="muted" style={{ margin: "8px 0" }}>📷 Photos are deleted once an admin reviews them. The result and points stay.</p>;
   const n = Math.max(1, Math.min(4, Number(count) || 2));
   return (
     <div className={"photo-grid n" + n}>
