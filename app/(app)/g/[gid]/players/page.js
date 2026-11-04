@@ -28,6 +28,14 @@ export default function Page() {
   const st = useApi(`/groups/${gid}/members`);
   const [q, setQ] = useState("");
   const [adj, setAdj] = useState(null);
+  const makeAdmin = async (u) => {
+    if (!confirm(`Make ${u.nickname} co-admin? They'll stop playing and can review submissions, run challenges and manage players. They can't remove you or delete the hunt.`)) return;
+    try { await api(`/groups/${gid}/members/${u.id}/make-admin`, { method: "POST" }); toast(`${u.nickname} is now co-admin`, "good"); refreshGroups(); st.reload(); } catch (e) { toast(e.message, "bad"); }
+  };
+  const dropAdmin = async (u) => {
+    if (!confirm(`Remove ${u.nickname} as co-admin? They'll go back to being a player.`)) return;
+    try { await api(`/groups/${gid}/members/${u.id}/remove-admin`, { method: "POST" }); toast(`${u.nickname} is a player again`); refreshGroups(); st.reload(); } catch (e) { toast(e.message, "bad"); }
+  };
   const remove = async (u) => {
     if (!confirm(`Remove ${u.nickname} from this hunt? Their past results stay in the hunt's history.`)) return;
     try { await api(`/groups/${gid}/members/${u.id}/remove`, { method: "POST" }); toast("Removed"); refreshGroups(); st.reload(); } catch (e) { toast(e.message, "bad"); }
@@ -36,8 +44,19 @@ export default function Page() {
     <Async st={st}>{(d) => {
       const players = d.members.filter((m) => m.role === "player");
       const rows = players.filter((m) => !q || m.nickname.toLowerCase().includes(q.toLowerCase()));
+      const coAdmins = d.members.filter((m) => m.role === "admin");
+      const seatFree = coAdmins.length < (d.max_co_admins || 1);
       return (
         <>
+          <section className="card">
+            <h2>Co-admin</h2>
+            {coAdmins.length ? coAdmins.map((u) => (
+              <div key={u.id} className="row between" style={{ marginTop: 10 }}>
+                <b>{u.nickname}</b>
+                {d.founder ? <button className="btn sm ghost" onClick={() => dropAdmin(u)}>Remove as co-admin</button> : <span className="muted">Co-admin</span>}
+              </div>
+            )) : <p className="muted" style={{ margin: "6px 0 0" }}>{d.founder ? "You can make one player co-admin. They help review and run the hunt, but can't remove you or delete the hunt." : "No co-admin yet."}</p>}
+          </section>
           <input type="search" placeholder="Search players" value={q} onChange={(e) => setQ(e.target.value)} />
           {rows.length ? rows.map((u) => (
             <div key={u.id} className="card flat">
@@ -45,6 +64,7 @@ export default function Page() {
               <div className="muted">{u.submissions} submissions · {u.approved} approved · {u.score} pts this week</div>
               <div className="row wrap" style={{ marginTop: 10 }}>
                 <button className="btn sm ghost" onClick={() => (d.active_challenge ? setAdj(u) : toast("There's no active challenge to adjust", "bad"))}>Adjust score</button>
+                {d.founder && seatFree ? <button className="btn sm ghost" onClick={() => makeAdmin(u)}>Make co-admin</button> : null}
                 <button className="btn sm bad" onClick={() => remove(u)}>Remove</button>
               </div>
             </div>

@@ -1,9 +1,9 @@
 # Data breach response procedure
 
-Owner: the Hunt Week operator (contact in `lib/shared.js` → `PRIVACY_CONTACT`).
+Owner: the PrimaHunt operator (contact in `lib/shared.js` → `PRIVACY_CONTACT`).
 Law: Nigeria Data Protection Act 2023 (NDPA) s.40 and the NDPC General Application and Implementation Directive (GAID) 2025.
 
-A **personal data breach** is any security incident that leads to personal data being destroyed, lost, changed, disclosed or accessed without authorisation. Examples for Hunt Week: a leaked `DATABASE_URL` or Supabase service key, someone viewing another hunt's photos, a stolen admin session, emails sent to the wrong people, accidental public exposure of the `hunt-photos` bucket.
+A **personal data breach** is any security incident that leads to personal data being destroyed, lost, changed, disclosed or accessed without authorisation. Examples for PrimaHunt: a leaked `DATABASE_URL` or Supabase service key, someone viewing another hunt's photos, a stolen admin session, emails sent to the wrong people, accidental public exposure of the `hunt-photos` bucket.
 
 ## The clock
 - The 72 hours start when you **become aware** of a breach, not when you finish investigating.
@@ -39,7 +39,7 @@ Write down:
 
 ## Step 3. Notify the NDPC (within 72 hours)
 Use the NDPC's breach-notification channel published at https://ndpc.gov.ng (check the site for the current form/portal and email). Include:
-- Your name and contact (the operator) and the service (Hunt Week, weekly-hunt.vercel.app).
+- Your name and contact (the operator) and the service (PrimaHunt, weekly-hunt.vercel.app).
 - Nature of the breach; categories and approximate numbers of people and records.
 - Likely consequences.
 - Measures taken or proposed to address it and limit harm.
@@ -49,11 +49,11 @@ Use the NDPC's breach-notification channel published at https://ndpc.gov.ng (che
 Send through the in-app notifications **and** email (both are available; email via `sendEmails` in `lib/notify.js`).
 
 Template:
-> **Subject:** Security notice from Hunt Week
+> **Subject:** Security notice from PrimaHunt
 >
 > On [date] we found that [what happened, in plain words]. It affected [what data], from [time window]. We have [what you did to stop it].
 >
-> What you should do: [e.g. change your Hunt Week password; if you use the same password elsewhere, change it there too; be wary of emails pretending to be Hunt Week].
+> What you should do: [e.g. change your PrimaHunt password; if you use the same password elsewhere, change it there too; be wary of emails pretending to be PrimaHunt].
 >
 > We've reported this to the Nigeria Data Protection Commission. Questions: [contact email].
 

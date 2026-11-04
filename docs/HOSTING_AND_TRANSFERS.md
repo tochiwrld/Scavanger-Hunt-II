@@ -2,7 +2,7 @@
 
 Last reviewed: 3 November 2026. Fonts are self-hosted (next/font) since 3 Nov 2026, so browsers no longer contact Google Fonts. Shown to users in the Privacy Policy, section 7 (`app/(public)/privacy/page.js`).
 
-Hunt Week has no infrastructure in Nigeria. All personal data leaves Nigeria.
+PrimaHunt has no infrastructure in Nigeria. All personal data leaves Nigeria.
 
 ## Data map
 
@@ -20,7 +20,7 @@ Hunt Week has no infrastructure in Nigeria. All personal data leaves Nigeria.
    - Supabase: dashboard → Organization → Legal Documents (DPA)
    - Vercel: vercel.com/legal/dpa
    - Google Workspace/Gmail: Google's Cloud Data Processing Addendum (only covers Workspace accounts; a personal Gmail account has no DPA, which is a reason to switch to Resend or a Workspace account for email)
-3. **Informed consent (s.43):** Every user ticks a separate statement at registration ("I agree that my data is stored and processed by Hunt Week's providers outside Nigeria…"), after being told the risk in the Privacy Policy. The wording, version and time are stored in `hunt.consents`.
+3. **Informed consent (s.43):** Every user ticks a separate statement at registration ("I agree that my data is stored and processed by PrimaHunt's providers outside Nigeria…"), after being told the risk in the Privacy Policy. The wording, version and time are stored in `hunt.consents`.
 
 ## Transfer risk notes
 - US-headquartered providers may receive US government requests for data they hold, even when it is stored in France.

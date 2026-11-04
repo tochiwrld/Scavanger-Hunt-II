@@ -16,7 +16,7 @@ function stamp(ctx, w, h, label) {
   ctx.font = `700 ${size}px system-ui, -apple-system, "Segoe UI", sans-serif`;
   ctx.textBaseline = "middle";
   ctx.fillStyle = "#FFD21F";
-  const tag = "HUNT WEEK";
+  const tag = "PRIMAHUNT";
   ctx.fillText(tag, pad, h - barH / 2);
   const tagW = ctx.measureText(tag + "  ").width;
   ctx.fillStyle = "#ffffff";

@@ -2,10 +2,10 @@
 
 Date: 2 November 2026. Not legal advice. Have a Nigerian data protection lawyer or a licensed Data Protection Compliance Organisation (DPCO) confirm.
 
-## Does the NDPA apply to Hunt Week?
-**Yes.** Hunt Week is operated from Lagos and processes personal data (emails, nicknames, photos) of people in Nigeria (NDPA s.2). The household/personal-use exemption doesn't fit: it is a public website that anyone can sign up to and that serves many separate groups.
+## Does the NDPA apply to PrimaHunt?
+**Yes.** PrimaHunt is operated from Lagos and processes personal data (emails, nicknames, photos) of people in Nigeria (NDPA s.2). The household/personal-use exemption doesn't fit: it is a public website that anyone can sign up to and that serves many separate groups.
 
-## Must Hunt Week register as a "data controller of major importance" (DCMI)?
+## Must PrimaHunt register as a "data controller of major importance" (DCMI)?
 Under the NDPA (s.44) and the GAID 2025, controllers and processors of major importance must register with the NDPC. The GAID treats an organisation as of major importance if, among other things, it processes the personal data of **more than 200 data subjects within six months**, or works in certain sectors (finance, health, telecoms, insurance, public sector, etc.). Tiers:
 
 | Tier | Data subjects in 6 months | Annual fee (reported) | Other duties |
@@ -14,10 +14,10 @@ Under the NDPA (s.44) and the GAID 2025, controllers and processors of major imp
 | Extra-High Level (EHL) | 1,000 to 5,000 | ₦100,000 | Annual Compliance Audit Return (CAR) via a DPCO by 31 March |
 | Ultra-High Level (UHL) | over 5,000 | ₦250,000 | Annual CAR via a DPCO by 31 March |
 
-**Hunt Week today:** 17 user accounts in total, all created in the last six months (2 November 2026), with no sector designation, no payments processed and no sensitive data collected on purpose. That is **well under 200**, so **registration is not required right now.**
+**PrimaHunt today:** 17 user accounts in total, all created in the last six months (2 November 2026), with no sector designation, no payments processed and no sensitive data collected on purpose. That is **well under 200**, so **registration is not required right now.**
 
 ## When it becomes required
-As soon as Hunt Week processes data of **more than 200 people in any six-month window**. In practice: more than 200 accounts created or active in six months. Registration would then be at the **OHL** tier (₦10,000/year) until 1,000 people.
+As soon as PrimaHunt processes data of **more than 200 people in any six-month window**. In practice: more than 200 accounts created or active in six months. Registration would then be at the **OHL** tier (₦10,000/year) until 1,000 people.
 
 Check monthly:
 ```sql
@@ -35,7 +35,7 @@ Action at **150** users: prepare registration (NDPC portal at ndpc.gov.ng). At *
 - Cross-border transfer safeguards → `docs/HOSTING_AND_TRANSFERS.md`.
 - No children's data → 18+ confirmation at sign-up.
 
-## Not needed at this size (revisit if Hunt Week grows)
+## Not needed at this size (revisit if PrimaHunt grows)
 - A Data Protection Officer (required for DCMIs).
 - A Data Protection Impact Assessment, unless processing becomes high-risk (e.g. adding location tracking, face recognition or payments).
 

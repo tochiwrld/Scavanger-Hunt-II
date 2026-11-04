@@ -1,8 +1,8 @@
-# Hunt Week — project notes for Claude
+# PrimaHunt — project notes for Claude
 
 Mobile-first weekly scavenger hunt for private friend groups (Lagos, Nigeria). One account can run several groups and play in others. Each group has its own players, weekly challenge, leaderboard, submissions and ₦3,000 weekly prize. Groups must never see each other's data.
 
-Live site: https://weekly-hunt.vercel.app — owner's real group is "Ghetto Search" (group id 1). Treat production data as real.
+Live site: https://weekly-hunt.vercel.app (brand: **PrimaHunt**, wordmark PRIMA<em>HUNT</em>; formerly Hunt Week) — owner's real group is "Ghetto Search" (group id 1). The site's official public hunt is **PRIMAHUNT OFFICIAL** (group id 11, owner user id 1): `groups.auto_join = true`, so `POST /auth/register` adds every new account as a player; all accounts that existed on 2026-11-04 were added once. Members who leave or are removed are not re-added. Treat production data as real.
 
 ## Stack
 - Next.js 15 App Router + React 19, **plain JavaScript (no TypeScript), no UI library**.
@@ -29,10 +29,11 @@ Live site: https://weekly-hunt.vercel.app — owner's real group is "Ghetto Sear
 
 ## Rules that must hold
 - Every `/groups/:gid/...` route goes through `membership()`; look up challenge/item/submission/member IDs **inside that group**.
+- Admins: `group_members.role` is `owner` (founder, = `groups.owner_user_id`), `admin` (co-admin, max `MAX_CO_ADMINS` = 1, also a partial unique index) or `player`. `membership()` maps `admin` → `role: "owner"` so co-admins get every admin route, and sets `group.founder` / `group.member_role`. Route auth `founder` is founder-only: `DELETE /groups/:gid`, `POST /groups/:gid/members/:uid/make-admin`, `.../remove-admin`. Member removal only touches `role='player'`, so a co-admin can't remove the founder. Co-admins see pending photos and get submission alerts; a co-admin who leaves drops back to player. Summaries send `founder` and `co_admin`; `RoleBadge` shows "Co-admin".
 - Submission photos: pending/rejected ones are visible only to the submitter and that group's owner. Approved ones with `in_feed = true` are also visible to that group's active members (group feed). Submissions from before the feed launched have `in_feed = false` and stay private. The poster or the admin can take a post off the feed (`in_feed = false`). Emails are never shown to other users.
 - Points come from the item row at approval time, never from the client. Unique indexes guarantee one approval payment per player per item.
 - Tie-break: equal points → whoever reached that score first (time of the approved submission that got them there).
-- 1 to 4 photos per submission (`photo_1_key` required, `photo_2_key` optional, photos 3-4 in `extra_photo_keys`; form fields `photo1`..`photo4`; served as `/api/photo/:id/1..4`); immutable once sent; refused after the deadline. **Camera only**: `components/CameraCapture.js` opens a live in-app camera (getUserMedia) for every photo, with no gallery or file picker, and burns a stamp (HUNT WEEK · nickname · item · Lagos time) into the bottom. Pinch or 1×/2×/3×/5× zoom (track `zoom` constraint when supported, else centre crop on capture). Front/back flip button (stops the old stream before opening the other camera; selfies are saved mirrored as previewed). Browsers without getUserMedia fall back to `capture="environment"`/`"user"` buttons (phone camera). This is client-side; the stamp plus admin review is the real check. Rejection needs a reason.
+- 1 to 4 photos per submission (`photo_1_key` required, `photo_2_key` optional, photos 3-4 in `extra_photo_keys`; form fields `photo1`..`photo4`; served as `/api/photo/:id/1..4`); immutable once sent; refused after the deadline. **Camera only**: `components/CameraCapture.js` opens a live in-app camera (getUserMedia) for every photo, with no gallery or file picker, and burns a stamp (PRIMAHUNT · nickname · item · Lagos time) into the bottom. Pinch or 1×/2×/3×/5× zoom (track `zoom` constraint when supported, else centre crop on capture). Front/back flip button (stops the old stream before opening the other camera; selfies are saved mirrored as previewed). Browsers without getUserMedia fall back to `capture="environment"`/`"user"` buttons (phone camera). This is client-side; the stamp plus admin review is the real check. Rejection needs a reason.
 - Deleting a hunt: `DELETE /groups/:gid` (owner only, body `confirm` must equal the hunt name; Settings → "Delete this hunt"). DB rows cascade from `groups`; photos (submissions, item references, hunt image) are removed from storage; other members get an in-app note with `group_id` NULL.
 - Published challenges are locked. Times are entered and shown in Africa/Lagos (UTC+1, no DST). Default week: Monday 00:00 → Sunday 23:59:59.
 
@@ -57,7 +58,7 @@ Live site: https://weekly-hunt.vercel.app — owner's real group is "Ghetto Sear
 - Global ranking = all-time points from groups with `is_public = true`. Public groups can be joined without an invite; removed members still can't rejoin.
 
 ## Design system
-Matches the reference https://scavenger-hunt-website.netlify.app/ ("HUNTWEEK"). Dark by default, `html.light` for light mode (saved in `localStorage.theme`). Tokens and all styles are in `app/globals.css` (oklch colours, `--primary` yellow). Fonts: Bricolage Grotesque (headings, uppercase), Space Grotesk (body), JetBrains Mono (numbers). Floating pill nav at the bottom. Hero photo: `https://iwljafkilkizabmgczjn.supabase.co/storage/v1/object/public/site/hero.jpg` (public `site` bucket).
+Matches the reference https://scavenger-hunt-website.netlify.app/ ("HUNTWEEK"). Dark by default, `html.light` for light mode (saved in `localStorage.theme`). Tokens and all styles are in `app/globals.css` (oklch colours, `--primary` yellow). Fonts: Bricolage Grotesque (headings, uppercase), Space Grotesk (body), JetBrains Mono (numbers). Floating pill nav at the bottom; inside a hunt it skips Overview/Home, Review and Leaderboard (already in the hunt's tab row) and shows Hunt (players), Feed, Hunts, 1v1, Profile. Hero photo: `https://iwljafkilkizabmgczjn.supabase.co/storage/v1/object/public/site/hero.jpg` (public `site` bucket).
 
 ## Infrastructure
 - GitHub: `tochiwrld/Scavanger-Hunt-II` (public). **Pushing to `main` auto-deploys to Vercel production.**

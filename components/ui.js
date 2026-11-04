@@ -87,7 +87,7 @@ export function Sheet({ onClose, children }) {
 export function Avatar({ g }) {
   return <div className="av" style={{ "--gc": colorFor(g.id) }}>{g.has_image ? <img src={`/api/groups/${g.id}/image`} alt="" /> : (g.name || "?").trim().charAt(0).toUpperCase()}</div>;
 }
-export const RoleBadge = ({ g }) => <span className={"role" + (g.role === "owner" ? " owner" : "")}>{g.role === "owner" ? "Admin" : "Player"}</span>;
+export const RoleBadge = ({ g }) => <span className={"role" + (g.role === "owner" ? " owner" : "")}>{g.role === "owner" ? (g.co_admin ? "Co-admin" : "Admin") : "Player"}</span>;
 
 export function Countdown({ end, onDone }) {
   const { offset } = useApp();

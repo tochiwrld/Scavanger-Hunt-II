@@ -29,7 +29,7 @@ function InviteBox() {
         <input id="invite" value={v} onChange={(e) => setV(e.target.value)} placeholder="Invite code" autoCapitalize="off" autoCorrect="off" spellCheck={false} />
         <button className="btn" type="submit" disabled={!v.trim()}>Join<Icon n="arrow" size={17} /></button>
       </div>
-      <p className="hint">Hunt Week is invite-only. Ask your hunt admin for the link.</p>
+      <p className="hint">PrimaHunt is invite-only. Ask your hunt admin for the link.</p>
     </form>
   );
 }

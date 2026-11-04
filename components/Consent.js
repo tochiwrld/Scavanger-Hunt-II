@@ -16,7 +16,7 @@ export function useConsent() {
   const view = (
     <fieldset className="consent">
       <legend>Privacy acknowledgement</legend>
-      <p className="muted">Please read the <Link className="link" href="/privacy" target="_blank">Privacy Policy</Link>, then tick each box. You need all of them to use Hunt Week.</p>
+      <p className="muted">Please read the <Link className="link" href="/privacy" target="_blank">Privacy Policy</Link>, then tick each box. You need all of them to use PrimaHunt.</p>
       {CONSENT_ITEMS.map(([k, label]) => (
         <label key={k} className="consent-row">
           <input type="checkbox" checked={!!ticked[k]} onChange={(e) => setTicked((t) => ({ ...t, [k]: e.target.checked }))} required />

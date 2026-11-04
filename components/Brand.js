@@ -6,9 +6,9 @@ import Icon from "./icons.js";
 
 export function Brand({ href = "/" }) {
   return (
-    <Link className="brand" href={href} aria-label="Hunt Week home">
-      <span className="mk">H</span>
-      <span className="wm">HUNT<em>WEEK</em></span>
+    <Link className="brand" href={href} aria-label="PrimaHunt home">
+      <span className="mk">P</span>
+      <span className="wm">PRIMA<em>HUNT</em></span>
     </Link>
   );
 }

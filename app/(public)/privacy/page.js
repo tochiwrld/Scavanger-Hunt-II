@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Brand, ThemeToggle } from "../../../components/Brand.js";
 import { PRIVACY_CONTACT, PRIVACY_VERSION, RETAIN_DAYS } from "../../../lib/shared.js";
 
-export const metadata = { title: "Privacy Policy · Hunt Week", description: "How Hunt Week collects, uses, stores and deletes your data." };
+export const metadata = { title: "Privacy Policy · PrimaHunt", description: "How PrimaHunt collects, uses, stores and deletes your data." };
 
 const UPDATED = "2 November 2026";
 const Mail = () => <a className="link" href={`mailto:${PRIVACY_CONTACT}?subject=Hunt%20Week%20privacy`}>{PRIVACY_CONTACT}</a>;
@@ -19,7 +19,7 @@ export default function Page() {
           <b>The short version.</b> We collect only a nickname, an email, a password and the photos you choose to send. Your email is never shown to anyone.
           Photos are private to you and your hunt admin until approved, then visible only inside your hunt. Location data is stripped from every photo.
           Photos, submissions, comments and 1v1 lists are <b>deleted {RETAIN_DAYS} days after each hunt ends</b>; only score cards are kept.
-          You can download or delete your data at any time from your profile. Hunt Week is for people aged 18 and over.
+          You can download or delete your data at any time from your profile. PrimaHunt is for people aged 18 and over.
         </div>
 
         <nav className="card toc" aria-label="Contents">
@@ -27,7 +27,7 @@ export default function Page() {
         </nav>
 
         <h2 id="s1">1. Who we are</h2>
-        <p>Hunt Week (weekly-hunt.vercel.app) is a free social scavenger-hunt game run from Lagos, Nigeria. The operator of Hunt Week is the <b>data controller</b> for the platform under the Nigeria Data Protection Act 2023 (NDPA). Contact: <Mail />.</p>
+        <p>PrimaHunt (weekly-hunt.vercel.app) is a free social scavenger-hunt game run from Lagos, Nigeria. The operator of PrimaHunt is the <b>data controller</b> for the platform under the Nigeria Data Protection Act 2023 (NDPA). Contact: <Mail />.</p>
         <p>Each hunt is created and run by a <b>hunt admin</b> (a player who sets up a hunt). Hunt admins decide who joins their hunt, review the photos sent to it, and pay any prize personally. If you share anything with an admin outside the app (for example bank details for a prize), that is between you and them and is not covered by this policy.</p>
 
         <h2 id="s2">2. What we collect</h2>
@@ -59,9 +59,10 @@ export default function Page() {
         <ul>
           <li><b>Your email</b>: only you and the operator. Never other players or hunt admins.</li>
           <li><b>Your nickname</b>: everyone in the hunts and 1v1s you play in, and on the global ranking if you play in a hunt its admin has made public.</li>
-          <li><b>Pending or rejected photos</b>: only you and that hunt's admin.</li>
+          <li><b>Pending or rejected photos</b>: only you and that hunt's admins (its admin and, if it has one, its co-admin).</li>
           <li><b>Approved photos</b>: the active players of that hunt, in its feed. You or the admin can take a post off the feed at any time.</li>
           <li><b>1v1 photos</b>: only you and your opponent.</li>
+          <li><b>PRIMAHUNT OFFICIAL</b>: every account is a player in the site's official public hunt, so your nickname can appear on its leaderboard and the global ranking once you score there. You can leave it any time from its Players tab.</li>
           <li><b>Admins</b> can only see and act on their own hunt. The server checks every request against your membership in that hunt; there is no way for an admin to reach another hunt's players, photos or data.</li>
           <li><b>Our providers</b> (section 7) process data only to run the service, under their own security and confidentiality terms.</li>
           <li>We disclose data to authorities only when the law requires it.</li>
@@ -93,7 +94,7 @@ export default function Page() {
         </ul>
 
         <h2 id="s7">7. Where your data is stored (international transfers)</h2>
-        <p>Hunt Week has no servers in Nigeria. Your data is processed by these providers:</p>
+        <p>PrimaHunt has no servers in Nigeria. Your data is processed by these providers:</p>
         <div className="tbl"><table>
           <thead><tr><th>Provider</th><th>What it does</th><th>Location</th></tr></thead>
           <tbody>
@@ -128,7 +129,7 @@ export default function Page() {
         <p>We aim to reply to requests within 7 days, and always within the time the law allows. We may ask you to confirm the request from your account email.</p>
 
         <h2 id="s11">11. Age limit</h2>
-        <p>Hunt Week is only for people aged <b>18 or older</b>. You confirm your age when you register. If we learn an account belongs to someone under 18, we delete it.</p>
+        <p>PrimaHunt is only for people aged <b>18 or older</b>. You confirm your age when you register. If we learn an account belongs to someone under 18, we delete it.</p>
 
         <h2 id="s12">12. Changes</h2>
         <p>If we change this policy in a way that affects you, we'll update the version number above and ask you to read and accept it again before you can keep playing.</p>
@@ -136,7 +137,7 @@ export default function Page() {
         <h2 id="s13">13. Contact</h2>
         <p>Questions, requests or complaints: <Mail />.</p>
 
-        <p style={{ marginTop: 28 }}><Link className="btn ghost block" href="/login">Back to Hunt Week</Link></p>
+        <p style={{ marginTop: 28 }}><Link className="btn ghost block" href="/login">Back to PrimaHunt</Link></p>
       </main>
     </>
   );
