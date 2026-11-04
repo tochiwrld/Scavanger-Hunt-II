@@ -1,20 +1,37 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { api, cap, colorFor, fmtLeft, naira, pad2, TZ, zoom } from "../lib/client.js";
 import Icon from "./icons.js";
 import { useApp } from "./Providers.js";
 
 /** Fetch helper: { data, error, loading, reload }. Reloads when alerts arrive. */
-export function useApi(path) {
+/**
+ * Loads `path`. With { poll: ms } it also re-checks quietly every `ms` while the page is on screen, pauses when the
+ * tab is hidden or the phone is locked, and checks right away on return. A failed background check keeps the last data.
+ */
+export function useApi(path, { poll } = {}) {
   const [state, setState] = useState({ data: null, error: null, loading: !!path });
   const [tick, setTick] = useState(0);
+  const quiet = useRef(false);
   useEffect(() => {
     if (!path) return undefined;
     let dead = false;
+    const bg = quiet.current;
+    quiet.current = false;
     api(path).then((data) => !dead && setState({ data, error: null, loading: false }))
-      .catch((error) => !dead && setState({ data: null, error, loading: false }));
+      .catch((error) => !dead && setState((st) => (bg && st.data ? st : { data: null, error, loading: false })));
     return () => { dead = true; };
   }, [path, tick]);
+  useEffect(() => {
+    if (!poll || !path) return undefined;
+    let timer;
+    const check = () => { quiet.current = true; setTick((t) => t + 1); };
+    const start = () => { clearInterval(timer); timer = setInterval(check, poll); };
+    const onVis = () => { if (document.hidden) clearInterval(timer); else { check(); start(); } };
+    if (!document.hidden) start();
+    document.addEventListener("visibilitychange", onVis);
+    return () => { clearInterval(timer); document.removeEventListener("visibilitychange", onVis); };
+  }, [poll, path]);
   useEffect(() => {
     const f = () => setTick((t) => t + 1);
     window.addEventListener("hunt:refresh", f);
@@ -192,13 +209,15 @@ export function ItemCard({ it, gid, preview, onSubmit }) {
 }
 
 /** 1 to 4 photos of one submission, laid out like a social post. Tap to zoom. */
-export function Photos({ base = "/api/photo", id, count, who = "" }) {
+/** Photo grid. thumb=true shows the small copies (feed, finds, my submissions) and opens the full photo on tap; admin review passes thumb={false}. */
+export function Photos({ base = "/api/photo", id, count, who = "", thumb = true }) {
   const n = Math.max(1, Math.min(4, Number(count) || 2));
   return (
     <div className={"photo-grid n" + n}>
-      {Array.from({ length: n }, (_, i) => (
-        <img key={i} loading="lazy" src={`${base}/${id}/${i + 1}`} alt={`${who ? who + "'s " : ""}photo ${i + 1}`} onClick={(e) => zoom(e.currentTarget.src)} />
-      ))}
+      {Array.from({ length: n }, (_, i) => {
+        const full = `${base}/${id}/${i + 1}`;
+        return <img key={i} loading="lazy" decoding="async" src={thumb ? `${full}?s=thumb` : full} alt={`${who ? who + "'s " : ""}photo ${i + 1}`} onClick={() => zoom(full)} />;
+      })}
     </div>
   );
 }

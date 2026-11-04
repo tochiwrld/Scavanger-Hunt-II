@@ -1,9 +1,9 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { TZ } from "../lib/client.js";
+import { PHOTO_EDGE, TZ, encodeCanvas } from "../lib/client.js";
 import Icon from "./icons.js";
 
-const MAX_EDGE = 1600;
+const MAX_EDGE = PHOTO_EDGE; // 1280px keeps each photo around 150-300 KB
 
 /** Burns "nickname · item · Sun 1 Nov, 18:48" into the bottom of a photo so admins can see when and for what it was taken. */
 function stamp(ctx, w, h, label) {
@@ -37,7 +37,7 @@ function toCanvas(src, sw, sh, label, mirror = false, crop = 1) {
   ctx.drawImage(src, cx, cy, cw, ch, 0, 0, c.width, c.height);
   if (mirror) ctx.restore();
   stamp(ctx, c.width, c.height, label);
-  return new Promise((r) => c.toBlob(r, "image/jpeg", 0.85));
+  return encodeCanvas(c, 0.8); // WebP where the browser supports it, otherwise JPEG
 }
 
 /**

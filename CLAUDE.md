@@ -15,7 +15,7 @@ Live site: https://weekly-hunt.vercel.app — owner's real group is "Ghetto Sear
 ## Layout
 - `app/(public)/` login, register, forgot, reset/[token], join/[token]
 - `app/(app)/` signed-in pages, wrapped by `components/AppShell.js`; group pages under `app/(app)/g/[gid]/…`
-- `components/ui.js` shared pieces (ItemCard, LbRows, ChallengeHead, Plate, StatusPill, Difficulty, Countdown, useApi, useForm)
+- `components/ui.js` shared pieces (ItemCard, LbRows, ChallengeHead, Plate, StatusPill, Difficulty, Countdown, useApi, useForm). `useApi(path, { poll: ms })` re-checks quietly while the page is visible (the leaderboard polls every 60 s; no Realtime, no refresh button).
 - `components/icons.js` inline Lucide-style icons (`<Icon n="trophy" />`); `components/Brand.js` logo + theme toggle
 - `lib/duel.js` 1v1 phases, scoring and finishing; 1v1 routes are at the end of `lib/router.js`; pages `app/(app)/duels`, `app/(app)/duel/[id]`, `app/(public)/vs/[token]`
 - `components/GlobalSearch.js` public groups + global leaderboard on the home page (`GET /global`, `POST /global/:gid/join`; admins toggle `groups.is_public` in Settings)
@@ -41,7 +41,8 @@ Live site: https://weekly-hunt.vercel.app — owner's real group is "Ghetto Sear
 - Consent: registration requires every `CONSENT_ITEMS` key `=== true` in `body.consent` (18+, policy, photo visibility, 7-day deletion, transfers abroad). Stored on `users.privacy_version/privacy_accepted_at` and as history in `hunt.consents`. `handle()` returns **428** for any signed-in route (except `CONSENT_FREE`) until the current version is accepted; `AppShell` shows `components/Consent.js` (`POST /me/consent`).
 - Rights: `GET /me/export` (JSON download), `DELETE /me` (password + "DELETE"; deletes photos first, then the user row, which cascades, including hunts they own and their 1v1s).
 - Retention: `lib/retention.js` `runRetention()` runs in the cron after `runLifecycle()`. 7 days after a challenge's `end_at` (or a 1v1's finish) it deletes submissions + photos + comments + reference images, and 1v1 submissions + items; keeps score cards (`point_transactions`, `weekly_results`, `prizes`, `duels.creator_items/opponent_items/*_reached_at`). Storage first, rows second. Also prunes notifications > 30 days, old resets and rate limits. `duelScores()` uses the saved score once a duel is finished.
-- Uploads: `lib/imagesafe.js` `sanitizeImage()` strips EXIF/XMP/comments (GPS) and rejects > 8000 px / 40 MP, without re-encoding. Photos served with `no-store`, `nosniff`, `CSP: sandbox`, `CORP: same-origin`.
+- Uploads: `lib/imagesafe.js` `sanitizeImage()` strips EXIF/XMP/comments (GPS) and rejects > 8000 px / 40 MP, without re-encoding. Photos served with `private, max-age=3600` (browser-only cache; photos are immutable), `nosniff`, `CSP: sandbox`, `CORP: same-origin`.
+- Photo size: `CameraCapture` saves 1280px WebP (JPEG where the browser can't encode WebP), ~150-300 KB. `SubmitSheet` also sends a 400px `thumbN` per photo (`lib/client.js` `makeThumb`); the server stores them in `thumb_keys text[]` (aligned with the photos, `''` where none) on `submissions` and `duel_submissions`. `/api/photo/:id/:n?s=thumb` (and `/api/duel-photo`) serves the thumbnail, falling back to the full photo. `Photos` in `components/ui.js` shows thumbs and opens the full photo on tap; `ReviewCard` passes `thumb={false}` so admins judge full photos. Any query feeding `photoKeys()` must select `thumb_keys` so deletions remove thumbnails too.
 - Reminder emails: `lib/reminders.js` `runReminders()` (cron, 10:00–19:59 Lagos). `users.last_seen_at` (updated by `currentUser()` at most every 30 min; also resets `nudge_count`), `last_nudge_at`, `nudge_count`, `email_reminders`. In a live hunt and away `NUDGE_ACTIVE_DAYS` (3) → "NO FORGET YOUR HUNT O!" with their live hunts and the total live count; away `NUDGE_DORMANT_DAYS` (14) → same, max `NUDGE_DORMANT_MAX` (3) in a row. Opt-out: Profile toggle (`PUT /me/reminders`) or signed `GET /api/unsubscribe?u=&s=` (own HMAC context, not a login token).
 - Item points come from `DIFFICULTY_POINTS` (easy 5, medium 10, hard 15, extreme 20); the client only sends a difficulty.
 - Docs: `docs/BREACH_RESPONSE.md`, `docs/HOSTING_AND_TRANSFERS.md`, `docs/NDPC_ASSESSMENT.md`, `docs/PHOTO_DELETION_POLICY.md`. Update them with any new provider or data use.
@@ -77,6 +78,6 @@ Matches the reference https://scavenger-hunt-website.netlify.app/ ("HUNTWEEK"). 
 
 ## Known gaps / open items
 - NDPC registration becomes required above 200 users in six months (see docs/NDPC_ASSESSMENT.md).
-- Photo uploads capped at 2 MB each (Vercel's ~4.5 MB request limit); the phone shrinks photos before upload.
+- Photo uploads capped at 2 MB each, thumbnails at 300 KB (Vercel's ~4.5 MB request limit); the phone shrinks photos before upload. The `hunt-photos` bucket itself also enforces 2 MB and JPEG/PNG/WebP.
 - Old single-group tables still sit in the `public` schema, locked and unused. Safe to drop on request.
 - Secrets were once pasted into a chat; the owner may rotate the Supabase secret key and Gmail app password (update the Vercel env vars and redeploy).

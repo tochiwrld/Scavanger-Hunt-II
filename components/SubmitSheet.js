@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { api, shrink } from "../lib/client.js";
+import { api, extOf, makeThumb, shrink } from "../lib/client.js";
 import { useApp } from "./Providers.js";
 import CameraCapture from "./CameraCapture.js";
 import Icon from "./icons.js";
@@ -30,10 +30,13 @@ export default function SubmitSheet({ gid, it, endpoint = `/groups/${gid}/items/
     setBusy(true); setErr("");
     let files = ready.map((s) => s.file);
     // Rarely, big photos still add up past the limit: squeeze them harder rather than fail.
-    if (files.reduce((a, f) => a + f.size, 0) > LIMIT) files = await Promise.all(files.map((f) => shrink(f, 1200, 0.7)));
+    if (files.reduce((a, f) => a + f.size, 0) > LIMIT) files = await Promise.all(files.map((f) => shrink(f, 1080, 0.7)));
     if (files.reduce((a, f) => a + f.size, 0) > LIMIT) { setErr("These photos are too big together. Remove one and try again."); setBusy(false); return; }
+    // Small copies for the feed/finds, so scrolling loads ~30 KB per photo instead of the full one.
+    const thumbs = await Promise.all(files.map(makeThumb));
     const fd = new FormData();
-    files.forEach((f, k) => fd.append("photo" + (k + 1), f, `photo${k + 1}.jpg`));
+    files.forEach((f, k) => fd.append("photo" + (k + 1), f, `photo${k + 1}.${extOf(f)}`));
+    thumbs.forEach((t, k) => { if (t) fd.append("thumb" + (k + 1), t, `thumb${k + 1}.${extOf(t)}`); });
     try { await api(endpoint, { method: "POST", form: fd }); onDone(); }
     catch (e) { setErr(e.message); setBusy(false); }
   };

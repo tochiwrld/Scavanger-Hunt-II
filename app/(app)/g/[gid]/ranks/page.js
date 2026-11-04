@@ -6,7 +6,8 @@ import { Async, Empty, LbRows, useApi } from "../../../../../components/ui.js";
 
 export default function Page() {
   const { gid } = useParams();
-  const st = useApi(`/groups/${gid}/leaderboard`);
+  // Updates itself every 60 seconds while open (paused when the phone is locked or the tab is hidden). No refresh button needed.
+  const st = useApi(`/groups/${gid}/leaderboard`, { poll: 60_000 });
   return (
     <Async st={st}>{(d) => {
       if (d.phase === "none") return <Empty icon="🏆" title="No leaderboard yet" text="It appears when the first hunt goes live." />;
