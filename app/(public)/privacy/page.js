@@ -35,7 +35,7 @@ export default function Page() {
           <thead><tr><th>Data</th><th>Where it comes from</th></tr></thead>
           <tbody>
             <tr><td><b>Account:</b> nickname, email address, password (stored only as a salted scrypt hash)</td><td>You, when you register</td></tr>
-            <tr><td><b>Game data:</b> hunts you create or join, your role, submissions, approval/rejection decisions and reasons, points, ranks, prizes, 1v1 lists and results, feed comments</td><td>You and other players while you play</td></tr>
+            <tr><td><b>Game data:</b> hunts you create or join, your role, submissions, approval/rejection decisions and reasons, pips (points), ranks, prizes, 1v1 and team match lists and results, daily hunt finds and streaks, feed comments</td><td>You and other players while you play</td></tr>
             <tr><td><b>Photos:</b> pictures you take in the app's camera, stamped with your nickname, the item and the time. Optional hunt and item reference images uploaded by admins.</td><td>You (or the admin)</td></tr>
             <tr><td><b>Consent record:</b> which version of this notice you accepted, every statement you ticked, and when</td><td>You, at sign-up or when the notice changes</td></tr>
             <tr><td><b>Security data:</b> a signed login cookie, short-lived rate-limit counters keyed to your network address, password-reset tokens (stored only as a hash), an admin action log per hunt</td><td>Generated automatically</td></tr>
@@ -62,6 +62,8 @@ export default function Page() {
           <li><b>Pending or rejected photos</b>: only you and that hunt's admins (its admin and, if it has one, its co-admin).</li>
           <li><b>Approved photos</b>: the active players of that hunt, in its feed. You or the admin can take a post off the feed at any time.</li>
           <li><b>1v1 photos</b>: only you and your opponent.</li>
+          <li><b>Team vs photos</b>: only the players in that match (both teams).</li>
+          <li><b>Daily hunt photos</b>: only you. Your streak shows on your own profile.</li>
           <li><b>PRIMAHUNT OFFICIAL</b>: every account is a player in the site's official public hunt, so your nickname can appear on its leaderboard and the global ranking once you score there. It has no cash prize and runs as one long hunt, so its photos are deleted as soon as an admin reviews them (the feed only shows who found what), comments on its finds are deleted 7 days later, and it never sends email. You can leave it any time from its Players tab.</li>
           <li><b>Admins</b> can only see and act on their own hunt. The server checks every request against your membership in that hunt; there is no way for an admin to reach another hunt's players, photos or data.</li>
           <li><b>Our providers</b> (section 7) process data only to run the service, under their own security and confidentiality terms.</li>
@@ -73,8 +75,9 @@ export default function Page() {
           <thead><tr><th>Data</th><th>Kept for</th></tr></thead>
           <tbody>
             <tr><td>Submission photos, submissions, rejection reasons, feed comments, item reference images</td><td><b>{RETAIN_DAYS} days after that week's hunt ends</b>, then deleted automatically</td></tr>
-            <tr><td>1v1 photos and lists</td><td><b>{RETAIN_DAYS} days after the 1v1 ends</b>, then deleted automatically</td></tr>
-            <tr><td><b>Score cards</b>: points, ranks, weekly results and stat recaps (for example who led and for how long), wins, prize records, "Hunter of the week" awards, 1v1 final scores, and item names</td><td>Kept while the hunt exists, so other players' results stay correct. If you delete your account, your entries stay but show as "Deleted player" and can no longer be linked to you.</td></tr>
+            <tr><td>1v1 and Team vs photos and lists</td><td><b>{RETAIN_DAYS} days after the match ends</b>, then deleted automatically</td></tr>
+            <tr><td>Daily hunt photos</td><td><b>{RETAIN_DAYS} days after you take them</b>, then deleted automatically. The record that you found that day's item stays, because it is your streak.</td></tr>
+            <tr><td><b>Score cards</b>: pips, ranks, weekly results and stat recaps (for example who led and for how long), wins, prize records, "Hunter of the week" awards, 1v1 final scores, and item names</td><td>Kept while the hunt exists, so other players' results stay correct. If you delete your account, your entries stay but show as "Deleted player" and can no longer be linked to you.</td></tr>
             <tr><td>Account (nickname, email, password hash) and consent records</td><td>Until you delete your account</td></tr>
             <tr><td>Notifications</td><td>30 days</td></tr>
             <tr><td>Password-reset tokens and rate-limit counters</td><td>1 to 2 days</td></tr>

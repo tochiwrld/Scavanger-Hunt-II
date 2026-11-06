@@ -511,3 +511,7 @@ button.slot.filled{border:1.5px solid var(--primary)}
 .recap{list-style:none;padding:0;margin:10px 0 0;display:flex;flex-direction:column;gap:10px}
 .recap li{display:flex;gap:10px;align-items:flex-start;line-height:1.45}
 .recap li span{flex:none;width:24px;text-align:center}
+/* ---------- daily hunt / streak ---------- */
+.streak-card,.daily-card{gap:14px;align-items:center;color:inherit;text-decoration:none}
+.streak-card .flame,.daily-card .flame{font-size:34px;line-height:1}
+.daily-card{border:1.5px solid color-mix(in oklch,var(--primary) 40%,transparent)}

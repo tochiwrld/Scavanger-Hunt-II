@@ -140,7 +140,7 @@ export function LbRows({ rows, prize }) {
               <div className="nm"><span>{r.nickname}</span>{r.rank === 1 && r.points > 0 ? <Icon n="crown" size={16} /> : null}{r.me ? <span className="you">YOU</span> : null}</div>
               <div className="sub"><span>{r.tier ? r.tier : `${r.items} item${r.items === 1 ? "" : "s"} approved`}</span>{tied ? <span className="reach"><Icon n="timer" size={13} />reached {reached(r.reached_at)}</span> : null}</div>
             </div>
-            <div className="score"><div className="pt">{r.points}</div><div className="unit">{prize && r.rank === 1 && r.points > 0 ? naira(prize) : "PTS"}</div></div>
+            <div className="score"><div className="pt">{r.points}</div><div className="unit">{prize && r.rank === 1 && r.points > 0 ? naira(prize) : "PIPS"}</div></div>
           </div>
         );
       })}
@@ -188,7 +188,7 @@ export function ItemCard({ it, gid, preview, onSubmit }) {
     <article className={`card item ${it.status}`} style={{ animation: "rise .3s both" }}>
       <div className="head"><span className="num">Item {pad2(it.number)}</span><StatusPill status={it.status} /></div>
       <h3>{it.title}</h3>
-      <div className="tags"><Difficulty d={it.difficulty} /><span className="pts">{it.points} PTS</span></div>
+      <div className="tags"><Difficulty d={it.difficulty} /><span className="pts">{it.points} PIPS</span></div>
       {it.description ? <p className="txt">{it.description}</p> : null}
       {it.instructions ? <p className="txt">{it.instructions}</p> : null}
       {it.has_reference ? <img className="refimg" loading="lazy" src={`/api/groups/${gid}/items/${it.id}/reference`} alt="Reference" onClick={(e) => zoom(e.currentTarget.src)} /> : null}
@@ -197,7 +197,7 @@ export function ItemCard({ it, gid, preview, onSubmit }) {
         <div className="foot">
           {it.status === "not_submitted" ? <button className="btn block" onClick={() => onSubmit(it)}><Icon n="camera" size={18} />Submit photos</button> : null}
           {it.status === "pending" ? <div className="state-box">{it.submitted_at ? "Submitted " + fmtShort(it.submitted_at) + " · " : ""}photos locked while in review</div> : null}
-          {it.status === "approved" ? <div className="state-box earned">+{it.points} points earned</div> : null}
+          {it.status === "approved" ? <div className="state-box earned">+{it.points} pips earned</div> : null}
           {it.status === "rejected" ? (
             <>
               <div className="reason"><b>Rejected:</b> {it.rejection_reason}</div>
@@ -213,7 +213,7 @@ export function ItemCard({ it, gid, preview, onSubmit }) {
 /** 1 to 4 photos of one submission, laid out like a social post. Tap to zoom. */
 /** Photo grid. thumb=true shows the small copies (feed, finds, my submissions) and opens the full photo on tap; admin review passes thumb={false}. */
 export function Photos({ base = "/api/photo", id, count, who = "", thumb = true }) {
-  if (Number(count) === 0) return <p className="muted" style={{ margin: "8px 0" }}>📷 Photos are deleted once an admin reviews them. The result and points stay.</p>;
+  if (Number(count) === 0) return <p className="muted" style={{ margin: "8px 0" }}>📷 Photos are deleted once an admin reviews them. The result and pips stay.</p>;
   const n = Math.max(1, Math.min(4, Number(count) || 2));
   return (
     <div className={"photo-grid n" + n}>

@@ -45,6 +45,15 @@ export default function Page() {
   return (
     <>
       <h1>Profile</h1>
+      <Link href="/daily" className="card streak-card" style={{ display: "flex" }}>
+        <span className="flame" aria-hidden="true">🔥</span>
+        <div className="grow">
+          <div className="eyebrow">Daily hunt streak</div>
+          <div style={{ font: "800 26px/1.1 var(--font-head)", marginTop: 4 }}>{me.streak?.current || 0} day{(me.streak?.current || 0) === 1 ? "" : "s"}</div>
+          <div className="muted" style={{ fontSize: 14 }}>Best {me.streak?.best || 0} · {me.streak?.total || 0} found{me.streak?.done_today ? " · today ✅" : " · today's item is waiting"}</div>
+        </div>
+        <Icon n="arrow" size={18} />
+      </Link>
       {me.hunter ? (
         <div className="card hunter-badge" role="status">
           <span className="medal" aria-hidden="true">🏅</span>

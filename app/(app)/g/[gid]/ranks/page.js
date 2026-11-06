@@ -13,7 +13,7 @@ export default function Page() {
     <Async st={st}>{(d) => {
       if (d.phase === "none") return <Empty icon="🏆" title="No leaderboard yet" text="It appears when the first hunt goes live." />;
       const m = d.me, c = d.challenge, live = d.phase === "active";
-      // After Sunday 11:59 PM no new finds come in, but reviews of finds sent in time can still add points for RETAIN_DAYS.
+      // After Sunday 11:59 PM no new finds come in, but reviews of finds sent in time can still add pips for RETAIN_DAYS.
       const settlesAt = new Date(new Date(c.end_at).getTime() + RETAIN_DAYS * 864e5);
       const settling = !live && settlesAt > new Date();
       return (
@@ -22,7 +22,7 @@ export default function Page() {
           {m ? (
             <div className="tiles" style={{ marginTop: 0 }}>
               <div className="tile score"><div className="label">Your rank</div><div className="n">#{m.rank}<small>/ {d.total}</small></div></div>
-              <div className="tile rank"><div className="label">Your points</div><div className="n">{m.points}<small>pts</small></div></div>
+              <div className="tile rank"><div className="label">Your pips</div><div className="n">{m.points}<small>pips</small></div></div>
             </div>
           ) : null}
           {m ? <p className="gap-note" style={{ margin: 0 }}>{m.above ? <><b>{m.gap} point{m.gap === 1 ? "" : "s"}</b> to pass {m.above}</> : m.points > 0 ? <b style={{ color: "var(--primary)" }}>You're in front. Hold on to it.</b> : "Get your first item approved to get on the board."}</p> : null}

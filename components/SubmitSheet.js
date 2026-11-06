@@ -44,7 +44,7 @@ export default function SubmitSheet({ gid, it, endpoint = `/groups/${gid}/items/
   return (
     <Sheet onClose={onClose}>
       <h2>Item {it.number}</h2>
-      <p style={{ margin: "6px 0" }}><b>{it.title}</b>{it.points != null ? ` · ${it.points} points` : ""}</p>
+      <p style={{ margin: "6px 0" }}><b>{it.title}</b>{it.points != null ? ` · ${it.points} pips` : ""}</p>
       <p className="muted">{it.instructions || it.description || "Take a clear photo as proof with the camera. Add more if it helps."}</p>
       <div className={"slots n" + slots.length}>
         {slots.map((s, i) => (

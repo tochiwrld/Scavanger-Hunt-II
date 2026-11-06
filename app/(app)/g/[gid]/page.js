@@ -35,7 +35,7 @@ function PlayerHome({ gid }) {
             <div className="meta">{active ? "Ends" : "Ended"} {ends(c.end_at)} (Lagos time){c.prize_amount > 0 ? <> · Prize <b>{naira(c.prize_amount)}</b></> : null}</div>
             {active ? <Countdown end={c.end_at} onDone={st.reload} /> : <div className="cd">Challenge closed</div>}
             <div className="tiles">
-              <div className="tile score"><div className="label">Your score</div><div className="n"><CountUp to={d.score} /><small>pts</small></div></div>
+              <div className="tile score"><div className="label">Your score</div><div className="n"><CountUp to={d.score} /><small>pips</small></div></div>
               <div className="tile rank"><div className="label">Your rank</div><div className="n">{d.rank ? "#" + d.rank : "–"}<small>/ {d.total}</small>{bump ? <span className="bump">▲{bump}</span> : null}</div></div>
             </div>
             {d.rank > 1 && d.gap ? <p className="gap-note"><b>{d.gap} point{d.gap === 1 ? "" : "s"}</b> to pass {d.above}</p> : null}
@@ -43,7 +43,7 @@ function PlayerHome({ gid }) {
           </Plate>
           {up}
           <section className="card">
-            <div className="progress-head"><h2>Your progress</h2><span className="mono">{d.score} / {possible} pts possible</span></div>
+            <div className="progress-head"><h2>Your progress</h2><span className="mono">{d.score} / {possible} pips possible</span></div>
             <div className="bar"><i style={{ width: pct + "%" }} /></div>
             <div className="stats">
               <div className="stat"><Icon n="check" size={20} className="c-ok" /><b>{d.items_done}/{d.items_total}</b><span>Approved</span></div>

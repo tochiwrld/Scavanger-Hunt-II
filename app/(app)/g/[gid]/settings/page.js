@@ -54,7 +54,7 @@ export default function Page() {
             <Btn busy={edit.busy} className="block" type="submit">Save hunt</Btn></form>
         ) : null}
         <div className="card"><h2 style={{ marginBottom: 6 }}>Global Hunt</h2>
-          <div className="sw"><div><b>List this hunt in Global Hunt</b><div className="muted">Anyone can find it on the home page and join without an invite. Points earned here count toward the global ranking.</div></div>
+          <div className="sw"><div><b>List this hunt in Global Hunt</b><div className="muted">Anyone can find it on the home page and join without an invite. Pips earned here count toward the global ranking.</div></div>
             <input type="checkbox" aria-label="List this hunt publicly" checked={pub} onChange={(e) => setPublic(e.target.checked)} /></div>
         </div>
         {s ? (

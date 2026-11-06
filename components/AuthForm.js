@@ -35,9 +35,9 @@ function InviteBox() {
 }
 
 const STEPS = [
-  ["hunt", "A new list every Monday", "Your admin drops a fresh list of real-world items at 12:00 AM Lagos time. Each one has its own point value."],
+  ["hunt", "A new list every Monday", "Your admin drops a fresh list of real-world items at 12:00 AM Lagos time. Each one has its own pip value."],
   ["camera", "Find it, snap it", "Spot an item out in the world and send a photo as proof, straight from your phone camera. Add up to four if one shot doesn't tell the whole story."],
-  ["check", "Get approved, earn points", "Every submission is reviewed by hand. Approved items add points to your weekly score."],
+  ["check", "Get approved, earn pips", "Every submission is reviewed by hand. Approved items add pips to your weekly score."],
   ["trophy", "Top the board by Sunday", WEEK_END_RULE],
 ];
 
@@ -106,17 +106,7 @@ function Inner({ mode }) {
         <section className="card" style={{ marginTop: 18 }}>
           <h2 style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}><Icon n="timer" size={22} className="c-primary" />The tie-breaker</h2>
           <p className="prose" style={{ margin: 0 }}>If two players finish the week on the same score, the one who <b>reached that score first</b> ranks higher. We use the server time of the approval that brought each player to their final total — so the earlier hunter wins. Never a coin toss.</p>
-          <div className="codebox"><div>TOCHI — 500 pts — reached 3:32 PM</div><div className="dim">MIKE — 500 pts — reached 4:08 PM</div><div className="res">→ Tochi takes first place.</div></div>
-        </section>
-
-        <section className="card plist">
-          <h2 style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}><Icon n="lock" size={22} className="c-primary" />Your privacy</h2>
-          <p><b>Email</b> — used only to log you in, reset your password and send game updates. It is never shown to other players.</p>
-          <p><b>Photos</b> — stored privately. While they wait for review, only you and your hunt admin can see them. Once approved, they appear in your hunt's feed so the players in that hunt can see them and comment — you can take your own find off the feed at any time. People outside your hunt never see them.</p>
-          <p><b>Nickname</b> — the only thing that appears on leaderboards and results.</p>
-          <p><b>No location tracking</b> — we never ask for GPS, phone numbers, real names or payment details, and we strip location data from every photo.</p>
-          <p><b>Deleted after a week</b> — photos, submissions, comments and 1v1 lists are deleted {RETAIN_DAYS} days after each hunt ends. Only score cards are kept. You can download or delete your data any time.</p>
-          <p><Link className="link" href="/privacy">Read the full Privacy Policy</Link></p>
+          <div className="codebox"><div>TOCHI — 500 pips — reached 3:32 PM</div><div className="dim">MIKE — 500 pips — reached 4:08 PM</div><div className="res">→ Tochi takes first place.</div></div>
         </section>
 
         <div className="foot-brand"><Brand href="/login" /><div>A free social game among friends. Prizes are paid out personally by each hunt's admin.</div><div style={{ marginTop: 8 }}><Link className="link" href="/privacy">Privacy Policy</Link> · <Link className="link" href="/terms">Terms</Link></div></div>

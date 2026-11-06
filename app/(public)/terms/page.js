@@ -33,7 +33,7 @@ export default function Page() {
           <li>Harm or cruelty to animals.</li>
           <li>Personal information about others (addresses, phone numbers, ID, bank details).</li>
         </ul>
-        <p>If an item can't be completed safely and legally, skip it. No points are worth it.</p>
+        <p>If an item can't be completed safely and legally, skip it. No pips are worth it.</p>
 
         <h2>3. If you run a hunt</h2>
         <ul>

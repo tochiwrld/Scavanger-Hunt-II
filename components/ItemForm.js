@@ -32,11 +32,11 @@ export default function ItemForm({ gid, cid, it, onClose, onSaved }) {
             {Object.entries(DIFFICULTY_POINTS).map(([d, pts]) => (
               <label key={d} className={"diff-opt" + (diff === d ? " on" : "")}>
                 <input type="radio" name="difficulty" value={d} checked={diff === d} onChange={() => setDiff(d)} />
-                <b>{cap(d)}</b><span>{pts} pts</span>
+                <b>{cap(d)}</b><span>{pts} pips</span>
               </label>
             ))}
           </div>
-          <div className="muted" style={{ marginTop: 6, fontSize: 13 }}>Points are set by the difficulty.</div>
+          <div className="muted" style={{ marginTop: 6, fontSize: 13 }}>Pips are set by the difficulty.</div>
         </div>
         <div><label>Hint (optional)</label><input aria-label="Hint (optional)" name="hint" maxLength={500} defaultValue={it?.hint || ""} /></div>
         <div><label>Reference image (optional)</label><input aria-label="Reference image (optional)" name="ref" type="file" accept="image/*" />

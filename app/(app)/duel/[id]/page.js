@@ -8,6 +8,7 @@ import Icon from "../../../../components/icons.js";
 import ReviewCard from "../../../../components/ReviewCard.js";
 import SubmitSheet from "../../../../components/SubmitSheet.js";
 import FindPost from "../../../../components/FindPost.js";
+import { WinVideo, WinOverlay } from "../../../../components/Win.js";
 import { Async, Btn, Countdown, Empty, ErrBox, Plate, Sheet, StatusPill, useApi, useForm } from "../../../../components/ui.js";
 
 export default function Page() {
@@ -57,7 +58,7 @@ function Room({ d, reload }) {
         <p className="muted" style={{ margin: "14px 0 0", fontSize: 13 }}>Most approved items wins. Tied? Whoever got there first wins.</p>
       </Plate>
 
-      {duel.phase === "finished" && duel.result === "won" ? <WinOverlay id={duel.id} them={them.nickname} me={me.score} total={duel.item_count} /> : null}
+      {duel.phase === "finished" && duel.result === "won" ? <WinOverlay storageKey={"won:" + duel.id} title={`You beat ${them.nickname}!`} line={`${me.score}/${duel.item_count} found. First to finish takes the win.`} /> : null}
       {duel.phase === "waiting" ? <Waiting duel={duel} reload={reload} /> : null}
       {duel.phase === "setup" ? <Setup d={d} reload={reload} /> : null}
 
@@ -100,43 +101,6 @@ function Room({ d, reload }) {
 
       {hunting ? <SubmitSheet it={hunting} endpoint={`${base}/items/${hunting.id}/submit`} onClose={() => setHunting(null)} onDone={() => { setHunting(null); toast(`Sent! Waiting for ${them.nickname} to judge it.`, "good"); reload(); }} /> : null}
     </>
-  );
-}
-
-/** The "YOU WIN" animation (converted from the GIF to a small looping video). */
-function WinVideo({ className = "" }) {
-  return (
-    <video className={"win-video " + className} autoPlay muted loop playsInline poster="/img/you-win.jpg" aria-label="You win!">
-      <source src="/img/you-win.webm" type="video/webm" />
-      <source src="/img/you-win.mp4" type="video/mp4" />
-    </video>
-  );
-}
-
-/** Full-screen celebration the first time the winner opens a finished 1v1. Only ever rendered for the winner. */
-function WinOverlay({ id, them, me, total }) {
-  const [open, setOpen] = useState(false);
-  useEffect(() => {
-    let seen = false;
-    try { seen = localStorage.getItem("won:" + id) === "1"; localStorage.setItem("won:" + id, "1"); } catch {}
-    if (!seen) { setOpen(true); burst(); }
-  }, [id]);
-  useEffect(() => {
-    if (!open) return undefined;
-    const esc = (e) => { if (e.key === "Escape") setOpen(false); };
-    document.addEventListener("keydown", esc);
-    return () => document.removeEventListener("keydown", esc);
-  }, [open]);
-  if (!open) return null;
-  return (
-    <div className="win-overlay" role="dialog" aria-modal="true" aria-label="You won the 1v1" onClick={() => setOpen(false)}>
-      <div className="win-box" onClick={(e) => e.stopPropagation()}>
-        <WinVideo />
-        <h2>You beat {them}!</h2>
-        <p className="muted" style={{ margin: "6px 0 18px" }}>{me}/{total} found. First to finish takes the win.</p>
-        <button className="btn block" onClick={() => setOpen(false)}>Let's go<Icon n="arrow" size={18} /></button>
-      </div>
-    </div>
   );
 }
 

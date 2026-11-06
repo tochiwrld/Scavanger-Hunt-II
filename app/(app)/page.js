@@ -9,6 +9,7 @@ import Icon from "../../components/icons.js";
 import GlobalSearch from "../../components/GlobalSearch.js";
 import BecomeAdmin from "../../components/BecomeAdmin.js";
 import ActiveHunts from "../../components/ActiveHunts.js";
+import DailyCard from "../../components/DailyCard.js";
 
 export default function GroupsHome() {
   const { me, groups, setMe, toast } = useApp();
@@ -21,6 +22,7 @@ export default function GroupsHome() {
   return (
     <>
       <ActiveHunts />
+      <DailyCard />
       <div className="page-head"><h1>My hunts</h1><p>Each hunt has its own players, weekly challenges and leaderboard.</p></div>
       {groups.length ? groups.map((g) => (
         <Link key={g.id} href={`/g/${g.id}`} className="card gcard" style={{ "--gc": colorFor(g.id) }}>
@@ -29,7 +31,7 @@ export default function GroupsHome() {
             <div className="row between"><h3>{g.name}</h3><RoleBadge g={g} /></div>
             <div className="muted">{g.challenge ? `${g.challenge.week_number ? "Week " + String(g.challenge.week_number).padStart(2, "0") + ": " : ""}${g.challenge.title} · ${phase(g.challenge)}` : "No challenge yet"}</div>
             <div className="muted">{g.members} player{g.members === 1 ? "" : "s"}</div>
-            {g.role === "player" && g.my_rank ? <div className="rankline">#{g.my_rank} · {g.my_points} pts</div> : null}
+            {g.role === "player" && g.my_rank ? <div className="rankline">#{g.my_rank} · {g.my_points} pips</div> : null}
             {g.role === "owner" ? (
               <div className="row wrap" style={{ marginTop: 6, gap: 6 }}>
                 {g.pending ? <span className="st pending">{g.pending} to review</span> : <span className="st approved">All reviewed</span>}

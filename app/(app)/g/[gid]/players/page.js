@@ -11,7 +11,7 @@ function Adjust({ gid, u, ch, onClose, onDone }) {
   return (
     <Sheet onClose={onClose}>
       <h2>Adjust score</h2>
-      <p className="muted" style={{ margin: "6px 0 12px" }}>{u.nickname} · {ch.title} · now {u.score} pts</p>
+      <p className="muted" style={{ margin: "6px 0 12px" }}>{u.nickname} · {ch.title} · now {u.score} pips</p>
       <form className="stack" onSubmit={form.onSubmit} noValidate>
         <div><label>New score</label><input aria-label="New score" name="new_score" type="number" inputMode="numeric" min={0} defaultValue={u.score} /></div>
         <div><label>Reason (saved in the log)</label><textarea aria-label="Reason (saved in the log)" name="reason" maxLength={300} /></div>
@@ -61,7 +61,7 @@ export default function Page() {
           {rows.length ? rows.map((u) => (
             <div key={u.id} className="card flat">
               <div className="row between"><b>{u.nickname}</b><span className="muted">Joined {fmtDate(u.joined_at)}</span></div>
-              <div className="muted">{u.submissions} submissions · {u.approved} approved · {u.score} pts this week</div>
+              <div className="muted">{u.submissions} submissions · {u.approved} approved · {u.score} pips this week</div>
               <div className="row wrap" style={{ marginTop: 10 }}>
                 <button className="btn sm ghost" onClick={() => (d.active_challenge ? setAdj(u) : toast("There's no active challenge to adjust", "bad"))}>Adjust score</button>
                 {d.founder && seatFree ? <button className="btn sm ghost" onClick={() => makeAdmin(u)}>Make co-admin</button> : null}

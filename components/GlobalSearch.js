@@ -23,7 +23,7 @@ export default function GlobalSearch() {
   };
   return (
     <section className="stack" style={{ gap: 14, marginTop: 14 }}>
-      <div className="page-head"><h1 style={{ display: "flex", alignItems: "center", gap: 12 }}><Icon n="globe" size={30} className="c-primary" />Global Hunt</h1><p>Open hunts anyone can join, even mid-week. Every point you earn in them counts toward your global rank.</p></div>
+      <div className="page-head"><h1 style={{ display: "flex", alignItems: "center", gap: 12 }}><Icon n="globe" size={30} className="c-primary" />Global Hunt</h1><p>Open hunts anyone can join, even mid-week. Every pip you earn in them counts toward your global rank.</p></div>
       <Async st={st}>{(d) => {
         const t = tierFor(d.me.points);
         const pct = t.next ? Math.round(((d.me.points - t.min) / (t.next.at - t.min)) * 100) : 100;
@@ -36,7 +36,7 @@ export default function GlobalSearch() {
                 <div className="tile rank"><div className="label">Rank</div><div className="n">{d.me.rank ? "#" + d.me.rank : "–"}{d.me.total ? <small>/ {d.me.total}</small> : null}</div></div>
               </div>
               <div className="bar" style={{ marginBottom: 10 }}><i style={{ width: pct + "%" }} /></div>
-              <div className="progress-head"><span className="mono" style={{ color: "var(--fg)" }}>{d.me.points} pts</span><span className="muted" style={{ fontSize: 13 }}>{t.next ? `${t.next.need} more to reach ${t.next.name}` : "Top tier reached"}</span></div>
+              <div className="progress-head"><span className="mono" style={{ color: "var(--fg)" }}>{d.me.points} pips</span><span className="muted" style={{ fontSize: 13 }}>{t.next ? `${t.next.need} more to reach ${t.next.name}` : "Top tier reached"}</span></div>
               <div className="row wrap" style={{ gap: 6, marginTop: 14 }}>
                 {TIERS.map(([at, name], i) => <span key={name} className="chip" style={i <= t.index ? { color: "var(--primary)", borderColor: "color-mix(in oklch,var(--primary) 50%,transparent)" } : { color: "var(--muted-fg)" }}>{name} <span className="mono" style={{ fontSize: 11, opacity: .7 }}>{at}</span></span>)}
               </div>

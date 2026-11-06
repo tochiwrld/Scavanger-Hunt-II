@@ -67,7 +67,7 @@ function Post({ gid, p, now, onChange, onRemoved }) {
     catch (ex) { toast(ex.message, "bad"); }
   };
   const remove = async () => {
-    if (!confirm(p.mine ? "Take your find off the feed? Your points stay." : `Take ${p.nickname}'s find off the feed? Their points stay.`)) return;
+    if (!confirm(p.mine ? "Take your find off the feed? Your pips stay." : `Take ${p.nickname}'s find off the feed? Their pips stay.`)) return;
     try { await api(`/groups/${gid}/feed/${p.id}/remove`, { method: "POST" }); toast("Removed from the feed"); onRemoved(); }
     catch (ex) { toast(ex.message, "bad"); }
   };

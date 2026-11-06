@@ -21,7 +21,7 @@ function ChallengeForm({ gid, c, isNew, draft, onSaved }) {
     <form className="card" onSubmit={form.onSubmit} noValidate>
       <h2>{isNew ? "New challenge" : draft ? "Edit draft" : c.title}</h2>
       {draft ? <p className="muted">Draft: only you can see it. Times are Lagos time.</p>
-        : <div className="card mist">🔒 {official && c.phase !== "closed" ? "Published. Existing items are locked, but you can keep adding new ones." : c.phase === "upcoming" ? "Scheduled. Items and points are locked. Unpublish to edit." : c.phase === "active" ? "Live. Items and points are locked." : "This challenge has finished."}</div>}
+        : <div className="card mist">🔒 {official && c.phase !== "closed" ? "Published. Existing items are locked, but you can keep adding new ones." : c.phase === "upcoming" ? "Scheduled. Items and pips are locked. Unpublish to edit." : c.phase === "active" ? "Live. Items and pips are locked." : "This challenge has finished."}</div>}
       <fieldset disabled={!draft} style={{ border: 0, padding: 0, margin: "12px 0 0" }}>
         <div className="field"><label>Challenge title</label><input aria-label="Challenge title" name="title" defaultValue={c.title} maxLength={120} placeholder="The City Hunt" required /></div>
         <div className="field"><label>Description</label><textarea aria-label="Description" name="description" defaultValue={c.description} maxLength={2000} /></div>
@@ -91,7 +91,7 @@ function Editor({ gid, d, reload }) {
         <Sheet onClose={() => setConfirmPublish(false)}>
           <h2>Publish this week's challenge?</h2>
           <p style={{ margin: "10px 0 16px" }}><b>{c.title}</b></p>
-          <p>Once the challenge becomes active, players will be able to see the complete item list and point values. Items and scoring are then locked.</p>
+          <p>Once the challenge becomes active, players will be able to see the complete item list and pip values. Items and scoring are then locked.</p>
           <div className="row" style={{ marginTop: 16 }}><button className="btn ghost grow" onClick={() => setConfirmPublish(false)}>Cancel</button><Btn busy={busy === "publish"} className="ok grow" onClick={publish}>Publish</Btn></div>
         </Sheet>
       ) : null}

@@ -15,7 +15,7 @@ export default function Page() {
           {d.finalized ? null : <div className="card mist">Some submissions are still being reviewed, so these standings may change.</div>}
           <div className="card dark stack">
             {podium.length ? podium.map((r) => (
-              <div key={r.rank + r.nickname} className="row between"><span style={{ font: "800 19px/1.2 var(--font-head)", textTransform: "uppercase", letterSpacing: "-.02em" }}>{["🥇", "🥈", "🥉"][r.rank - 1]} {["1st", "2nd", "3rd"][r.rank - 1]} · {r.nickname}</span><span className="pts">{r.points} PTS</span></div>
+              <div key={r.rank + r.nickname} className="row between"><span style={{ font: "800 19px/1.2 var(--font-head)", textTransform: "uppercase", letterSpacing: "-.02em" }}>{["🥇", "🥈", "🥉"][r.rank - 1]} {["1st", "2nd", "3rd"][r.rank - 1]} · {r.nickname}</span><span className="pts">{r.points} PIPS</span></div>
             )) : <p>Nobody scored this week.</p>}
           </div>
           {d.recap?.length ? (
@@ -33,7 +33,7 @@ export default function Page() {
           </div> : null}
           {m ? (
             <div className="card"><h2>Your week</h2>
-              <dl className="kv" style={{ marginTop: 10 }}><dt>Final rank</dt><dd>#{m.rank}</dd><dt>Final score</dt><dd>{m.points} points</dd><dt>Items completed</dt><dd>{d.completed.length}</dd><dt>Items missed</dt><dd>{d.missed.length}</dd><dt>Approved submissions</dt><dd>{d.approved.length}</dd></dl>
+              <dl className="kv" style={{ marginTop: 10 }}><dt>Final rank</dt><dd>#{m.rank}</dd><dt>Final score</dt><dd>{m.points} pips</dd><dt>Items completed</dt><dd>{d.completed.length}</dd><dt>Items missed</dt><dd>{d.missed.length}</dd><dt>Approved submissions</dt><dd>{d.approved.length}</dd></dl>
               {d.completed.length ? <><p style={{ margin: "12px 0 4px" }}><b>Completed</b></p>{d.completed.map((i, k) => <div key={k} className="row between"><span>✅ {i.title}</span><b>+{i.points}</b></div>)}</> : null}
               {d.missed.length ? <><p style={{ margin: "12px 0 4px" }}><b>Missed</b></p>{d.missed.map((i, k) => <div key={k} className="row between muted"><span>⬜ {i.title}</span><span>{i.points}</span></div>)}</> : null}
             </div>

@@ -15,7 +15,7 @@ export default function ReviewCard({ s, gid, base = `/groups/${gid}`, photoBase 
   const done = () => { refreshGroups(); setGone(true); setTimeout(onChanged, 350); };
   const approve = async () => {
     setBusy(true);
-    try { await api(`${base}/submissions/${s.id}/approve`, { method: "POST" }); toast(s.points != null ? "Approved. Points awarded." : "Approved.", "good"); burst(); done(); }
+    try { await api(`${base}/submissions/${s.id}/approve`, { method: "POST" }); toast(s.points != null ? "Approved. Pips awarded." : "Approved.", "good"); burst(); done(); }
     catch (e) { toast(e.message, "bad"); setBusy(false); }
   };
   const reject = async () => {
@@ -28,7 +28,7 @@ export default function ReviewCard({ s, gid, base = `/groups/${gid}`, photoBase 
     <article className={"card review" + (gone ? " gone" : "")}>
       <div className="row between wrap"><span className="lb" style={{ display: "contents" }}><span className="nm" style={{ font: "800 19px/1.1 var(--font-head)", textTransform: "uppercase", letterSpacing: "-.02em" }}>{s.nickname}</span></span><StatusPill status={s.status} /></div>
       <h3 style={{ margin: "12px 0 8px", fontSize: 18, textTransform: "none", letterSpacing: "-.02em" }}>{s.item_title}</h3>
-      <div className="row wrap" style={{ gap: 8 }}>{s.points != null ? <span className="pts">{s.points} PTS</span> : null}<span className="muted">{s.challenge_title ? `${s.challenge_title} · ` : ""}{fmtDate(s.submitted_at)}</span></div>
+      <div className="row wrap" style={{ gap: 8 }}>{s.points != null ? <span className="pts">{s.points} PIPS</span> : null}<span className="muted">{s.challenge_title ? `${s.challenge_title} · ` : ""}{fmtDate(s.submitted_at)}</span></div>
       {s.instructions ? <p className="muted" style={{ margin: "10px 0 0" }}>{s.instructions}</p> : null}
       <Photos base={photoBase} id={s.id} count={s.photos} who={s.nickname} thumb={false} />
       {s.status === "rejected" && s.rejection_reason ? <div className="reason"><b>Reason:</b> {s.rejection_reason}</div> : null}

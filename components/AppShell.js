@@ -74,6 +74,7 @@ export default function AppShell({ children }) {
         {/* App-wide only, and the same everywhere. Everything about one hunt (Hunt, Feed, Leaderboard, Review...) lives in that hunt's tab row, so nothing appears twice. */}
         <A href="/" icon="users" label="Hunts" on={path === "/" || Boolean(gid)} />
         <A href="/duels" icon="swords" label="1v1" on={path.startsWith("/duel")} />
+        <A href="/teams" icon="team" label="Team vs" on={path.startsWith("/team")} />
         <A href="/join" icon="key" label="Join" on={path === "/join"} />
         <A href="/profile" icon="user" label="Profile" on={path === "/profile"} />
       </nav>
