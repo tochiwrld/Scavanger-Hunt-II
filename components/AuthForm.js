@@ -61,7 +61,6 @@ function Inner({ mode }) {
       <section className="hero-wrap">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img className="bg" src={HERO_IMG} alt="" fetchPriority="high" />
-        <span className="vf-frame hero-frame" aria-hidden="true" />
         <div className="hero-top">
           <Brand href="/login" />
           <div className="acts"><ThemeToggle />{mode === "login" ? <Link className="pill-btn" href={"/register" + q}>Sign up</Link> : <Link className="pill-btn" href={"/login" + q}>Log in</Link>}</div>
@@ -110,7 +109,7 @@ function Inner({ mode }) {
           <div className="codebox"><div>TOCHI — 500 pips — reached 3:32 PM</div><div className="dim">MIKE — 500 pips — reached 4:08 PM</div><div className="res">→ Tochi takes first place.</div></div>
         </section>
 
-        <div className="foot-brand"><span className="lockup vf"><Brand href="/login" /></span><div>A free social game among friends. Prizes are paid out personally by each hunt's admin.</div><div style={{ marginTop: 8 }}><Link className="link" href="/privacy">Privacy Policy</Link> · <Link className="link" href="/terms">Terms</Link></div></div>
+        <div className="foot-brand"><Brand href="/login" /><div>A free social game among friends. Prizes are paid out personally by each hunt's admin.</div><div style={{ marginTop: 8 }}><Link className="link" href="/privacy">Privacy Policy</Link> · <Link className="link" href="/terms">Terms</Link></div></div>
       </div>
     </div>
   );
