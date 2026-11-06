@@ -9,7 +9,7 @@ export async function generateMetadata({ params }) {
   } catch {}
   const title = d ? `${d.host} challenged you to a 1v1 on PrimaHunt` : "You've been challenged to a 1v1 on PrimaHunt";
   const description = d
-    ? `${d.item_count} items each. You write a list for each other, then race the clock. Tap to accept.`
+    ? `${d.item_count} item${d.item_count === 1 ? "" : "s"} each. You write a list for each other, then race the clock. Tap to accept.`
     : "Write a list for each other, then race the clock. First to find it all wins.";
   return {
     title, description,
