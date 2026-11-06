@@ -5,7 +5,7 @@ import { Bricolage_Grotesque, Inter, Space_Mono } from "next/font/google";
 // and visitors' browsers never contact Google Fonts.
 const head = Bricolage_Grotesque({ subsets: ["latin"], weight: ["600", "800"], variable: "--nf-head", display: "swap" });
 // Brand type: Bricolage Grotesque ExtraBold for display, Inter for body and interface, Space Mono for timers, scores and pips.
-const bodyFont = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--nf-body", display: "swap" });
+const bodyFont = Inter({ subsets: ["latin"], variable: "--nf-body", display: "swap" });
 const mono = Space_Mono({ subsets: ["latin"], weight: ["400", "700"], variable: "--nf-mono", display: "swap" });
 import Providers from "../components/Providers.js";
 
