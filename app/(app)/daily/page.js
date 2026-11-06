@@ -26,7 +26,7 @@ export default function Page() {
   return (
     <Async st={st}>{(d) => (
       <>
-        <div className="page-head"><h1>Daily hunt</h1><p>One item a day, the same for everyone. Find it before midnight to keep your streak alive. Tomorrow's item stays secret until tomorrow.</p></div>
+        <div className="page-head"><h1>Daily hunt</h1><p>One item a day, the same for everyone. Find it before midnight to keep your streak alive.</p></div>
         <Plate>
           <div className="eyebrow live">Day {d.number} · today</div>
           <div className="week">{d.item}</div>

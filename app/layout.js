@@ -1,11 +1,12 @@
 import "./globals.css";
-import { Bricolage_Grotesque, Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Bricolage_Grotesque, Inter, Space_Mono } from "next/font/google";
 
 // Fonts are downloaded at build time and served from our own domain: no render-blocking trip to Google,
 // and visitors' browsers never contact Google Fonts.
 const head = Bricolage_Grotesque({ subsets: ["latin"], weight: ["600", "800"], variable: "--nf-head", display: "swap" });
-const bodyFont = Space_Grotesk({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--nf-body", display: "swap" });
-const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["500", "700"], variable: "--nf-mono", display: "swap" });
+// Brand type: Bricolage Grotesque ExtraBold for display, Inter for body and interface, Space Mono for timers, scores and pips.
+const bodyFont = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--nf-body", display: "swap" });
+const mono = Space_Mono({ subsets: ["latin"], weight: ["400", "700"], variable: "--nf-mono", display: "swap" });
 import Providers from "../components/Providers.js";
 
 const SITE = (process.env.APP_URL || "https://weekly-hunt.vercel.app").replace(/\/$/, "");
@@ -21,7 +22,6 @@ export const metadata = {
     images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "PrimaHunt: Hunt it. Snap it. Win the week." }],
   },
   twitter: { card: "summary_large_image", images: ["/og.jpg"] },
-  icons: { icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23FFD21F'/%3E%3Ctext x='50' y='68' font-size='52' font-family='Arial Black,Arial' font-weight='900' text-anchor='middle' fill='%2316141f'%3EP%3C/text%3E%3C/svg%3E" },
 };
 export const viewport = {
   width: "device-width", initialScale: 1, viewportFit: "cover",

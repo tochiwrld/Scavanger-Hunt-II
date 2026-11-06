@@ -219,7 +219,11 @@ export function Photos({ base = "/api/photo", id, count, who = "", thumb = true 
     <div className={"photo-grid n" + n}>
       {Array.from({ length: n }, (_, i) => {
         const full = `${base}/${id}/${i + 1}`;
-        return <img key={i} loading="lazy" decoding="async" src={thumb ? `${full}?s=thumb` : full} alt={`${who ? who + "'s " : ""}photo ${i + 1}`} onClick={() => zoom(full)} />;
+        return (
+          <span key={i} className="ph vf">
+            <img loading="lazy" decoding="async" src={thumb ? `${full}?s=thumb` : full} alt={`${who ? who + "'s " : ""}photo ${i + 1}`} onClick={() => zoom(full)} />
+          </span>
+        );
       })}
     </div>
   );
