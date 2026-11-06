@@ -12,7 +12,7 @@ export default function Page() {
   const router = useRouter();
   const st = useApi("/teams");
   const create = useForm(async (v) => {
-    const r = await api("/teams", { method: "POST", json: { size: +v.size, minutes: +v.minutes, items: +v.items } });
+    const r = await api("/teams", { method: "POST", json: { size: +v.size, minutes: +v.minutes, items: +v.items, name: v.name } });
     router.push(`/team/${r.id}`);
   });
   return (
@@ -22,6 +22,7 @@ export default function Page() {
         <div className="stripe" />
         <div className="in">
           <h2 style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}><Icon n="team" size={22} className="c-primary" />New team match</h2>
+          <div className="field"><label htmlFor="tname">Your team's name</label><input id="tname" name="name" maxLength={24} placeholder="e.g. Yaba Hustlers" autoComplete="off" /><div className="muted">Optional. You can change it until the timer starts.</div></div>
           <div className="field"><label htmlFor="size">Team size</label>
             <select id="size" name="size" defaultValue="2">{[2, 3, 4, 5, 6].map((n) => <option key={n} value={n}>{n}v{n}</option>)}</select></div>
           <div className="row" style={{ alignItems: "flex-start" }}>
@@ -30,7 +31,7 @@ export default function Page() {
           </div>
           <ErrBox error={create.error} />
           <Btn busy={create.busy} className="block" type="submit"><Icon n="link" size={18} />Create match</Btn>
-          <p className="muted" style={{ margin: "12px 0 0", fontSize: 13 }}>You'll captain Team A. One account can only be on one team.</p>
+          <p className="muted" style={{ margin: "12px 0 0", fontSize: 13 }}>You'll captain your team. One account can only be on one team.</p>
         </div>
       </form>
       <Async st={st}>{(d) => (
@@ -48,10 +49,10 @@ export default function Page() {
             return (
               <Link key={x.id} href={`/team/${x.id}`} className="card gcard" style={{ display: "block" }}>
                 <div className="row between" style={{ alignItems: "flex-start" }}>
-                  <h3>{x.size}v{x.size} vs {x.rival ? `${x.rival}'s team` : "(no rival yet)"}</h3>
+                  <h3>{x.us} vs {x.them ? x.them : "(no rival yet)"}</h3>
                   {x.result ? <span className={`st ${RESULT[x.result][0]}`}>{RESULT[x.result][1]}</span> : <span className={"st " + (x.phase === "live" ? "approved" : x.phase === "judging" ? "pending" : "draft")}><Icon n={ic} size={12} />{label}</span>}
                 </div>
-                <div className="row wrap" style={{ gap: 8, marginTop: 10 }}><span className="pts">{x.items} PER TEAM</span><span className="muted" style={{ fontSize: 13 }}>{fmtMinutes(x.minutes)} · {x.phase === "live" ? "Ends " + fmtDate(x.end_at) : "Created " + fmtDate(x.created_at)}</span></div>
+                <div className="row wrap" style={{ gap: 8, marginTop: 10 }}><span className="pts">{x.size}V{x.size}</span><span className="pts">{x.items} PER TEAM</span><span className="muted" style={{ fontSize: 13 }}>{fmtMinutes(x.minutes)} · {x.phase === "live" ? "Ends " + fmtDate(x.end_at) : "Created " + fmtDate(x.created_at)}</span></div>
               </Link>
             );
           }) : <Empty icon="🤝" title="No team matches yet" text="Create one above and send the rival link to the other captain." />}

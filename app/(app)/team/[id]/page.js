@@ -9,6 +9,7 @@ import ReviewCard from "../../../../components/ReviewCard.js";
 import SubmitSheet from "../../../../components/SubmitSheet.js";
 import FindPost from "../../../../components/FindPost.js";
 import { WinVideo, WinOverlay } from "../../../../components/Win.js";
+import { ShareResult } from "../../../../components/Share.js";
 import { Async, Btn, Countdown, Empty, ErrBox, Plate, Sheet, StatusPill, useApi, useForm } from "../../../../components/ui.js";
 
 export default function Page() {
@@ -35,6 +36,12 @@ function Room({ d, reload }) {
   const started = ["live", "judging", "finished"].includes(m.phase);
   const tab = picked || (m.phase === "finished" ? "finds" : "hunt");
   const vs = `${m.size}v${m.size}`;
+  const share = m.phase === "finished" ? {
+    text: m.result === "won" ? `${us.name} just beat ${them.name} ${us.score}–${them.score} in a ${vs} on PrimaHunt 🏆`
+      : m.result === "lost" ? `${them.name} edged ${us.name} ${them.score}–${us.score} in a ${vs} on PrimaHunt. We'll be back 😤`
+      : `${us.name} vs ${them.name} ended in a ${us.score}–${them.score} tie in our ${vs} on PrimaHunt 🤝`,
+    card: { kicker: `Team vs · ${vs}`, title: m.result === "won" ? `${us.name} won` : m.result === "lost" ? `${them.name} won` : "Dead tie", big: `${us.score}–${them.score}`, line: `${us.name} vs ${them.name}`, sub: `${m.item_count} item${m.item_count === 1 ? "" : "s"} per team · most finds wins` },
+  } : null;
   return (
     <>
       <Link href="/teams" className="link" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><Icon n="back" size={16} />All team matches</Link>
@@ -52,13 +59,16 @@ function Room({ d, reload }) {
         {m.phase === "judging" ? <p className="gap-note">Time's up. Judge the last photos — anything not judged by <b>{fmtDate(new Date(new Date(m.end_at).getTime() + m.grace_minutes * 60000))}</b> is approved automatically.</p> : null}
         {m.phase === "finished" && m.result === "won" ? <WinVideo className="win-inline" /> : null}
         {m.phase === "finished" ? <div className="state-box earned" style={{ marginTop: 16, fontFamily: "var(--font-head)", textTransform: "uppercase", fontSize: 22, letterSpacing: "-.02em", ...(m.result === "lost" ? { color: "var(--danger)", background: "color-mix(in oklch,var(--danger) 12%,var(--card))" } : m.result === "tie" ? { color: "var(--warning)", background: "color-mix(in oklch,var(--warning) 12%,var(--card))" } : {}) }}>{m.result === "won" ? "Your team won!" : m.result === "lost" ? `${them.name} won` : "It's a tie"}</div> : null}
+        {share ? <ShareResult {...share} label={m.result === "won" ? "Share the win" : "Share your result"} /> : null}
         {m.purged ? <p className="gap-note">The photos and lists from this match were deleted {m.retain_days} days after it ended. The score card is kept.</p> : null}
         <p className="muted" style={{ margin: "14px 0 0", fontSize: 13 }}>Most approved items wins. Tied? Whichever team got there first wins.</p>
       </Plate>
 
-      {m.phase === "finished" && m.result === "won" ? <WinOverlay storageKey={"teamwon:" + m.id} title="Your team won!" line={`${us.score}/${m.item_count} found. Take a bow, ${us.name}.`} /> : null}
+      {share ? <WinOverlay storageKey={(m.result === "won" ? "teamwon:" : "teamres:") + m.id} result={m.result} share={share}
+        title={m.result === "won" ? "Your team won!" : m.result === "lost" ? `${them.name} won this one` : "It's a tie!"}
+        line={m.result === "won" ? `${us.score}/${m.item_count} found. Take a bow, ${us.name}.` : m.result === "lost" ? `${us.score}–${them.score}. Regroup and run it back.` : `${us.score}–${them.score}. Nobody blinked.`} /> : null}
 
-      <Teams d={d} />
+      <Teams d={d} reload={reload} />
       {m.phase === "waiting" || m.phase === "setup" ? <Links d={d} reload={reload} /> : null}
       {m.phase === "waiting" || m.phase === "setup" ? <Setup d={d} reload={reload} /> : null}
 
@@ -104,12 +114,14 @@ function Room({ d, reload }) {
   );
 }
 
-function Teams({ d }) {
+function Teams({ d, reload }) {
   const { match: m, us, them } = d;
+  const [naming, setNaming] = useState(false);
+  const canName = m.captain && ["waiting", "setup"].includes(m.phase);
   const Side = ({ t }) => (
     <div className="inset">
       <div className="row between" style={{ marginBottom: 8 }}>
-        <b>{t.name}</b>
+        <b className="row" style={{ gap: 6 }}>{t.name}{t === us && canName ? <button className="icon-btn" style={{ width: 30, height: 30 }} aria-label="Rename your team" onClick={() => setNaming(true)}><Icon n="pencil" size={15} /></button> : null}</b>
         <span className="muted" style={{ fontSize: 13 }}>{t.members.length}/{m.size}{["waiting", "setup"].includes(m.phase) ? (t.ready ? " · ✅ ready" : ` · ${t.written}/${m.item_count} written`) : ""}</span>
       </div>
       {t.members.length ? t.members.map((p, i) => (
@@ -123,9 +135,26 @@ function Teams({ d }) {
   return (
     <section className="card stack">
       <h2>Teams</h2>
+      {canName && !us.custom ? <button className="card mist flat" style={{ textAlign: "left", cursor: "pointer", font: "inherit", color: "inherit" }} onClick={() => setNaming(true)}>🏷️ <b>Name your team.</b> You're “{us.name}” for now. Tap to pick a name before the timer starts.</button> : null}
       <Side t={us} />
       <Side t={them} />
+      {naming ? <NameTeam m={m} current={us.custom ? us.name : ""} onClose={() => setNaming(false)} onSaved={() => { setNaming(false); reload(); }} /> : null}
     </section>
+  );
+}
+
+function NameTeam({ m, current, onClose, onSaved }) {
+  const { toast } = useApp();
+  const form = useForm(async (v) => { const r = await api(`/teams/${m.id}/name`, { method: "PUT", json: { name: v.name } }); toast(`You're now “${r.name}”`, "good"); onSaved(); });
+  return (
+    <Sheet onClose={onClose}>
+      <h2>Name your team</h2>
+      <form style={{ marginTop: 18 }} onSubmit={form.onSubmit} noValidate>
+        <div className="field"><label htmlFor="tnm">Team name</label><input id="tnm" name="name" maxLength={24} defaultValue={current} placeholder="e.g. Lekki Lions" autoFocus autoComplete="off" /><div className="muted">2 to 24 characters. Everyone in the match sees it. Leave it empty to go back to Team A/B.</div></div>
+        <ErrBox error={form.error} />
+        <Btn busy={form.busy} className="block" type="submit">Save name</Btn>
+      </form>
+    </Sheet>
   );
 }
 

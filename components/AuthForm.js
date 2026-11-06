@@ -41,7 +41,9 @@ const STEPS = [
   ["trophy", "Top the board by Sunday", WEEK_END_RULE],
 ];
 
-function Inner({ mode }) {
+function Inner({ mode: startMode }) {
+  // Switching between Log in and Create account happens in place (no page change), so the page never jumps back to the top.
+  const [mode, setMode] = useState(startMode);
   const router = useRouter();
   const sp = useSearchParams();
   const next = safeNext(sp.get("next"));
@@ -53,7 +55,13 @@ function Inner({ mode }) {
     await refreshMe();
     router.push(next || (mode === "register" ? "/start" : "/"));
   });
+  // The header button takes you down to the form instead of leaving you at the top of the page.
   const q = next ? "?next=" + encodeURIComponent(next) : "";
+  const switchTo = (m, toForm) => (e) => {
+    e.preventDefault();
+    if (m !== mode) { setMode(m); try { window.history.replaceState(null, "", "/" + m + q); } catch {} }
+    if (toForm) document.getElementById("account")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
   const invited = next && next.startsWith("/join/");
   const challenged = next && next.startsWith("/vs/");
   return (
@@ -63,7 +71,7 @@ function Inner({ mode }) {
         <img className="bg" src={HERO_IMG} alt="" fetchPriority="high" />
         <div className="hero-top">
           <Brand href="/login" />
-          <div className="acts"><ThemeToggle />{mode === "login" ? <Link className="pill-btn" href={"/register" + q}>Sign up</Link> : <Link className="pill-btn" href={"/login" + q}>Log in</Link>}</div>
+          <div className="acts"><ThemeToggle />{mode === "login" ? <Link className="pill-btn" href={"/register" + q} onClick={switchTo("register", true)}>Sign up</Link> : <Link className="pill-btn" href={"/login" + q} onClick={switchTo("login", true)}>Log in</Link>}</div>
         </div>
         <div className="inner">
           <div className="row wrap" style={{ gap: 10 }}><span className="kicker">The weekly scavenger hunt</span><ActiveHunts hero /></div>
@@ -80,8 +88,8 @@ function Inner({ mode }) {
           {invited ? <div className="card mist flat" style={{ marginBottom: 16 }}>You've been invited to a hunt. {mode === "login" ? "Log in" : "Create an account"} to join it.</div> : null}
           {challenged ? <div className="card mist flat" style={{ marginBottom: 16 }}>You've been challenged to a 1v1. {mode === "login" ? "Log in" : "Create an account"} to accept it.</div> : null}
           <div className="tabs" style={{ marginBottom: 18 }}>
-            <Link className={"tab" + (mode === "login" ? " on" : "")} href={"/login" + q}>Log in</Link>
-            <Link className={"tab" + (mode === "register" ? " on" : "")} href={"/register" + q}>Create account</Link>
+            <Link className={"tab" + (mode === "login" ? " on" : "")} href={"/login" + q} onClick={switchTo("login")}>Log in</Link>
+            <Link className={"tab" + (mode === "register" ? " on" : "")} href={"/register" + q} onClick={switchTo("register")}>Create account</Link>
           </div>
           <form onSubmit={form.onSubmit} noValidate>
             <ErrBox error={form.error} />

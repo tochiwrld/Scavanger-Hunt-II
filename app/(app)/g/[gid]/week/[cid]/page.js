@@ -2,6 +2,8 @@
 import { useParams } from "next/navigation";
 import { fmtDate, naira } from "../../../../../../lib/client.js";
 import { Async, LbRows, useApi } from "../../../../../../components/ui.js";
+import { WinOverlay } from "../../../../../../components/Win.js";
+import { ShareResult } from "../../../../../../components/Share.js";
 
 export default function Page() {
   const { gid, cid } = useParams();
@@ -9,9 +11,18 @@ export default function Page() {
   return (
     <Async st={st}>{(d) => {
       const podium = d.rows.filter((r) => r.points > 0 && r.rank <= 3), m = d.me, p = d.prize;
+      const wk = d.challenge.week_number ? `Week ${String(d.challenge.week_number).padStart(2, "0")}` : d.challenge.title;
+      const hunt = d.group?.name || "my hunt";
+      // Share once the week is final and you actually scored.
+      const share = d.finalized && m && m.points > 0 ? {
+        text: m.rank === 1 ? `I won ${wk} of ${hunt} on PrimaHunt 🏆 ${m.points} pips. Who's next?` : `I finished #${m.rank} of ${d.rows.length} in ${wk} of ${hunt} on PrimaHunt with ${m.points} pips 🎯`,
+        card: { kicker: `${hunt} · ${wk}`, title: m.rank === 1 ? "I won the week" : `Finished #${m.rank}`, big: `${m.points} pips`, line: `${d.completed.length} item${d.completed.length === 1 ? "" : "s"} found · #${m.rank} of ${d.rows.length}`, sub: "Hunt it. Snap it. Win the week." },
+      } : null;
       return (
         <>
           <div><h2>{d.challenge.week_number ? `Week ${String(d.challenge.week_number).padStart(2, "0")} results` : "Results"}</h2><p className="muted">{d.challenge.title}</p></div>
+          {share ? <WinOverlay storageKey={`weekres:${d.challenge.id}`} result={m.rank === 1 ? "won" : "podium"} share={share}
+            title={m.rank === 1 ? "You won the week!" : `You finished #${m.rank}`} line={`${m.points} pips in ${wk} of ${hunt}.`} /> : null}
           {d.finalized ? null : <div className="card mist">Some submissions are still being reviewed, so these standings may change.</div>}
           <div className="card dark stack">
             {podium.length ? podium.map((r) => (
@@ -34,6 +45,7 @@ export default function Page() {
           {m ? (
             <div className="card"><h2>Your week</h2>
               <dl className="kv" style={{ marginTop: 10 }}><dt>Final rank</dt><dd>#{m.rank}</dd><dt>Final score</dt><dd>{m.points} pips</dd><dt>Items completed</dt><dd>{d.completed.length}</dd><dt>Items missed</dt><dd>{d.missed.length}</dd><dt>Approved submissions</dt><dd>{d.approved.length}</dd></dl>
+              {share ? <ShareResult {...share} label={m.rank === 1 ? "Share the win" : "Share your week"} /> : null}
               {d.completed.length ? <><p style={{ margin: "12px 0 4px" }}><b>Completed</b></p>{d.completed.map((i, k) => <div key={k} className="row between"><span>✅ {i.title}</span><b>+{i.points}</b></div>)}</> : null}
               {d.missed.length ? <><p style={{ margin: "12px 0 4px" }}><b>Missed</b></p>{d.missed.map((i, k) => <div key={k} className="row between muted"><span>⬜ {i.title}</span><span>{i.points}</span></div>)}</> : null}
             </div>

@@ -531,3 +531,22 @@ button.slot.filled{border:1.5px solid var(--primary)}
 .hero-frame{--vf-inset:calc(64px + env(safe-area-inset-top)) 14px 18px;--vf-len:34px;--vf-w:4px;z-index:0}
 /* Logo lockup framed by viewfinder corners (sign-in footer and 404). Clear space = the H height on all sides. */
 .lockup{display:inline-flex;padding:.9em 1em;--vf-inset:0;--vf-len:14px;--vf-w:3px}
+
+/* Camera flash */
+.cam-top{align-items:center}
+.cam-flash{position:absolute;right:16px;top:calc(8px + env(safe-area-inset-top));width:44px;height:44px}
+.cam-flash.on{background:var(--primary);color:var(--primary-fg)}
+.cam-glow{position:absolute;inset:0;z-index:4;background:#fff;animation:fade .12s}
+.cam-note{position:absolute;left:16px;right:16px;top:calc(64px + env(safe-area-inset-top));z-index:3;background:rgba(0,0,0,.72);border-radius:14px;padding:10px 14px;font-size:14px;text-align:center}
+
+/* Result sharing */
+.result-emoji{font-size:72px;line-height:1;padding:22px 0 4px}
+.share-result{text-align:left;margin-top:14px}
+.share-label{font:700 12px/1 var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted-fg);margin-bottom:10px}
+.share-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.share-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:8px 6px;border-radius:12px;border:1px solid var(--border);background:var(--secondary);color:var(--fg);font:700 13px/1.1 var(--font-body);cursor:pointer;text-align:center}
+.share-btn:active{transform:scale(.97)}
+.share-btn[disabled]{opacity:.6}
+.share-btn.wa,.share-btn.ig{border-color:color-mix(in oklch,var(--primary) 55%,var(--border))}
+.share-btn.wa{background:var(--primary);color:var(--primary-fg)}
+.share-save{display:inline-flex;align-items:center;gap:6px;margin-top:12px;background:none;border:0;padding:0;font:600 13px var(--font-body);cursor:pointer}

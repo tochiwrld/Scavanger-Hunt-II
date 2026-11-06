@@ -15,7 +15,7 @@ export default function Page() {
   const act = async (name, fn) => { setBusy(name); try { await fn(); } catch (e) { toast(e.message, "bad"); } finally { setBusy(""); } };
   const copy = async (link) => { try { await navigator.clipboard.writeText(link); toast("Invite link copied 📋", "good"); } catch { window.prompt("Copy this link:", link); } };
   const share = async (link) => {
-    if (navigator.share) { try { await navigator.share({ title: g?.name, text: `Join ${g?.name} on Weekly Hunt`, url: link }); } catch {} } else copy(link);
+    if (navigator.share) { try { await navigator.share({ title: g?.name, text: `Join ${g?.name} on PrimaHunt`, url: link }); } catch {} } else copy(link);
   };
   return (
     <Async st={st}>{(d) => {

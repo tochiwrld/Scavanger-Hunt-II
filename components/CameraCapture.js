@@ -56,6 +56,10 @@ export default function CameraCapture({ label, onShot, onClose }) {
   const [zoom, setZoomState] = useState(1);
   const [zr, setZr] = useState({ min: 1, max: 4, hw: false });
   const pinch = useRef(null);
+  // Flash: the phone's torch on the back camera (where the browser allows it), a white screen flash on the front camera.
+  const [flash, setFlash] = useState(false);
+  const [torch, setTorch] = useState(false); // does this camera expose a torch?
+  const [glow, setGlow] = useState(false);
 
   const stop = useCallback(() => { stream.current?.getTracks().forEach((t) => t.stop()); stream.current = null; }, []);
 
@@ -75,6 +79,8 @@ export default function CameraCapture({ label, onShot, onClose }) {
         if (caps.zoom && caps.zoom.max > caps.zoom.min) setZr({ min: caps.zoom.min, max: Math.min(caps.zoom.max, 10), hw: true });
         else setZr({ min: 1, max: 4, hw: false });
         setZoomState(caps.zoom ? Math.max(caps.zoom.min, 1) : 1);
+        setTorch(Boolean(caps.torch));
+        setFlash(false);
         setState("live");
       })
       .catch((e) => {
@@ -106,12 +112,25 @@ export default function CameraCapture({ label, onShot, onClose }) {
   const onTouchStart = (e) => { if (e.touches.length === 2) pinch.current = { d: dist(e.touches), z: zoom }; };
   const onTouchMove = (e) => { if (e.touches.length === 2 && pinch.current) { e.preventDefault(); setZoom(pinch.current.z * (dist(e.touches) / pinch.current.d)); } };
   const onTouchEnd = (e) => { if (e.touches.length < 2) pinch.current = null; };
+  const toggleFlash = async () => {
+    const on = !flash;
+    if (facing === "environment") {
+      const track = stream.current?.getVideoTracks()[0];
+      if (!torch || !track) { setNote("Your phone's browser doesn't let websites switch on the flash. Find more light, or flip to the front camera for a screen flash."); return; }
+      try { await track.applyConstraints({ advanced: [{ torch: on }] }); } catch { setNote("The flash couldn't be turned on."); return; }
+    }
+    setFlash(on);
+  };
+  const [note, setNoteState] = useState("");
+  const noteTimer = useRef(null);
+  const setNote = (t) => { setNoteState(t); clearTimeout(noteTimer.current); noteTimer.current = setTimeout(() => setNoteState(""), 4000); };
   const presets = [1, 2, 3, 5].filter((z) => z >= zr.min && z <= zr.max);
 
   const shoot = async () => {
     const v = video.current;
     if (!v || !v.videoWidth) return;
     setBusy(true);
+    if (flash && facing === "user") { setGlow(true); await new Promise((r) => setTimeout(r, 350)); } // light the face with a white screen
     const blob = await toCanvas(v, v.videoWidth, v.videoHeight, label, facing === "user", zr.hw ? 1 : zoom);
     stop();
     onShot(blob);
@@ -139,7 +158,12 @@ export default function CameraCapture({ label, onShot, onClose }) {
           <label className="btn ghost">Front camera<input type="file" accept="image/*" capture="user" hidden onChange={(e) => fromPhoneCamera(e.target.files[0])} /></label>
         </div>
       ) : null}
-      <div className="cam-top"><span className="cam-tag">Live camera · photos are taken now</span></div>
+      {glow ? <div className="cam-glow" aria-hidden="true" /> : null}
+      <div className="cam-top">
+        <span className="cam-tag">Live camera · photos are taken now</span>
+        {state === "live" ? <button className={"cam-btn cam-flash" + (flash ? " on" : "")} onClick={toggleFlash} aria-pressed={flash} aria-label={flash ? "Turn flash off" : "Turn flash on"}><Icon n={flash ? "zap" : "zapoff"} size={20} /></button> : null}
+      </div>
+      {note ? <div className="cam-note" role="status">{note}</div> : null}
       {state === "live" ? (
         <div className="cam-zoom" role="group" aria-label="Zoom">
           {presets.map((z) => <button key={z} className={Math.abs(zoom - z) < 0.05 ? "on" : ""} onClick={() => setZoom(z)} aria-label={`Zoom ${z}x`}>{z}×</button>)}
@@ -149,7 +173,7 @@ export default function CameraCapture({ label, onShot, onClose }) {
       <div className="cam-bar">
         <button className="cam-btn" onClick={close} aria-label="Close camera"><span aria-hidden="true" style={{ fontSize: 26, lineHeight: 1 }}>×</span></button>
         <button className="cam-shutter" onClick={shoot} disabled={state !== "live" || busy} aria-label="Take photo"><span /></button>
-        <button className="cam-btn cam-flip" onClick={() => { setZoomState(1); setFacing((f) => (f === "environment" ? "user" : "environment")); }} disabled={state === "starting" || busy} aria-label={facing === "user" ? "Switch to back camera" : "Switch to front camera"}><Icon n="flip" size={22} /><small>{facing === "user" ? "Back" : "Front"}</small></button>
+        <button className="cam-btn cam-flip" onClick={() => { setZoomState(1); setFlash(false); setFacing((f) => (f === "environment" ? "user" : "environment")); }} disabled={state === "starting" || busy} aria-label={facing === "user" ? "Switch to back camera" : "Switch to front camera"}><Icon n="flip" size={22} /><small>{facing === "user" ? "Back" : "Front"}</small></button>
       </div>
     </div>
   );

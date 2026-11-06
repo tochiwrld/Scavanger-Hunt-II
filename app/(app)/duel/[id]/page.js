@@ -9,6 +9,7 @@ import ReviewCard from "../../../../components/ReviewCard.js";
 import SubmitSheet from "../../../../components/SubmitSheet.js";
 import FindPost from "../../../../components/FindPost.js";
 import { WinVideo, WinOverlay } from "../../../../components/Win.js";
+import { ShareResult } from "../../../../components/Share.js";
 import { Async, Btn, Countdown, Empty, ErrBox, Plate, Sheet, StatusPill, useApi, useForm } from "../../../../components/ui.js";
 
 export default function Page() {
@@ -37,6 +38,12 @@ function Room({ d, reload }) {
   // Your hunt while it's running; Finds once it's over. The player's own choice wins after that.
   const tab = picked || (duel.phase === "finished" ? "finds" : "hunt");
   const setTab = setPicked;
+  const share = duel.phase === "finished" && them ? {
+    text: duel.result === "won" ? `I just beat ${them.nickname} in a 1v1 on PrimaHunt 🏆 ${me.score}–${them.score}. Think you can take me?`
+      : duel.result === "lost" ? `${them.nickname} beat me ${them.score}–${me.score} in a 1v1 on PrimaHunt. Rematch loading 😤`
+      : `${me.nickname} vs ${them.nickname}: a dead tie (${me.score}–${them.score}) in our PrimaHunt 1v1 🤝`,
+    card: { kicker: "1v1 · " + (duel.result === "won" ? "Victory" : duel.result === "lost" ? "Good game" : "Tie"), title: duel.result === "won" ? `I beat ${them.nickname}` : duel.result === "lost" ? `${them.nickname} won this one` : "Dead tie", big: `${me.score}–${them.score}`, line: `${me.nickname} vs ${them.nickname} · ${duel.item_count} item${duel.item_count === 1 ? "" : "s"} each`, sub: "Most items found wins. Ties go to whoever got there first." },
+  } : null;
   return (
     <>
       <Link href="/duels" className="link" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><Icon n="back" size={16} />All 1v1s</Link>
@@ -54,11 +61,14 @@ function Room({ d, reload }) {
         {duel.phase === "judging" ? <p className="gap-note">Time's up. Judge the last photos — anything not judged by <b>{fmtDate(new Date(new Date(duel.end_at).getTime() + duel.grace_minutes * 60000))}</b> is approved automatically.</p> : null}
         {duel.phase === "finished" && duel.result === "won" ? <WinVideo className="win-inline" /> : null}
         {duel.phase === "finished" ? <div className="state-box earned" style={{ marginTop: 16, fontFamily: "var(--font-head)", textTransform: "uppercase", fontSize: 22, letterSpacing: "-.02em", ...(duel.result === "lost" ? { color: "var(--danger)", background: "color-mix(in oklch,var(--danger) 12%,var(--card))" } : duel.result === "tie" ? { color: "var(--warning)", background: "color-mix(in oklch,var(--warning) 12%,var(--card))" } : {}) }}>{duel.result === "won" ? "You won!" : duel.result === "lost" ? `${them.nickname} won` : "It's a tie"}</div> : null}
+        {share ? <ShareResult {...share} label={duel.result === "won" ? "Share the win" : "Share your result"} /> : null}
         {duel.purged ? <p className="gap-note">The photos and lists from this 1v1 were deleted {duel.retain_days} days after it ended. The score card is kept.</p> : null}
         <p className="muted" style={{ margin: "14px 0 0", fontSize: 13 }}>Most approved items wins. Tied? Whoever got there first wins.</p>
       </Plate>
 
-      {duel.phase === "finished" && duel.result === "won" ? <WinOverlay storageKey={"won:" + duel.id} title={`You beat ${them.nickname}!`} line={`${me.score}/${duel.item_count} found. First to finish takes the win.`} /> : null}
+      {share ? <WinOverlay storageKey={(duel.result === "won" ? "won:" : "duelres:") + duel.id} result={duel.result} share={share}
+        title={duel.result === "won" ? `You beat ${them.nickname}!` : duel.result === "lost" ? `${them.nickname} won this one` : "It's a tie!"}
+        line={duel.result === "won" ? `${me.score}/${duel.item_count} found. First to finish takes the win.` : duel.result === "lost" ? `${me.score}–${them.score}. Run it back with a rematch.` : `${me.score}–${them.score}. Nobody blinked.`} /> : null}
       {duel.phase === "waiting" ? <Waiting duel={duel} reload={reload} /> : null}
       {duel.phase === "setup" ? <Setup d={d} reload={reload} /> : null}
 
