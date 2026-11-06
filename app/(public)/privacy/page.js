@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Brand, ThemeToggle } from "../../../components/Brand.js";
-import { PRIVACY_CONTACT, PRIVACY_VERSION, RETAIN_DAYS } from "../../../lib/shared.js";
+import { PRIVACY_CONTACT, PRIVACY_VERSION, RETAIN_DAYS, WEEK_END_RULE } from "../../../lib/shared.js";
 
 export const metadata = { title: "Privacy Policy · PrimaHunt", description: "How PrimaHunt collects, uses, stores and deletes your data." };
 
@@ -74,19 +74,19 @@ export default function Page() {
           <tbody>
             <tr><td>Submission photos, submissions, rejection reasons, feed comments, item reference images</td><td><b>{RETAIN_DAYS} days after that week's hunt ends</b>, then deleted automatically</td></tr>
             <tr><td>1v1 photos and lists</td><td><b>{RETAIN_DAYS} days after the 1v1 ends</b>, then deleted automatically</td></tr>
-            <tr><td><b>Score cards</b>: points, ranks, weekly results, wins, prize records, 1v1 final scores, and item names</td><td>Until you delete your account (or the admin deletes the hunt)</td></tr>
+            <tr><td><b>Score cards</b>: points, ranks, weekly results, wins, prize records, 1v1 final scores, and item names</td><td>Kept while the hunt exists, so other players' results stay correct. If you delete your account, your entries stay but show as "Deleted player" and can no longer be linked to you.</td></tr>
             <tr><td>Account (nickname, email, password hash) and consent records</td><td>Until you delete your account</td></tr>
             <tr><td>Notifications</td><td>30 days</td></tr>
             <tr><td>Password-reset tokens and rate-limit counters</td><td>1 to 2 days</td></tr>
             <tr><td>Admin action log for a hunt</td><td>Until the hunt is deleted</td></tr>
           </tbody>
         </table></div>
-        <p>An automatic job runs every 15 minutes and carries out these deletions. Admins therefore have {RETAIN_DAYS} days after a week ends to finish reviewing; anything still unreviewed then is deleted unscored.</p>
+        <p>An automatic job runs every 15 minutes and carries out these deletions. This matches the game's end-of-week rule: {WEEK_END_RULE} Anything an admin never reviewed is deleted at that point without scoring.</p>
 
         <h2 id="s6">6. Photo deletion policy</h2>
         <ul>
           <li><b>Automatic:</b> every photo is permanently deleted from storage {RETAIN_DAYS} days after its hunt or 1v1 ends. We delete the file from storage first and the record second, so a failed deletion is retried rather than forgotten.</li>
-          <li><b>Account deletion:</b> deleting your account immediately deletes all your photos, and all photos in hunts you run and 1v1s you played.</li>
+          <li><b>Account deletion:</b> deleting your account immediately deletes every photo you took, in hunts and 1v1s. Other players' photos are not affected.</li>
           <li><b>Hunt deletion:</b> when an admin deletes a hunt, all of its photos are deleted immediately.</li>
           <li><b>Feed removal:</b> you can take your approved photo off your hunt's feed at any time. It then stays visible only to you and the admin until it is deleted on schedule.</li>
           <li><b>Early removal on request:</b> email <Mail /> to have a specific photo deleted sooner.</li>
@@ -122,7 +122,7 @@ export default function Page() {
         <ul>
           <li><b>Access and port</b> your data: Profile → <i>Download my data</i> gives you everything we hold, as a file.</li>
           <li><b>Correct</b> it: change your nickname or password in your profile, or email us.</li>
-          <li><b>Delete</b> it: Profile → <i>Delete my account</i> erases it immediately.</li>
+          <li><b>Delete</b> it: Profile → <i>Delete my account</i> immediately erases your email, password, nickname, photos, submissions, comments, notifications and consent records. To keep other players' results fair, past scores and 1v1 results stay on their leaderboards as "Deleted player", with nothing that identifies you. Hunts you founded pass to your co-admin, or close to new finds if there isn't one.</li>
           <li><b>Withdraw consent</b>, <b>object</b> to or <b>restrict</b> processing: email us.</li>
           <li><b>Complain</b> to the Nigeria Data Protection Commission at <a className="link" href="https://ndpc.gov.ng" target="_blank" rel="noreferrer">ndpc.gov.ng</a>.</li>
         </ul>
@@ -137,6 +137,7 @@ export default function Page() {
         <h2 id="s13">13. Contact</h2>
         <p>Questions, requests or complaints: <Mail />.</p>
 
+        <p>See also the <Link className="link" href="/terms">Terms and safety rules</Link>.</p>
         <p style={{ marginTop: 28 }}><Link className="btn ghost block" href="/login">Back to PrimaHunt</Link></p>
       </main>
     </>

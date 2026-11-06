@@ -124,5 +124,10 @@ export default function Page() {
   const { groups } = useApp();
   const g = groups?.find((x) => String(x.id) === gid);
   if (!g) return <Skel />;
-  return g.role === "owner" ? <OwnerOverview gid={gid} /> : <PlayerHome gid={gid} />;
+  return (
+    <>
+      {g.admin_left ? <div className="card mist" role="status"><b>This hunt's admin has left PrimaHunt.</b> Your scores and past results are kept, but the hunt is closed to new finds. You can leave it from the Players tab.</div> : null}
+      {g.role === "owner" ? <OwnerOverview gid={gid} /> : <PlayerHome gid={gid} />}
+    </>
+  );
 }

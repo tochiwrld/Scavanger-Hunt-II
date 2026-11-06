@@ -6,9 +6,9 @@ import { api, safeNext } from "../lib/client.js";
 import { useApp } from "./Providers.js";
 import { Brand, ThemeToggle } from "./Brand.js";
 import Icon from "./icons.js";
-import { Btn, ErrBox, PasswordInput, useForm } from "./ui.js";
+import { Btn, ErrBox, NewPasswordFields, PasswordInput, useForm } from "./ui.js";
 import { useConsent } from "./Consent.js";
-import { RETAIN_DAYS } from "../lib/shared.js";
+import { RETAIN_DAYS, WEEK_END_RULE } from "../lib/shared.js";
 import ActiveHunts from "./ActiveHunts.js";
 
 export const HERO_IMG = "https://iwljafkilkizabmgczjn.supabase.co/storage/v1/object/public/site/hero.jpg";
@@ -29,7 +29,7 @@ function InviteBox() {
         <input id="invite" value={v} onChange={(e) => setV(e.target.value)} placeholder="Invite code" autoCapitalize="off" autoCorrect="off" spellCheck={false} />
         <button className="btn" type="submit" disabled={!v.trim()}>Join<Icon n="arrow" size={17} /></button>
       </div>
-      <p className="hint">PrimaHunt is invite-only. Ask your hunt admin for the link.</p>
+      <p className="hint">Friends' hunts are invite-only: ask the hunt admin for the link. Every account also joins PRIMAHUNT OFFICIAL, our public hunt, which you can leave any time.</p>
     </form>
   );
 }
@@ -38,7 +38,7 @@ const STEPS = [
   ["hunt", "A new list every Monday", "Your admin drops a fresh list of real-world items at 12:00 AM Lagos time. Each one has its own point value."],
   ["camera", "Find it, snap it", "Spot an item out in the world and send a photo as proof, straight from your phone camera. Add up to four if one shot doesn't tell the whole story."],
   ["check", "Get approved, earn points", "Every submission is reviewed by hand. Approved items add points to your weekly score."],
-  ["trophy", "Top the board by Sunday", "The leaderboard locks at 11:59 PM Sunday. First place takes the weekly prize."],
+  ["trophy", "Top the board by Sunday", WEEK_END_RULE],
 ];
 
 function Inner({ mode }) {
@@ -87,8 +87,9 @@ function Inner({ mode }) {
             <ErrBox error={form.error} />
             {mode === "register" ? <div className="field"><label htmlFor="nickname">Nickname</label><input id="nickname" name="nickname" autoComplete="nickname" maxLength={20} required /><div className="muted">The only thing other players see. Your email stays private.</div></div> : null}
             <div className="field"><label htmlFor="email">Email</label><input id="email" name="email" type="email" inputMode="email" autoComplete="email" required /></div>
-            <div className="field"><label htmlFor="password">Password</label><PasswordInput id="password" name="password" autoComplete={mode === "login" ? "current-password" : "new-password"} required /></div>
-            {mode === "register" ? <div className="field"><label htmlFor="confirm">Confirm password</label><PasswordInput id="confirm" name="confirm" autoComplete="new-password" required /></div> : null}
+            {mode === "login"
+              ? <div className="field"><label htmlFor="password">Password</label><PasswordInput id="password" name="password" autoComplete="current-password" required /></div>
+              : <NewPasswordFields idPrefix="reg" />}
             {mode === "register" ? consent.view : null}
             <Btn busy={form.busy} className="block" type="submit" disabled={mode === "register" && !consent.all}>{mode === "login" ? "Log in" : "Create my account"}<Icon n="arrow" size={18} /></Btn>
             {mode === "login" ? <p style={{ textAlign: "center", margin: "16px 0 0" }}><Link className="link" href="/forgot">Forgot your password?</Link></p> : null}
@@ -118,7 +119,7 @@ function Inner({ mode }) {
           <p><Link className="link" href="/privacy">Read the full Privacy Policy</Link></p>
         </section>
 
-        <div className="foot-brand"><Brand href="/login" /><div>A free social game among friends. Prizes are paid out personally by each hunt's admin.</div><div style={{ marginTop: 8 }}><Link className="link" href="/privacy">Privacy Policy</Link></div></div>
+        <div className="foot-brand"><Brand href="/login" /><div>A free social game among friends. Prizes are paid out personally by each hunt's admin.</div><div style={{ marginTop: 8 }}><Link className="link" href="/privacy">Privacy Policy</Link> · <Link className="link" href="/terms">Terms</Link></div></div>
       </div>
     </div>
   );

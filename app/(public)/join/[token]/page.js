@@ -6,7 +6,7 @@ import { api, fmtDate } from "../../../../lib/client.js";
 import { useApp } from "../../../../components/Providers.js";
 import { Brand, ThemeToggle } from "../../../../components/Brand.js";
 import Icon from "../../../../components/icons.js";
-import { Async, Btn, useApi } from "../../../../components/ui.js";
+import { Async, Btn, Empty, useApi } from "../../../../components/ui.js";
 
 export default function Page() {
   const { token } = useParams();
@@ -28,7 +28,11 @@ export default function Page() {
     <>
       <header className="top"><Brand /><div className="acts"><ThemeToggle /></div></header>
       <div className="auth" style={{ paddingTop: 28 }}>
-        <Async st={st}>{(d) => (
+        <Async st={st} gone={
+          <Empty icon="🔗" title="This invite link doesn't work" text="It may have been replaced, switched off or typed wrong. Ask your hunt admin to send you a new link.">
+            <Link className="btn" href="/">Go to PrimaHunt</Link>
+          </Empty>
+        }>{(d) => (
           <div className="stack" style={{ gap: 14 }}>
             <section className="plate"><div className="stripe" /><div className="in" style={{ textAlign: "center", padding: "30px 22px" }}>
               <div className="eyebrow">You're invited to join</div>

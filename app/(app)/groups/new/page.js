@@ -23,9 +23,9 @@ export default function Page() {
       <div className="page-head"><h1>Create a hunt</h1><p>Your own private scavenger hunt: invite your crew, post a list every week, crown a winner.</p></div>
       <form className="card" onSubmit={form.onSubmit} noValidate>
         <ErrBox error={form.error} />
-        <div className="field"><label>Hunt name</label><input name="name" maxLength={60} placeholder="Saturday Scavengers" required /></div>
-        <div className="field"><label>Description (optional)</label><textarea name="description" maxLength={300} placeholder="Weekly scavenger hunt for the boys." /></div>
-        <div className="field"><label>Hunt image (optional)</label><input name="image" type="file" accept="image/*" /></div>
+        <div className="field"><label>Hunt name</label><input aria-label="Hunt name" name="name" maxLength={60} placeholder="Saturday Scavengers" required /></div>
+        <div className="field"><label>Description (optional)</label><textarea aria-label="Description (optional)" name="description" maxLength={300} placeholder="Weekly scavenger hunt for the boys." /></div>
+        <div className="field"><label>Hunt image (optional)</label><input aria-label="Hunt image (optional)" name="image" type="file" accept="image/*" /></div>
         <Btn busy={form.busy} className="block" type="submit">Create hunt</Btn>
       </form>
     </>

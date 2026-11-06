@@ -11,7 +11,7 @@ function PaidSheet({ gid, p, onClose, onDone }) {
     <Sheet onClose={onClose}>
       <h2>Mark prize as paid</h2>
       <form className="stack" style={{ marginTop: 12 }} onSubmit={form.onSubmit} noValidate>
-        <div><label>Payment note (optional)</label><input name="note" maxLength={300} placeholder="Sent by bank transfer" /></div>
+        <div><label>Payment note (optional)</label><input aria-label="Payment note (optional)" name="note" maxLength={300} placeholder="Sent by bank transfer" /></div>
         <ErrBox error={form.error} />
         <Btn busy={form.busy} className="ok block" type="submit">Confirm paid</Btn>
       </form>

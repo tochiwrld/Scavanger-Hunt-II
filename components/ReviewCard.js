@@ -38,7 +38,7 @@ export default function ReviewCard({ s, gid, base = `/groups/${gid}`, photoBase 
           <div className="acts"><Btn busy={busy} className="ok" onClick={approve}><Icon n="check" size={18} />Approve</Btn><button className="btn ghost" disabled={busy} onClick={() => setRejecting((r) => !r)}><Icon n="x" size={18} />Reject</button></div>
           {rejecting ? (
             <div className="stack" style={{ marginTop: 10 }}>
-              <textarea autoFocus value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Why is it rejected? The player will see this." maxLength={300} />
+              <textarea aria-label="Reason for rejecting" autoFocus value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Why is it rejected? The player will see this." maxLength={300} />
               <Btn busy={busy} className="bad block" onClick={reject}>Send rejection</Btn>
             </div>
           ) : null}

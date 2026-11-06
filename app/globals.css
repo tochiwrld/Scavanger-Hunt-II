@@ -495,3 +495,8 @@ button.slot.filled{border:1.5px solid var(--primary)}
 .cam-zoom button{min-width:40px;height:34px;border-radius:99px;border:0;background:transparent;color:#fff;font:700 13px var(--font-mono);cursor:pointer}
 .cam-zoom button.on{background:rgba(255,255,255,.2);color:var(--primary)}
 .cam-zoom-now{color:var(--primary);font:700 13px var(--font-mono);padding:0 8px}
+/* ---------- password rules ---------- */
+.pw-rule{font-size:13px;color:var(--muted-fg);margin-top:6px}
+.pw-rule.ok{color:var(--good,oklch(78% .17 150))}
+.pw-rule.bad{color:var(--bad,oklch(70% .19 25))}
+.as-typed{text-transform:none;letter-spacing:0;font-family:var(--font-body)}

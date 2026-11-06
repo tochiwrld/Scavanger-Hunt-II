@@ -6,7 +6,7 @@ Implemented in `lib/retention.js` (`runRetention()`, run by the 15-minute cron) 
 |---|---|---|
 | A weekly challenge ends | All its submission photos and submissions (with rejection reasons), their feed comments, and the items' reference images | `end_at + 7 days` |
 | A 1v1 finishes or is cancelled | All its photos, submissions and both lists | `finished_at + 7 days` |
-| A player deletes their account | Their photos everywhere, plus all photos in hunts they run and in 1v1s they played | Immediately |
+| A player deletes their account | Every photo they took (hunts and 1v1s). The account is anonymised to "Deleted player"; other players' photos and results are untouched | Immediately |
 | An admin deletes a hunt | Every photo in the hunt, its item reference images and the hunt image | Immediately |
 | An admin replaces/removes a hunt image or reference image | The old file | Immediately |
 | A player or admin removes a post from the feed | Nothing is deleted; the photo becomes private again (submitter + admin) until the 7-day deletion | — |

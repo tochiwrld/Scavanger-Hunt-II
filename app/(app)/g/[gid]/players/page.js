@@ -13,8 +13,8 @@ function Adjust({ gid, u, ch, onClose, onDone }) {
       <h2>Adjust score</h2>
       <p className="muted" style={{ margin: "6px 0 12px" }}>{u.nickname} · {ch.title} · now {u.score} pts</p>
       <form className="stack" onSubmit={form.onSubmit} noValidate>
-        <div><label>New score</label><input name="new_score" type="number" inputMode="numeric" min={0} defaultValue={u.score} /></div>
-        <div><label>Reason (saved in the log)</label><textarea name="reason" maxLength={300} /></div>
+        <div><label>New score</label><input aria-label="New score" name="new_score" type="number" inputMode="numeric" min={0} defaultValue={u.score} /></div>
+        <div><label>Reason (saved in the log)</label><textarea aria-label="Reason (saved in the log)" name="reason" maxLength={300} /></div>
         <ErrBox error={form.error} />
         <Btn busy={form.busy} className="block" type="submit">Save adjustment</Btn>
       </form>
@@ -57,7 +57,7 @@ export default function Page() {
               </div>
             )) : <p className="muted" style={{ margin: "6px 0 0" }}>{d.founder ? "You can make one player co-admin. They help review and run the hunt, but can't remove you or delete the hunt." : "No co-admin yet."}</p>}
           </section>
-          <input type="search" placeholder="Search players" value={q} onChange={(e) => setQ(e.target.value)} />
+          <input type="search" aria-label="Search players" placeholder="Search players" value={q} onChange={(e) => setQ(e.target.value)} />
           {rows.length ? rows.map((u) => (
             <div key={u.id} className="card flat">
               <div className="row between"><b>{u.nickname}</b><span className="muted">Joined {fmtDate(u.joined_at)}</span></div>

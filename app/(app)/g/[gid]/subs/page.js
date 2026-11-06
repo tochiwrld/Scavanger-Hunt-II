@@ -15,10 +15,10 @@ export default function Page() {
   return (
     <>
       <div className="card stack">
-        <input type="search" placeholder="Search player or item" value={q} onChange={(e) => setQ(e.target.value)} />
+        <input type="search" aria-label="Search player or item" placeholder="Search player or item" value={q} onChange={(e) => setQ(e.target.value)} />
         <div className="row">
-          <select className="grow" value={status} onChange={(e) => setStatus(e.target.value)}><option value="">All statuses</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select>
-          <select className="grow" value={chal} onChange={(e) => setChal(e.target.value)}><option value="">All challenges</option>{(ch.data?.challenges || []).map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}</select>
+          <select className="grow" aria-label="Filter by status" value={status} onChange={(e) => setStatus(e.target.value)}><option value="">All statuses</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select>
+          <select className="grow" aria-label="Filter by challenge" value={chal} onChange={(e) => setChal(e.target.value)}><option value="">All challenges</option>{(ch.data?.challenges || []).map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}</select>
         </div>
       </div>
       <Async st={list}>{(d) => (

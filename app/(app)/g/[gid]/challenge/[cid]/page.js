@@ -23,12 +23,12 @@ function ChallengeForm({ gid, c, isNew, draft, onSaved }) {
       {draft ? <p className="muted">Draft: only you can see it. Times are Lagos time.</p>
         : <div className="card mist">🔒 {official && c.phase !== "closed" ? "Published. Existing items are locked, but you can keep adding new ones." : c.phase === "upcoming" ? "Scheduled. Items and points are locked. Unpublish to edit." : c.phase === "active" ? "Live. Items and points are locked." : "This challenge has finished."}</div>}
       <fieldset disabled={!draft} style={{ border: 0, padding: 0, margin: "12px 0 0" }}>
-        <div className="field"><label>Challenge title</label><input name="title" defaultValue={c.title} maxLength={120} placeholder="The City Hunt" required /></div>
-        <div className="field"><label>Description</label><textarea name="description" defaultValue={c.description} maxLength={2000} /></div>
-        <div className="field"><label>Rules</label><textarea name="rules" defaultValue={c.rules} maxLength={4000} /><div className="muted">The tie-breaker rule is added automatically.</div></div>
-        <div className="field"><label>Starts (Lagos time)</label><input type="datetime-local" name="start_at" defaultValue={toLagosInput(c.start_at)} required /></div>
-        <div className="field"><label>Ends (Lagos time)</label><input type="datetime-local" name="end_at" defaultValue={toLagosInput(c.end_at)} required /><div className="muted">Default: Monday 12:00 AM to Sunday 11:59 PM.</div></div>
-        {official ? <input type="hidden" name="prize_amount" value="0" /> : <div className="field"><label>Weekly prize (₦)</label><input name="prize_amount" type="number" inputMode="numeric" min={0} defaultValue={c.prize_amount} /></div>}
+        <div className="field"><label>Challenge title</label><input aria-label="Challenge title" name="title" defaultValue={c.title} maxLength={120} placeholder="The City Hunt" required /></div>
+        <div className="field"><label>Description</label><textarea aria-label="Description" name="description" defaultValue={c.description} maxLength={2000} /></div>
+        <div className="field"><label>Rules</label><textarea aria-label="Rules" name="rules" defaultValue={c.rules} maxLength={4000} /><div className="muted">The tie-breaker rule is added automatically.</div></div>
+        <div className="field"><label>Starts (Lagos time)</label><input aria-label="Starts (Lagos time)" type="datetime-local" name="start_at" defaultValue={toLagosInput(c.start_at)} required /></div>
+        <div className="field"><label>Ends (Lagos time)</label><input aria-label="Ends (Lagos time)" type="datetime-local" name="end_at" defaultValue={toLagosInput(c.end_at)} required /><div className="muted">Default: Monday 12:00 AM to Sunday 11:59 PM.</div></div>
+        {official ? <input type="hidden" name="prize_amount" value="0" /> : <div className="field"><label>Weekly prize (₦)</label><input aria-label="Weekly prize (₦)" name="prize_amount" type="number" inputMode="numeric" min={0} defaultValue={c.prize_amount} /></div>}
       </fieldset>
       <ErrBox error={form.error} />
       {draft ? <Btn busy={form.busy} className="block" type="submit">{isNew ? "Save draft" : "Save changes"}</Btn> : null}

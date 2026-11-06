@@ -48,8 +48,10 @@ export function Empty({ icon, title, text, children }) {
 }
 
 /** Renders loading / error states, then children(data). */
-export function Async({ st, children }) {
+/** `gone`: what to show when the thing simply doesn't exist (404/410), instead of a pointless "Try again". */
+export function Async({ st, children, gone }) {
   if (st.loading) return <Skel />;
+  if (st.error && gone && [403, 404, 410].includes(st.error.status)) return gone;
   if (st.error) return <Empty icon="😵" title="Couldn't load this page" text={st.error.message}><button className="btn" onClick={st.reload}>Try again</button></Empty>;
   return children(st.data);
 }
@@ -233,5 +235,41 @@ export function PasswordInput(props) {
         <Icon n={show ? "eyeoff" : "eye"} size={19} />
       </button>
     </div>
+  );
+}
+
+/** New password + confirm, with the rules shown up front and checked as you type. */
+export const PW_MIN = 8;
+export function NewPasswordFields({ label = "Password", confirmLabel = "Confirm password", idPrefix = "pw" }) {
+  const [pw, setPw] = useState("");
+  const [again, setAgain] = useState("");
+  const box = useRef(null);
+  useEffect(() => { // clear when the form is reset after a successful change
+    const form = box.current?.closest("form");
+    const clear = () => { setPw(""); setAgain(""); };
+    form?.addEventListener("reset", clear);
+    return () => form?.removeEventListener("reset", clear);
+  }, []);
+  const longEnough = pw.length >= PW_MIN;
+  const match = again.length > 0 && again === pw;
+  return (
+    <>
+      <div className="field" ref={box}>
+        <label htmlFor={`${idPrefix}-new`}>{label}</label>
+        <PasswordInput id={`${idPrefix}-new`} name="password" autoComplete="new-password" required minLength={PW_MIN} maxLength={200}
+          value={pw} onChange={(e) => setPw(e.target.value)} aria-describedby={`${idPrefix}-rule`} />
+        <div id={`${idPrefix}-rule`} className={"pw-rule" + (pw ? (longEnough ? " ok" : " bad") : "")} aria-live="polite">
+          {pw && longEnough ? "✓ " : ""}At least {PW_MIN} characters{pw && !longEnough ? ` (${PW_MIN - pw.length} more)` : ""}
+        </div>
+      </div>
+      <div className="field">
+        <label htmlFor={`${idPrefix}-again`}>{confirmLabel}</label>
+        <PasswordInput id={`${idPrefix}-again`} name="confirm" autoComplete="new-password" required maxLength={200}
+          value={again} onChange={(e) => setAgain(e.target.value)} aria-describedby={`${idPrefix}-match`} />
+        <div id={`${idPrefix}-match`} className={"pw-rule" + (again ? (match ? " ok" : " bad") : "")} aria-live="polite">
+          {!again ? "Type it again to check" : match ? "✓ Passwords match" : "Passwords don't match yet"}
+        </div>
+      </div>
+    </>
   );
 }

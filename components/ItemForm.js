@@ -23,9 +23,9 @@ export default function ItemForm({ gid, cid, it, onClose, onSaved }) {
     <Sheet onClose={onClose}>
       <h2>{it ? "Edit item" : "Add item"}</h2>
       <form className="stack" style={{ marginTop: 12 }} onSubmit={form.onSubmit} noValidate>
-        <div><label>Item name</label><input name="title" maxLength={160} defaultValue={it?.title || ""} placeholder="Find a red car" required /></div>
-        <div><label>Description</label><textarea name="description" maxLength={1000} defaultValue={it?.description || ""} /></div>
-        <div><label>Instructions for the photos</label><textarea name="instructions" maxLength={2000} defaultValue={it?.instructions || ""} /></div>
+        <div><label>Item name</label><input aria-label="Item name" name="title" maxLength={160} defaultValue={it?.title || ""} placeholder="Find a red car" required /></div>
+        <div><label>Description</label><textarea aria-label="Description" name="description" maxLength={1000} defaultValue={it?.description || ""} /></div>
+        <div><label>Instructions for the photos</label><textarea aria-label="Instructions for the photos" name="instructions" maxLength={2000} defaultValue={it?.instructions || ""} /></div>
         <div>
           <label>Difficulty</label>
           <div className="diff-pick" role="radiogroup" aria-label="Difficulty">
@@ -38,9 +38,10 @@ export default function ItemForm({ gid, cid, it, onClose, onSaved }) {
           </div>
           <div className="muted" style={{ marginTop: 6, fontSize: 13 }}>Points are set by the difficulty.</div>
         </div>
-        <div><label>Hint (optional)</label><input name="hint" maxLength={500} defaultValue={it?.hint || ""} /></div>
-        <div><label>Reference image (optional)</label><input name="ref" type="file" accept="image/*" />
+        <div><label>Hint (optional)</label><input aria-label="Hint (optional)" name="hint" maxLength={500} defaultValue={it?.hint || ""} /></div>
+        <div><label>Reference image (optional)</label><input aria-label="Reference image (optional)" name="ref" type="file" accept="image/*" />
           {it?.has_reference ? <button type="button" className="btn sm ghost" style={{ marginTop: 8 }} onClick={removeRef}>Remove current image</button> : null}</div>
+        <p className="muted" style={{ margin: 0, fontSize: 13 }}>Only set items that every player can do safely and legally. Nothing dangerous or illegal (see the <a className="link" href="/terms" target="_blank" rel="noreferrer">Terms</a>).</p>
         <ErrBox error={form.error} />
         <Btn busy={form.busy} className="block" type="submit">Save item</Btn>
       </form>

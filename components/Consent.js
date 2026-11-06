@@ -16,11 +16,13 @@ export function useConsent() {
   const view = (
     <fieldset className="consent">
       <legend>Privacy acknowledgement</legend>
-      <p className="muted">Please read the <Link className="link" href="/privacy" target="_blank">Privacy Policy</Link>, then tick each box. You need all of them to use PrimaHunt.</p>
+      <p className="muted">Please read the <Link className="link" href="/privacy" target="_blank">Privacy Policy</Link> and the <Link className="link" href="/terms" target="_blank">Terms</Link>, then tick each box. You need all of them to use PrimaHunt.</p>
       {CONSENT_ITEMS.map(([k, label]) => (
         <label key={k} className="consent-row">
           <input type="checkbox" checked={!!ticked[k]} onChange={(e) => setTicked((t) => ({ ...t, [k]: e.target.checked }))} required />
-          <span>{k === "policy" ? <>I have read and agree to the <Link className="link" href="/privacy" target="_blank">Privacy Policy</Link>.</> : label}</span>
+          <span>{k === "policy" ? <>I have read and agree to the <Link className="link" href="/privacy" target="_blank">Privacy Policy</Link>.</>
+            : k === "terms" ? <>I agree to the <Link className="link" href="/terms" target="_blank">Terms</Link>: I play at my own risk, I'll stay safe and within the law, I won't post or set anything dangerous or illegal, and PrimaHunt isn't responsible for what players or hunt admins do.</>
+            : label}</span>
         </label>
       ))}
       <button type="button" className="link sm-link" onClick={() => setTicked(all ? {} : Object.fromEntries(CONSENT_ITEMS.map(([k]) => [k, true])))}>{all ? "Untick all" : "I've read each statement. Tick all"}</button>
@@ -49,7 +51,7 @@ function Gate() {
     <main style={{ paddingTop: 24 }}>
       <div style={{ marginBottom: 14 }}><Brand /></div>
       <h1>Before you keep hunting</h1>
-      <p className="muted">Hi {me?.nickname}. We've published a new Privacy Policy. Hunt data is now deleted {RETAIN_DAYS} days after each hunt ends, and you can download or delete your data any time from your profile.</p>
+      <p className="muted">Hi {me?.nickname}. We've updated our Privacy Policy and added Terms covering safety: no dangerous or illegal items, and you play at your own risk. Please read them and tick each box to keep playing.</p>
       <div className="card"><ErrBox error={err} />{c.view}
         <Btn className="block" busy={busy} disabled={!c.all} onClick={accept}>Accept and continue</Btn></div>
       <p className="muted" style={{ textAlign: "center" }}>Don't agree? <button className="link" onClick={logout}>Log out</button>, or accept and delete your account from your profile.</p>

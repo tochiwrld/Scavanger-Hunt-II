@@ -8,10 +8,20 @@ const bodyFont = Space_Grotesk({ subsets: ["latin"], weight: ["400", "500", "600
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["500", "700"], variable: "--nf-mono", display: "swap" });
 import Providers from "../components/Providers.js";
 
+const SITE = (process.env.APP_URL || "https://weekly-hunt.vercel.app").replace(/\/$/, "");
+// Link previews (WhatsApp, iMessage, X, Slack...). Invite and 1v1 links override the title and description.
 export const metadata = {
+  metadataBase: new URL(SITE),
   title: "PrimaHunt",
   description: "The weekly scavenger hunt for your crew. Hunt it. Snap it. Win the week.",
-  icons: { icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23FFD21F'/%3E%3Ctext x='50' y='68' font-size='52' font-family='Arial Black,Arial' font-weight='900' text-anchor='middle' fill='%2316141f'%3EH%3C/text%3E%3C/svg%3E" },
+  openGraph: {
+    type: "website", siteName: "PrimaHunt", url: "/", locale: "en_NG",
+    title: "PrimaHunt · Hunt it. Snap it. Win the week.",
+    description: "The weekly scavenger hunt for your crew. Race your friends to the wildest finds.",
+    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "PrimaHunt: Hunt it. Snap it. Win the week." }],
+  },
+  twitter: { card: "summary_large_image", images: ["/og.jpg"] },
+  icons: { icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23FFD21F'/%3E%3Ctext x='50' y='68' font-size='52' font-family='Arial Black,Arial' font-weight='900' text-anchor='middle' fill='%2316141f'%3EP%3C/text%3E%3C/svg%3E" },
 };
 export const viewport = {
   width: "device-width", initialScale: 1, viewportFit: "cover",

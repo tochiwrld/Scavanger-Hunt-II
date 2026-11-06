@@ -7,18 +7,17 @@ import { useApp } from "../../components/Providers.js";
 import { Avatar, Btn, Empty, RoleBadge, Skel } from "../../components/ui.js";
 import Icon from "../../components/icons.js";
 import GlobalSearch from "../../components/GlobalSearch.js";
+import BecomeAdmin from "../../components/BecomeAdmin.js";
 import ActiveHunts from "../../components/ActiveHunts.js";
 
 export default function GroupsHome() {
   const { me, groups, setMe, toast } = useApp();
   const router = useRouter();
-  const [busy, setBusy] = useState(false);
+  const [busy] = useState(false);
+  const [ask, setAsk] = useState(false);
   if (!groups) return <Skel />;
   const phase = (c) => (!c ? "No challenge yet" : c.phase === "active" ? "Live now" : c.phase === "upcoming" ? "Starts " + fmtDate(c.start_at) : "Week finished");
-  const becomeAdmin = async () => {
-    setBusy(true);
-    try { await api("/me/become-admin", { method: "POST" }); setMe({ ...me, can_create_groups: true }); router.push("/groups/new"); } catch (e) { toast(e.message, "bad"); setBusy(false); }
-  };
+  const becomeAdmin = () => setAsk(true);
   return (
     <>
       <ActiveHunts />
@@ -56,6 +55,7 @@ export default function GroupsHome() {
         </div>
       </Link>
       <GlobalSearch />
+      {ask ? <BecomeAdmin onClose={() => setAsk(false)} onDone={() => router.push("/groups/new")} /> : null}
     </>
   );
 }
