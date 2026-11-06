@@ -56,6 +56,18 @@ export default function GroupsHome() {
           <Icon n="arrow" size={20} className="c-mute" />
         </div>
       </Link>
+      <Link href="/teams" className="plate" style={{ textDecoration: "none", color: "inherit", marginTop: 14 }}>
+        <div className="stripe" />
+        <div className="in row" style={{ gap: 16, alignItems: "flex-start" }}>
+          <span style={{ width: 50, height: 50, borderRadius: 14, background: "var(--primary)", color: "var(--primary-fg)", display: "grid", placeItems: "center", flex: "none" }}><Icon n="team" size={24} /></span>
+          <div className="grow">
+            <div className="eyebrow">New</div>
+            <h2 style={{ margin: "6px 0 8px", fontSize: 26 }}>Team vs</h2>
+            <p className="muted" style={{ margin: 0 }}>2v2, 3v3, 4v4 and up. Challenge another captain, bring in your teammates, and race to find the other team's list first.</p>
+          </div>
+          <Icon n="arrow" size={20} className="c-mute" />
+        </div>
+      </Link>
       <GlobalSearch />
       {ask ? <BecomeAdmin onClose={() => setAsk(false)} onDone={() => router.push("/groups/new")} /> : null}
     </>
