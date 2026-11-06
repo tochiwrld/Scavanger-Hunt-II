@@ -42,7 +42,6 @@ export default function AppShell({ children }) {
         <div className="acts">
           <Link href="/alerts" className="icon-btn" aria-label={unread ? `Alerts, ${unread} unread` : "Alerts"}><Icon n="bell" size={19} />{dot(unread)}</Link>
           <ThemeToggle />
-          <Link href="/profile" className="icon-btn" aria-label={`Profile: ${me.nickname}`}><Icon n="user" size={19} /></Link>
         </div>
       </header>
       <main id="view">
@@ -72,23 +71,11 @@ export default function AppShell({ children }) {
           : gid && !groups ? <Skel /> : children}
       </main>
       <nav className="nav" aria-label="Main">
-        {g ? (
-          // Overview/Home, Review and Leaderboard already sit in the hunt's tab row above, so the pill skips them.
-          <>
-            {owner ? null : <A href={`/g/${g.id}/hunt`} icon="hunt" label="Hunt" on={sub === "hunt"} />}
-            <A href={`/g/${g.id}/feed`} icon="chat" label="Feed" on={sub === "feed"} />
-            <A href="/" icon="users" label="Hunts" on={false} />
-            <A href="/duels" icon="swords" label="1v1" on={false} />
-            <A href="/profile" icon="user" label="Profile" on={false} />
-          </>
-        ) : (
-          <>
-            <A href="/" icon="users" label="Hunts" on={path === "/"} />
-            <A href="/duels" icon="swords" label="1v1" on={path.startsWith("/duel")} />
-            <A href="/join" icon="key" label="Join" on={path === "/join"} />
-            <A href="/profile" icon="user" label="Profile" on={path === "/profile"} />
-          </>
-        )}
+        {/* App-wide only, and the same everywhere. Everything about one hunt (Hunt, Feed, Leaderboard, Review...) lives in that hunt's tab row, so nothing appears twice. */}
+        <A href="/" icon="users" label="Hunts" on={path === "/" || Boolean(gid)} />
+        <A href="/duels" icon="swords" label="1v1" on={path.startsWith("/duel")} />
+        <A href="/join" icon="key" label="Join" on={path === "/join"} />
+        <A href="/profile" icon="user" label="Profile" on={path === "/profile"} />
       </nav>
     </>
   );

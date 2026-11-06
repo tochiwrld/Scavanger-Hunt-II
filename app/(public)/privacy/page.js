@@ -74,7 +74,7 @@ export default function Page() {
           <tbody>
             <tr><td>Submission photos, submissions, rejection reasons, feed comments, item reference images</td><td><b>{RETAIN_DAYS} days after that week's hunt ends</b>, then deleted automatically</td></tr>
             <tr><td>1v1 photos and lists</td><td><b>{RETAIN_DAYS} days after the 1v1 ends</b>, then deleted automatically</td></tr>
-            <tr><td><b>Score cards</b>: points, ranks, weekly results, wins, prize records, 1v1 final scores, and item names</td><td>Kept while the hunt exists, so other players' results stay correct. If you delete your account, your entries stay but show as "Deleted player" and can no longer be linked to you.</td></tr>
+            <tr><td><b>Score cards</b>: points, ranks, weekly results and stat recaps (for example who led and for how long), wins, prize records, "Hunter of the week" awards, 1v1 final scores, and item names</td><td>Kept while the hunt exists, so other players' results stay correct. If you delete your account, your entries stay but show as "Deleted player" and can no longer be linked to you.</td></tr>
             <tr><td>Account (nickname, email, password hash) and consent records</td><td>Until you delete your account</td></tr>
             <tr><td>Notifications</td><td>30 days</td></tr>
             <tr><td>Password-reset tokens and rate-limit counters</td><td>1 to 2 days</td></tr>

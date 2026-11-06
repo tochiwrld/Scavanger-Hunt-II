@@ -500,3 +500,14 @@ button.slot.filled{border:1.5px solid var(--primary)}
 .pw-rule.ok{color:var(--good,oklch(78% .17 150))}
 .pw-rule.bad{color:var(--bad,oklch(70% .19 25))}
 .as-typed{text-transform:none;letter-spacing:0;font-family:var(--font-body)}
+/* ---------- hunter of the week + recap ---------- */
+.live-wrap{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin-bottom:14px}
+.live-wrap.hero{margin:0;display:inline-flex}
+.live-wrap .live-bar{margin-bottom:0}
+.hunter-line{font-size:13px;color:var(--muted-fg);padding-left:4px}
+.hunter-line b{color:var(--primary);font-weight:700}
+.hunter-badge{display:flex;gap:14px;align-items:center;border:1.5px solid color-mix(in oklch,var(--primary) 55%,transparent);background:color-mix(in oklch,var(--primary) 12%,transparent)}
+.hunter-badge .medal{font-size:38px;line-height:1}
+.recap{list-style:none;padding:0;margin:10px 0 0;display:flex;flex-direction:column;gap:10px}
+.recap li{display:flex;gap:10px;align-items:flex-start;line-height:1.45}
+.recap li span{flex:none;width:24px;text-align:center}

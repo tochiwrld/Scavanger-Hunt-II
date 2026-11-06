@@ -18,6 +18,13 @@ export default function Page() {
               <div key={r.rank + r.nickname} className="row between"><span style={{ font: "800 19px/1.2 var(--font-head)", textTransform: "uppercase", letterSpacing: "-.02em" }}>{["🥇", "🥈", "🥉"][r.rank - 1]} {["1st", "2nd", "3rd"][r.rank - 1]} · {r.nickname}</span><span className="pts">{r.points} PTS</span></div>
             )) : <p>Nobody scored this week.</p>}
           </div>
+          {d.recap?.length ? (
+            <div className="card">
+              <h2>Week recap</h2>
+              <ul className="recap">{d.recap.map((l, i) => <li key={i}><span aria-hidden="true">{l.icon}</span><span style={{ width: "auto", textAlign: "left" }}>{l.text}</span></li>)}</ul>
+              {d.finalized ? null : <p className="muted" style={{ margin: "12px 0 0", fontSize: 13 }}>Reviews are still counting, so this can change.</p>}
+            </div>
+          ) : null}
           {p.amount > 0 ? <div className={"card" + (p.winner ? " mist" : "")}>
             <h3>🏆 {naira(p.amount)} prize</h3>
             <p style={{ margin: "6px 0 0" }}>{p.winner ? <>Winner: <b>{p.winner}</b></> : "No winner this week."}</p>

@@ -19,7 +19,7 @@ export default function Page() {
   useEffect(() => { if (st.data) { setS(st.data.settings); setPub(Boolean(st.data.is_public)); } }, [st.data]);
   const setPublic = async (on) => {
     setPub(on);
-    try { await api(`/groups/${gid}/public`, { method: "PUT", json: { is_public: on } }); toast(on ? "Listed in Global Search" : "Removed from Global Search", "good"); } catch (e) { toast(e.message, "bad"); st.reload(); }
+    try { await api(`/groups/${gid}/public`, { method: "PUT", json: { is_public: on } }); toast(on ? "Listed in Global Hunt" : "Removed from Global Hunt", "good"); } catch (e) { toast(e.message, "bad"); st.reload(); }
   };
   const save = async (patch) => {
     setS((o) => ({ ...o, ...patch }));
@@ -53,8 +53,8 @@ export default function Page() {
             <div className="field"><label>Hunt image</label><input aria-label="Hunt image" type="file" accept="image/*" onChange={image} /></div>
             <Btn busy={edit.busy} className="block" type="submit">Save hunt</Btn></form>
         ) : null}
-        <div className="card"><h2 style={{ marginBottom: 6 }}>Global Search</h2>
-          <div className="sw"><div><b>List this hunt in Global Search</b><div className="muted">Anyone can find it on the home page and join without an invite. Points earned here count toward the global ranking.</div></div>
+        <div className="card"><h2 style={{ marginBottom: 6 }}>Global Hunt</h2>
+          <div className="sw"><div><b>List this hunt in Global Hunt</b><div className="muted">Anyone can find it on the home page and join without an invite. Points earned here count toward the global ranking.</div></div>
             <input type="checkbox" aria-label="List this hunt publicly" checked={pub} onChange={(e) => setPublic(e.target.checked)} /></div>
         </div>
         {s ? (

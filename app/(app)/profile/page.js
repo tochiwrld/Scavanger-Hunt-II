@@ -45,6 +45,18 @@ export default function Page() {
   return (
     <>
       <h1>Profile</h1>
+      {me.hunter ? (
+        <div className="card hunter-badge" role="status">
+          <span className="medal" aria-hidden="true">🏅</span>
+          <div>
+            <div className="eyebrow">{me.hunter.current ? "Hunter of the week" : "Former Hunter of the week"}</div>
+            <div style={{ font: "800 20px/1.15 var(--font-head)", textTransform: "uppercase", letterSpacing: "-.02em", marginTop: 4 }}>{me.nickname}</div>
+            <div className="muted" style={{ fontSize: 14, marginTop: 2 }}>
+              PRIMAHUNT OFFICIAL winner{me.hunter.weeks.length > 1 ? ` ${me.hunter.weeks.length} times` : ""}{me.hunter.weeks.filter(Boolean).length ? ` · Week${me.hunter.weeks.length > 1 ? "s" : ""} ${me.hunter.weeks.filter(Boolean).sort((a, b) => a - b).join(", ")}` : ""}
+            </div>
+          </div>
+        </div>
+      ) : null}
       <form className="card" onSubmit={nick.onSubmit} noValidate>
         <h3>Nickname</h3><ErrBox error={nick.error} />
         <div className="field" style={{ marginTop: 10 }}><input name="nickname" defaultValue={me.nickname} maxLength={20} aria-label="Nickname" /></div>
