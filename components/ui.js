@@ -134,7 +134,7 @@ export function LbRows({ rows, prize }) {
         const tied = r.points > 0 && r.reached_at && ((rows[i - 1] && rows[i - 1].points === r.points) || (rows[i + 1] && rows[i + 1].points === r.points));
         const top = r.points > 0 && r.rank <= 3 ? " top" + r.rank : "";
         return (
-          <div key={i} className={"r" + top + (r.me ? " me" : "")} style={{ animation: "rise .35s both", animationDelay: Math.min(i, 12) * 35 + "ms" }}>
+          <div key={i} className={"r" + top + (r.me ? " me" : "")} style={{ animation: "rise .22s cubic-bezier(.23,1,.32,1) both", animationDelay: Math.min(i, 10) * 30 + "ms" }}>
             <div className="pos">{r.rank}</div>
             <div className="who">
               <div className="nm"><span>{r.nickname}</span>{r.rank === 1 && r.points > 0 ? <Icon n="crown" size={16} /> : null}{r.me ? <span className="you">YOU</span> : null}</div>
@@ -185,7 +185,7 @@ export function Difficulty({ d }) {
 
 export function ItemCard({ it, gid, preview, onSubmit }) {
   return (
-    <article className={`card item ${it.status}`} style={{ animation: "rise .3s both" }}>
+    <article className={`card item ${it.status}`} style={{ animation: "rise .2s cubic-bezier(.23,1,.32,1) both" }}>
       <div className="head"><span className="num">Item {pad2(it.number)}</span><StatusPill status={it.status} /></div>
       <h3>{it.title}</h3>
       <div className="tags"><Difficulty d={it.difficulty} /><span className="pts">{it.points} PIPS</span></div>

@@ -217,7 +217,7 @@ function EditItem({ duel, it, onClose, onSaved }) {
 /** One item: on your hunt (with Submit) or on your own list (showing how your opponent is doing). */
 function DuelItem({ it, canSubmit, onSubmit, theirs }) {
   return (
-    <article className={`card item ${it.status}`} style={{ animation: "rise .3s both" }}>
+    <article className={`card item ${it.status}`} style={{ animation: "rise .2s cubic-bezier(.23,1,.32,1) both" }}>
       <div className="head"><span className="num">Item {pad2(it.number)}</span><StatusPill status={it.status} label={it.status === "approved" ? "Found" : undefined} /></div>
       <h3>{it.title}</h3>
       {it.instructions ? <p className="txt">{it.instructions}</p> : null}

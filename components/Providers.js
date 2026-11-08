@@ -16,6 +16,8 @@ export default function Providers({ children }) {
   const toast = useCallback((msg, kind = "") => {
     const id = Math.random();
     setToasts((t) => [...t, { id, msg, kind }]);
+    // Fade out quickly (exit faster than enter), then remove.
+    setTimeout(() => setToasts((t) => t.map((x) => (x.id === id ? { ...x, out: true } : x))), 4350);
     setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 4500);
   }, []);
 
@@ -67,7 +69,7 @@ export default function Providers({ children }) {
   return (
     <Ctx.Provider value={value}>
       {children}
-      <div id="toasts" aria-live="polite">{toasts.map((t) => <div key={t.id} className={"toast " + t.kind}>{t.msg}</div>)}</div>
+      <div id="toasts" aria-live="polite">{toasts.map((t) => <div key={t.id} className={"toast " + t.kind + (t.out ? " out" : "")}>{t.msg}</div>)}</div>
     </Ctx.Provider>
   );
 }

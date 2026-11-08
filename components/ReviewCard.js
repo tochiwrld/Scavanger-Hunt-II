@@ -12,7 +12,7 @@ export default function ReviewCard({ s, gid, base = `/groups/${gid}`, photoBase 
   const [rejecting, setRejecting] = useState(false);
   const [reason, setReason] = useState("");
   const [gone, setGone] = useState(false);
-  const done = () => { refreshGroups(); setGone(true); setTimeout(onChanged, 350); };
+  const done = () => { refreshGroups(); setGone(true); setTimeout(onChanged, 200); };
   const approve = async () => {
     setBusy(true);
     try { await api(`${base}/submissions/${s.id}/approve`, { method: "POST" }); toast(s.points != null ? "Approved. Pips awarded." : "Approved.", "good"); burst(); done(); }

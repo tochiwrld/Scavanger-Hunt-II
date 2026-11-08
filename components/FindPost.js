@@ -5,7 +5,7 @@ import { Photos } from "./ui.js";
 /** Facebook-style find: "Tochi found “A red umbrella”", time underneath, the photos. Children render below (comments etc.). */
 export default function FindPost({ nickname, title, at, now, mine, meta, badge, photoBase, id, photos, children }) {
   return (
-    <article className="card post" style={{ animation: "rise .3s both" }}>
+    <article className="card post" style={{ animation: "rise .2s cubic-bezier(.23,1,.32,1) both" }}>
       <header className="post-head">
         <span className="who-av" aria-hidden="true">{(nickname || "?").charAt(0).toUpperCase()}</span>
         <div className="grow post-line">
