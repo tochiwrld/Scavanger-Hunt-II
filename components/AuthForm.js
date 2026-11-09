@@ -48,11 +48,12 @@ function Inner({ mode: startMode }) {
   const sp = useSearchParams();
   const next = safeNext(sp.get("next"));
   const deleted = sp.get("deleted") === "1";
-  const { refreshMe } = useApp();
+  const { refreshMe, toast } = useApp();
   const consent = useConsent();
   const form = useForm(async (v) => {
     await api(mode === "login" ? "/auth/login" : "/auth/register", { method: "POST", json: mode === "login" ? v : { ...v, consent: consent.consent } });
     await refreshMe();
+    if (mode === "login") toast("Welcome back, hunter! 🎯", "good");
     router.push(next || (mode === "register" ? "/start" : "/"));
   });
   // The header button takes you down to the form instead of leaving you at the top of the page.
