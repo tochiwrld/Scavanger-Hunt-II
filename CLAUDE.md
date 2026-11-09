@@ -9,7 +9,7 @@ Live site: https://weekly-hunt.vercel.app (brand: **PrimaHunt**, wordmark PRIMA<
 - One API route: `app/api/[[...path]]/route.js` → `lib/router.js` `handle(req)`. **All business rules and authorization live in `lib/router.js`.** Routes are declared with `route(method, path, auth, fn)` where auth is `public` | `user` | `member` | `owner`.
 - Postgres on Supabase via `pg` (`lib/db.js`); tables live in the **`hunt` schema** (`search_path` set per connection). SQL in `supabase/migrations/`.
 - Photos: private Supabase Storage bucket `hunt-photos` via REST (`lib/storage.js`), served only through `/api/photo/:id/:n` after permission checks.
-- Email: Gmail SMTP via nodemailer (`SMTP_USER`/`SMTP_PASS`), or Resend if `RESEND_API_KEY` + `EMAIL_FROM` are set (`lib/notify.js`).
+- Email: Gmail SMTP via nodemailer (`SMTP_USER`/`SMTP_PASS`; since 2026-11-09 the site sends as "PrimaHunt <primahuntofficial@gmail.com>" with a Google app password), or Resend if `RESEND_API_KEY` + `EMAIL_FROM` are set (`lib/notify.js`).
 - Custom auth (`lib/util.js`): scrypt passwords, HMAC-signed HttpOnly `sid` cookie, origin check on writes, DB-backed rate limits.
 
 ## Layout
