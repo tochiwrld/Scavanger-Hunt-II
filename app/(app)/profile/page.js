@@ -35,7 +35,7 @@ export default function Page() {
   const [rem, setRem] = useState(me.email_reminders !== false);
   const toggleRem = async (on) => {
     setRem(on);
-    try { await api("/me/reminders", { method: "PUT", json: { on } }); setMe({ ...me, email_reminders: on }); toast(on ? "Reminder emails on" : "Reminder emails off", "good"); } catch (e) { setRem(!on); toast(e.message, "bad"); }
+    try { await api("/me/reminders", { method: "PUT", json: { on } }); setMe({ ...me, email_reminders: on }); toast(on ? "Game emails on" : "Game emails off", "good"); } catch (e) { setRem(!on); toast(e.message, "bad"); }
   };
   const [ask, setAsk] = useState(false);
   const stopAdmin = async () => {
@@ -85,8 +85,8 @@ export default function Page() {
         {ask ? <BecomeAdmin onClose={() => setAsk(false)} onDone={() => { setAsk(false); toast("Admin tools are on", "good"); }} /> : null}
       </div>
       <div className="card"><h3>Emails</h3>
-        <div className="sw"><div><b>Reminder emails</b></div>
-          <input type="checkbox" checked={rem} onChange={(e) => toggleRem(e.target.checked)} aria-label="Reminder emails" /></div>
+        <div className="sw"><div><b>Game emails</b></div>
+          <input type="checkbox" checked={rem} onChange={(e) => toggleRem(e.target.checked)} aria-label="Game emails" /></div>
       </div>
       <div className="card"><h3>Your data</h3>
         <p className="muted">Photos, submissions, comments and 1v1 lists are deleted automatically {RETAIN_DAYS} days after each hunt ends. Only score cards are kept. <Link className="link" href="/privacy">Privacy Policy</Link></p>

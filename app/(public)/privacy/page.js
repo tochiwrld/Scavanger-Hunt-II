@@ -39,8 +39,8 @@ export default function Page() {
             <tr><td><b>Photos:</b> pictures you take in the app's camera, stamped with your nickname, the item and the time. Optional hunt and item reference images uploaded by admins.</td><td>You (or the admin)</td></tr>
             <tr><td><b>Consent record:</b> which version of this notice you accepted, every statement you ticked, and when</td><td>You, at sign-up or when the notice changes</td></tr>
             <tr><td><b>Security data:</b> a signed login cookie, short-lived rate-limit counters keyed to your network address, password-reset tokens (stored only as a hash), an admin action log per hunt</td><td>Generated automatically</td></tr>
-            <tr><td><b>Notifications:</b> in-app alerts, and emails if the hunt admin turns them on</td><td>Generated automatically</td></tr>
-            <tr><td><b>Activity:</b> when you last opened the app, and when we last sent you a reminder email</td><td>Generated automatically</td></tr>
+            <tr><td><b>Notifications:</b> in-app alerts, and game emails from Pip (see below)</td><td>Generated automatically</td></tr>
+            <tr><td><b>Activity:</b> when you last opened the app, and when we last sent you a game email</td><td>Generated automatically</td></tr>
           </tbody>
         </table></div>
         <p>We do <b>not</b> collect your real name, phone number, GPS location, contacts, payment details or ID documents. We remove EXIF and other hidden metadata (including any location) from every image on our server before it is stored. We do not use advertising or tracking cookies, and we do not sell or rent your data.</p>
@@ -48,7 +48,9 @@ export default function Page() {
         <h2 id="s3">3. Why we use it (lawful basis)</h2>
         <ul>
           <li><b>To run the game you signed up for</b> (performance of a contract, NDPA s.25(1)(b)(i)): your account, hunts, photo review, scoring, leaderboards, 1v1s and notifications.</li>
-          <li><b>Reminder emails</b> (legitimate interests, NDPA s.25(1)(b)(v)): if you're in a live hunt and haven't opened the app for 3 days, or you've been away for 2 weeks, we may email you a reminder ("NO FORGET YOUR HUNT O!") with the number of hunts going on. At most one every few days, never at night, and no more than 3 in a row if you don't come back. Switch them off any time in your profile or with the link in the email.</li>
+          <li><b>Account emails</b> (contract, NDPA s.25(1)(b)(i)): a welcome email when you sign up, and password-reset links when you ask for one. These always arrive.</li>
+          <li><b>Game emails from Pip</b> (legitimate interests, NDPA s.25(1)(b)(v)): for each hunt you play in, when a new week drops, a midweek progress note (or a streak note), a last call on the final day if you still have finds open, and the results when the board is final. If you're in a live hunt and haven't opened the app for 3 days, a reminder ("NO FORGET YOUR HUNT O!"). If you've been away 30 days, one "we miss you" email, and one last one at 60 days, then we stop. They use only your nickname, your scores and the hunt's public details, and go out between 10 AM and 8 PM Lagos time. A hunt's admin can switch them off for their hunt, and you can switch them all off any time in your profile ("Game emails") or with the unsubscribe link in every email.</li>
+          <li><b>Email invites</b>: if a hunt admin invites someone by typing their email address, we use that address only to send that one invite. We don't keep it.</li>
           <li><b>Your consent</b> (NDPA s.25(1)(a)): sharing approved photos in your hunt's feed, and storing your data with providers outside Nigeria (section 7). You can withdraw consent at any time by taking a post off the feed or deleting your account; this doesn't affect anything done before.</li>
           <li><b>Legitimate interests</b> (NDPA s.25(1)(b)(v)): keeping the service secure (rate limits, login protection, the admin action log) and preventing cheating.</li>
           <li><b>Legal obligations</b> (NDPA s.25(1)(b)(ii)): responding to lawful requests and reporting breaches to the Nigeria Data Protection Commission (NDPC).</li>
@@ -64,7 +66,7 @@ export default function Page() {
           <li><b>1v1 photos</b>: only you and your opponent.</li>
           <li><b>Team vs photos</b>: only the players in that match (both teams).</li>
           <li><b>Daily hunt photos</b>: you, and the PrimaHunt admin (the account that runs PRIMAHUNT OFFICIAL) while it reviews the find. Your streak shows on your own profile.</li>
-          <li><b>PRIMAHUNT OFFICIAL</b>: every account is a player in the site's official public hunt, so your nickname can appear on its leaderboard and the global ranking once you score there. It has no cash prize and runs as one long hunt, so its photos are deleted as soon as an admin reviews them (the feed only shows who found what), comments on its finds are deleted 7 days later, and it never sends email. You can leave it any time from its Players tab.</li>
+          <li><b>PRIMAHUNT OFFICIAL</b>: every account is a player in the site's official public hunt, so your nickname can appear on its leaderboard and the global ranking once you score there. It has no cash prize and runs as one long hunt, so its photos are deleted as soon as an admin reviews them (the feed only shows who found what), comments on its finds are deleted 7 days later, and it sends Pip's game emails like any other hunt. You can leave it any time from its Players tab.</li>
           <li><b>Admins</b> can only see and act on their own hunt. The server checks every request against your membership in that hunt; there is no way for an admin to reach another hunt's players, photos or data.</li>
           <li><b>Our providers</b> (section 7) process data only to run the service, under their own security and confidentiality terms.</li>
           <li>We disclose data to authorities only when the law requires it.</li>
