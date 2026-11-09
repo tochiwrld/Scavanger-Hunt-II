@@ -4,7 +4,7 @@ import { PRIVACY_CONTACT, PRIVACY_VERSION, RETAIN_DAYS, WEEK_END_RULE } from "..
 
 export const metadata = { title: "Privacy Policy · PrimaHunt", description: "How PrimaHunt collects, uses, stores and deletes your data." };
 
-const UPDATED = "2 November 2026";
+const UPDATED = "9 November 2026";
 const Mail = () => <a className="link" href={`mailto:${PRIVACY_CONTACT}?subject=Hunt%20Week%20privacy`}>{PRIVACY_CONTACT}</a>;
 
 export default function Page() {
@@ -63,7 +63,7 @@ export default function Page() {
           <li><b>Approved photos</b>: the active players of that hunt, in its feed. You or the admin can take a post off the feed at any time.</li>
           <li><b>1v1 photos</b>: only you and your opponent.</li>
           <li><b>Team vs photos</b>: only the players in that match (both teams).</li>
-          <li><b>Daily hunt photos</b>: only you. Your streak shows on your own profile.</li>
+          <li><b>Daily hunt photos</b>: you, and the PrimaHunt admin (the account that runs PRIMAHUNT OFFICIAL) while it reviews the find. Your streak shows on your own profile.</li>
           <li><b>PRIMAHUNT OFFICIAL</b>: every account is a player in the site's official public hunt, so your nickname can appear on its leaderboard and the global ranking once you score there. It has no cash prize and runs as one long hunt, so its photos are deleted as soon as an admin reviews them (the feed only shows who found what), comments on its finds are deleted 7 days later, and it never sends email. You can leave it any time from its Players tab.</li>
           <li><b>Admins</b> can only see and act on their own hunt. The server checks every request against your membership in that hunt; there is no way for an admin to reach another hunt's players, photos or data.</li>
           <li><b>Our providers</b> (section 7) process data only to run the service, under their own security and confidentiality terms.</li>
@@ -76,7 +76,7 @@ export default function Page() {
           <tbody>
             <tr><td>Submission photos, submissions, rejection reasons, feed comments, item reference images</td><td><b>{RETAIN_DAYS} days after that week's hunt ends</b>, then deleted automatically</td></tr>
             <tr><td>1v1 and Team vs photos and lists</td><td><b>{RETAIN_DAYS} days after the match ends</b>, then deleted automatically</td></tr>
-            <tr><td>Daily hunt photos</td><td><b>{RETAIN_DAYS} days after you take them</b>, then deleted automatically. The record that you found that day's item stays, because it is your streak.</td></tr>
+            <tr><td>Daily hunt photos</td><td><b>As soon as the PrimaHunt admin approves or rejects the find</b> (and never later than {RETAIN_DAYS} days after you take them). The record of that day's find and the decision stay, because they are your streak.</td></tr>
             <tr><td><b>Score cards</b>: pips, ranks, weekly results and stat recaps (for example who led and for how long), wins, prize records, "Hunter of the week" awards, 1v1 final scores, and item names</td><td>Kept while the hunt exists, so other players' results stay correct. If you delete your account, your entries stay but show as "Deleted player" and can no longer be linked to you.</td></tr>
             <tr><td>Account (nickname, email, password hash) and consent records</td><td>Until you delete your account</td></tr>
             <tr><td>Notifications</td><td>30 days</td></tr>
