@@ -12,6 +12,18 @@ export default function Providers({ children }) {
   const [unread, setUnread] = useState(0);
   const [offset, setOffset] = useState(0);
   const [toasts, setToasts] = useState([]);
+  // Star hunt: live stars, the camera, and the full Lagos map, shared by the bottom bar, home and /stars.
+  const [stars, setStars] = useState(null);
+  const [starMe, setStarMe] = useState(null);
+  const [starAdmin, setStarAdmin] = useState(false);
+  const [starTarget, setStarTarget] = useState(null);
+  const [starHuntOpen, setStarHuntOpen] = useState(false);
+  const [starMapOpen, setStarMapOpen] = useState(false);
+  const loadStars = useCallback(async () => {
+    try { const d = await api("/stars"); setStars(d.stars); setStarMe(d.me); setStarAdmin(d.admin); return d.stars; } catch { setStars((s) => s || []); return []; }
+  }, []);
+  const openStarHunt = useCallback((target = null) => { setStarTarget(target); setStarMapOpen(false); setStarHuntOpen(true); }, []);
+  const starCaught = useCallback((id, totals) => { setStars((list) => (list || []).map((x) => (x.id === id ? { ...x, caught: true, catches: x.catches + 1 } : x))); if (totals) setStarMe(totals); }, []);
 
   const toast = useCallback((msg, kind = "") => {
     const id = Math.random();
@@ -65,7 +77,8 @@ export default function Providers({ children }) {
     return () => { clearInterval(t); document.removeEventListener("visibilitychange", vis); };
   }, [me, toast]);
 
-  const value = { me, ready, groups, unread, setUnread, offset, toast, refreshMe, refreshGroups, setMe };
+  const value = { me, ready, groups, unread, setUnread, offset, toast, refreshMe, refreshGroups, setMe,
+    stars, starMe, starAdmin, loadStars, starTarget, setStarTarget, starHuntOpen, setStarHuntOpen, openStarHunt, starMapOpen, setStarMapOpen, starCaught };
   return (
     <Ctx.Provider value={value}>
       {children}

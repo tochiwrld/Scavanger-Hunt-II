@@ -10,6 +10,7 @@ import GlobalSearch from "../../components/GlobalSearch.js";
 import BecomeAdmin from "../../components/BecomeAdmin.js";
 import ActiveHunts from "../../components/ActiveHunts.js";
 import DailyCard from "../../components/DailyCard.js";
+import StarsCard from "../../components/StarsCard.js";
 
 export default function GroupsHome() {
   const { me, groups, setMe, toast } = useApp();
@@ -23,6 +24,7 @@ export default function GroupsHome() {
     <>
       <ActiveHunts />
       <DailyCard />
+      <StarsCard />
       <div className="page-head"><h1>My hunts</h1><p>Each hunt has its own players, weekly challenges and leaderboard.</p></div>
       {groups.length ? groups.map((g) => (
         <Link key={g.id} href={`/g/${g.id}`} className="card gcard" style={{ "--gc": colorFor(g.id) }}>
@@ -44,7 +46,7 @@ export default function GroupsHome() {
       )) : <Empty icon="🎯" title="You're not in a hunt yet" text="Join one with an invitation link, or create your own." />}
       <Link className="btn block" href="/join"><Icon n="key" size={18} />Join {groups.length ? "another" : "a"} hunt</Link>
       {me.can_create_groups ? <Link className="btn block ghost" href="/groups/new"><Icon n="plus" size={18} />Create a hunt</Link> : <Btn busy={busy} className="block ghost" onClick={becomeAdmin}><Icon n="shield" size={18} />Run your own hunt? Become an admin</Btn>}
-      <Link href="/duels" className="plate" style={{ textDecoration: "none", color: "inherit", marginTop: 14 }}>
+      <Link href="/vs" className="plate" style={{ textDecoration: "none", color: "inherit", marginTop: 14 }}>
         <div className="stripe" />
         <div className="in row" style={{ gap: 16, alignItems: "flex-start" }}>
           <span style={{ width: 50, height: 50, borderRadius: 14, background: "var(--primary)", color: "var(--primary-fg)", display: "grid", placeItems: "center", flex: "none" }}><Icon n="swords" size={24} /></span>
@@ -56,7 +58,7 @@ export default function GroupsHome() {
           <Icon n="arrow" size={20} className="c-mute" />
         </div>
       </Link>
-      <Link href="/teams" className="plate" style={{ textDecoration: "none", color: "inherit", marginTop: 14 }}>
+      <Link href="/vs#team" className="plate" style={{ textDecoration: "none", color: "inherit", marginTop: 14 }}>
         <div className="stripe" />
         <div className="in row" style={{ gap: 16, alignItems: "flex-start" }}>
           <span style={{ width: 50, height: 50, borderRadius: 14, background: "var(--primary)", color: "var(--primary-fg)", display: "grid", placeItems: "center", flex: "none" }}><Icon n="team" size={24} /></span>

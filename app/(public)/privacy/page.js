@@ -4,7 +4,7 @@ import { PRIVACY_CONTACT, PRIVACY_VERSION, RETAIN_DAYS, WEEK_END_RULE } from "..
 
 export const metadata = { title: "Privacy Policy · PrimaHunt", description: "How PrimaHunt collects, uses, stores and deletes your data." };
 
-const UPDATED = "9 November 2026";
+const UPDATED = "12 November 2026";
 const Mail = () => <a className="link" href={`mailto:${PRIVACY_CONTACT}?subject=Hunt%20Week%20privacy`}>{PRIVACY_CONTACT}</a>;
 
 export default function Page() {
@@ -40,6 +40,8 @@ export default function Page() {
             <tr><td><b>Consent record:</b> which version of this notice you accepted, every statement you ticked, and when</td><td>You, at sign-up or when the notice changes</td></tr>
             <tr><td><b>Security data:</b> a signed login cookie, short-lived rate-limit counters keyed to your network address, password-reset tokens (stored only as a hash), an admin action log per hunt</td><td>Generated automatically</td></tr>
             <tr><td><b>Notifications:</b> in-app alerts, and game emails from Pip (see below)</td><td>Generated automatically</td></tr>
+            <tr><td><b>Star hunt:</b> which stars you caught, when, the pips and how many metres from the star you were. <b>Not your location.</b> To check you're at a star, your phone sends its position once when you tap Catch; we compare it with the star and throw the position away</td><td>You, when you catch a star</td></tr>
+            <tr><td><b>Star alerts (push):</b> if you switch them on, the address your browser gives us for sending notifications to that phone, and when one last arrived</td><td>Your browser, only if you switch alerts on</td></tr>
             <tr><td><b>Activity:</b> when you last opened the app, and when we last sent you a game email</td><td>Generated automatically</td></tr>
           </tbody>
         </table></div>
@@ -50,6 +52,8 @@ export default function Page() {
           <li><b>To run the game you signed up for</b> (performance of a contract, NDPA s.25(1)(b)(i)): your account, hunts, photo review, scoring, leaderboards, 1v1s and notifications.</li>
           <li><b>Account emails</b> (contract, NDPA s.25(1)(b)(i)): a welcome email when you sign up, and password-reset links when you ask for one. These always arrive.</li>
           <li><b>Game emails from Pip</b> (legitimate interests, NDPA s.25(1)(b)(v)): for each hunt you play in, when a new week drops, a midweek progress note (or a streak note), a last call on the final day if you still have finds open, and the results when the board is final. If you're in a live hunt and haven't opened the app for 3 days, a reminder ("NO FORGET YOUR HUNT O!"). If you've been away 30 days, one "we miss you" email, and one last one at 60 days, then we stop. They use only your nickname, your scores and the hunt's public details, and go out between 10 AM and 8 PM Lagos time. A hunt's admin can switch them off for their hunt, and you can switch them all off any time in your profile ("Game emails") or with the unsubscribe link in every email.</li>
+          <li><b>Star hunt</b> (contract, NDPA s.25(1)(b)(i)): to check you are within about 30 m of a star when you catch it. Your phone's location is used on your phone to show the distance and direction, and sent to us only at the moment you tap Catch. We keep only the distance, never the position, and we never track you in the background. The camera and motion sensor work only on your phone; nothing is recorded or uploaded.</li>
+          <li><b>Star alerts</b> (consent, NDPA s.25(1)(a)): only if you switch them on, we send a notification to that phone when a new star drops. Switch them off any time in your profile; this deletes the phone's push address.</li>
           <li><b>Email invites</b>: if a hunt admin invites someone by typing their email address, we use that address only to send that one invite. We don't keep it.</li>
           <li><b>Your consent</b> (NDPA s.25(1)(a)): sharing approved photos in your hunt's feed, and storing your data with providers outside Nigeria (section 7). You can withdraw consent at any time by taking a post off the feed or deleting your account; this doesn't affect anything done before.</li>
           <li><b>Legitimate interests</b> (NDPA s.25(1)(b)(v)): keeping the service secure (rate limits, login protection, the admin action log) and preventing cheating.</li>
@@ -105,7 +109,9 @@ export default function Page() {
           <tbody>
             <tr><td>Supabase Inc. (USA), on Amazon Web Services</td><td>Database and private photo storage</td><td>Paris, France (eu-west-3)</td></tr>
             <tr><td>Vercel Inc. (USA)</td><td>Runs the website and app server</td><td>Paris, France (cdg1); pages pass through Vercel's global network</td></tr>
-            <tr><td>Google LLC (USA)</td><td>Sends emails (Gmail)</td><td>USA and Google's global network</td></tr>
+            <tr><td>Google LLC (USA)</td><td>Sends emails (Gmail); delivers star alerts to Android and Chrome</td><td>USA and Google's global network</td></tr>
+            <tr><td>Apple, Mozilla, Microsoft (USA)</td><td>Deliver star alerts to iPhones, Firefox and Edge (only if you switch alerts on; they see only an encrypted message)</td><td>Their global networks</td></tr>
+            <tr><td>OpenStreetMap Foundation (UK) and Cloudflare (USA)</td><td>Show the Lagos map and load the map software. Your browser fetches map pictures directly; we send them nothing about you</td><td>Global networks</td></tr>
           </tbody>
         </table></div>
         <p>Your data is therefore transferred out of Nigeria, mainly to France, which is governed by the EU General Data Protection Regulation and an independent data protection authority. Each provider is also bound by its own data processing terms and security programme. Because the NDPC has not yet published adequacy decisions or approved transfer instruments, we also rely on <b>your informed consent</b> (NDPA s.43), which you give when you register. The risk is that foreign authorities could, in rare cases, request access to data held by these companies under their own laws. If you don't accept this, please don't create an account.</p>

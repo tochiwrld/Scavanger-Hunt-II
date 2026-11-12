@@ -1,0 +1,281 @@
+"use client";
+import { useEffect, useRef, useState } from "react";
+import { api } from "../lib/client.js";
+import { distBearing, fmtDist } from "../lib/stars-client.js";
+import StarMap from "./StarMap.js";
+import Icon from "./icons.js";
+
+/* ---------- the 3D star: a faceted, bevelled gold star built from triangles and lit, drawn on a 2D canvas ---------- */
+const STAR_TRIS = (() => {
+  const R = 1, r = 0.42, depth = 0.22, dome = 0.38, ring = [];
+  for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + (i * Math.PI) / 5, rr = i % 2 ? r : R; ring.push([Math.cos(a) * rr, Math.sin(a) * rr]); }
+  const tris = [], F = [0, 0, depth + dome], B = [0, 0, -depth - dome];
+  for (let i = 0; i < 10; i++) {
+    const a = ring[i], b = ring[(i + 1) % 10];
+    tris.push([F, [a[0], a[1], depth], [b[0], b[1], depth]]);
+    tris.push([B, [b[0], b[1], -depth], [a[0], a[1], -depth]]);
+    tris.push([[a[0], a[1], depth], [a[0], a[1], -depth], [b[0], b[1], -depth]]);
+    tris.push([[a[0], a[1], depth], [b[0], b[1], -depth], [b[0], b[1], depth]]);
+  }
+  return tris;
+})();
+const sub3 = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const norm = (v) => { const l = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / l, v[1] / l, v[2] / l]; };
+const LIGHT = norm([-0.45, -0.7, 0.9]), HALF = norm([LIGHT[0], LIGHT[1], LIGHT[2] + 1]);
+function drawStar(ctx, x, y, size, t, alpha) {
+  const ry = t, rx = Math.sin(t * 0.7) * 0.28 - 0.12;
+  const cy = Math.cos(ry), sy = Math.sin(ry), cx = Math.cos(rx), sx = Math.sin(rx);
+  const rot = (p) => { const x1 = p[0] * cy + p[2] * sy, z1 = -p[0] * sy + p[2] * cy; return [x1, p[1] * cx - z1 * sx, p[1] * sx + z1 * cx]; };
+  const camZ = 4.2, f = size * camZ;
+  ctx.save(); ctx.globalAlpha = alpha;
+  const glow = ctx.createRadialGradient(x, y, size * 0.2, x, y, size * 2.3);
+  glow.addColorStop(0, "rgba(255,214,40,.5)"); glow.addColorStop(1, "rgba(255,214,40,0)");
+  ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y, size * 2.3, 0, Math.PI * 2); ctx.fill();
+  const faces = [];
+  for (const tri of STAR_TRIS) {
+    const v = tri.map(rot);
+    const n = norm(cross(sub3(v[1], v[0]), sub3(v[2], v[0])));
+    if (n[2] <= 0.02) continue;
+    const pts = v.map((p) => { const k = f / (camZ - p[2]); return [x + p[0] * k, y + p[1] * k]; });
+    const diff = Math.max(0, n[0] * LIGHT[0] + n[1] * LIGHT[1] + n[2] * LIGHT[2]);
+    const spec = Math.pow(Math.max(0, n[0] * HALF[0] + n[1] * HALF[1] + n[2] * HALF[2]), 28);
+    const k = 0.32 + 0.78 * diff;
+    faces.push({ pts, z: (v[0][2] + v[1][2] + v[2][2]) / 3, c: `rgb(${Math.round(Math.min(255, 255 * k + 255 * spec))},${Math.round(Math.min(255, 186 * k + 245 * spec))},${Math.round(Math.min(255, 18 * k + 200 * spec))})` });
+  }
+  faces.sort((a, b) => a.z - b.z);
+  ctx.lineJoin = "round"; ctx.lineWidth = 0.8;
+  for (const fc of faces) {
+    ctx.beginPath(); ctx.moveTo(fc.pts[0][0], fc.pts[0][1]); ctx.lineTo(fc.pts[1][0], fc.pts[1][1]); ctx.lineTo(fc.pts[2][0], fc.pts[2][1]); ctx.closePath();
+    ctx.fillStyle = fc.c; ctx.strokeStyle = fc.c; ctx.fill(); ctx.stroke();
+  }
+  ctx.restore();
+  for (let i = 0; i < 6; i++) {
+    const a = t * 1.3 + (i * Math.PI) / 3, rr = size * (1.45 + 0.15 * Math.sin(t * 3 + i));
+    const s2 = 2 + 1.5 * Math.sin(t * 4 + i);
+    ctx.fillStyle = `rgba(255,255,255,${0.55 * alpha})`; ctx.beginPath(); ctx.arc(x + Math.cos(a) * rr, y + Math.sin(a) * rr * 0.55, Math.max(0.5, s2), 0, Math.PI * 2); ctx.fill();
+  }
+}
+const wrap = (a) => ((a + 540) % 360) - 180;
+const turnText = (rel) => (Math.abs(rel) < 12 ? "Straight ahead" : rel > 0 ? "Turn right" : "Turn left");
+const needsMotionTap = () => typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function";
+
+/**
+ * Full-screen star hunt. Real mode hunts `target` (or the nearest live star); the server checks you are really there.
+ * Practice mode hides a star in the room, for fun, with no pips.
+ */
+export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, onCaught }) {
+  const root = useRef(null), video = useRef(null), canvas = useRef(null);
+  const [mode, setMode] = useState("real");
+  const [phase, setPhase] = useState(needsMotionTap() ? "ask" : "run");
+  const [won, setWon] = useState(null);
+  const [me, setMe] = useState(null);
+  const [camOk, setCamOk] = useState(true);
+  const live = useRef({});
+  live.current.mode = mode; live.current.target = target; live.current.stars = stars;
+
+  // Pick the nearest uncaught star once we know where you are.
+  useEffect(() => {
+    if (!target && me && stars?.length) {
+      const open = stars.filter((s) => !s.caught);
+      if (open.length) onTarget(open.reduce((a, b) => (distBearing(me, a).d <= distBearing(me, b).d ? a : b)));
+    }
+  }, [me, stars, target, onTarget]);
+
+  useEffect(() => {
+    if (phase !== "run") return undefined;
+    const L = live.current, el = root.current, cv = canvas.current, ctx = cv.getContext("2d");
+    const $ = (k) => el.querySelector(`[data-k="${k}"]`);
+    let stream = null, raf = 0, geo = null, dead = false;
+    let heading = 0, pitch = 0, hasMotion = false, hasAbs = false;
+    const sm = { h: 0, p: 0 };
+    let practiceBearing = 120, practiceElev = 5, spin = 0, particles = [], catching = 0, fix = null;
+    L.fix = null;
+
+    const resize = () => { const dpr = Math.min(2, window.devicePixelRatio || 1); cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
+    resize(); addEventListener("resize", resize);
+
+    (async () => {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false });
+        if (dead) { stream.getTracks().forEach((t) => t.stop()); return; }
+        video.current.srcObject = stream; setCamOk(true);
+      } catch { setCamOk(false); }
+    })();
+
+    const onOrient = (e) => {
+      let h = null;
+      if (typeof e.webkitCompassHeading === "number") h = e.webkitCompassHeading;
+      else if (e.absolute && e.alpha != null) h = 360 - e.alpha;
+      else if (e.alpha != null && e.type === "deviceorientation" && !hasAbs) h = 360 - e.alpha;
+      if (e.type === "deviceorientationabsolute" && e.alpha != null) hasAbs = true;
+      if (h == null || e.beta == null) return;
+      const ang = (screen.orientation && screen.orientation.angle) || window.orientation || 0;
+      heading = (h + ang + 360) % 360; pitch = e.beta - 90;
+      if (!hasMotion) { hasMotion = true; sm.h = heading; sm.p = pitch; practiceBearing = (heading + 75) % 360; }
+    };
+    addEventListener("deviceorientationabsolute", onOrient, true);
+    addEventListener("deviceorientation", onOrient, true);
+
+    if (navigator.geolocation) {
+      geo = navigator.geolocation.watchPosition((p) => {
+        fix = { lat: p.coords.latitude, lon: p.coords.longitude, acc: p.coords.accuracy };
+        L.fix = fix;
+        setMe((old) => (!old || distBearing(old, fix).d > 8 ? fix : old));
+      }, () => { $("sub").textContent = "Location is off. Turn it on to hunt real stars."; }, { enableHighAccuracy: true, maximumAge: 2000 });
+    }
+
+    // No motion sensor (computers): drag to look around.
+    let drag = null;
+    const down = (e) => { if (hasMotion) return; drag = { x: e.clientX, y: e.clientY, h: heading, p: pitch }; cv.setPointerCapture?.(e.pointerId); };
+    const move = (e) => { if (!drag) return; heading = (drag.h - (e.clientX - drag.x) * 0.25 + 360) % 360; pitch = Math.max(-60, Math.min(60, drag.p + (e.clientY - drag.y) * 0.25)); };
+    const up = () => (drag = null);
+    cv.addEventListener("pointerdown", down); cv.addEventListener("pointermove", move); cv.addEventListener("pointerup", up);
+    cv.addEventListener("click", () => { if (!$("catch").disabled) L.doCatch(); });
+
+    L.newPractice = () => { practiceBearing = (heading + 60 + Math.random() * 120) % 360; practiceElev = 2 + Math.random() * 8; };
+    L.doCatch = async () => {
+      if (catching) return;
+      const real = L.mode === "real" && L.target;
+      if (real) {
+        const f = L.fix;
+        try {
+          const r = await api(`/stars/${L.target.id}/catch`, { method: "POST", json: { lat: f.lat, lon: f.lon, acc: f.acc } });
+          burst(); setTimeout(() => !dead && setWon({ pips: r.pips, name: r.name, me: r.me, real: true }), 650);
+          onCaught?.(L.target.id, r.me);
+        } catch (e) {
+          const h = $("hint"); h.textContent = e.message; h.dataset.err = "1";
+          setTimeout(() => { delete h.dataset.err; }, 5000);
+        }
+        return;
+      }
+      burst(); setTimeout(() => !dead && setWon({ pips: 0, real: false }), 650);
+    };
+    function burst() {
+      catching = 1;
+      navigator.vibrate?.([30, 40, 60]);
+      for (let i = 0; i < 70; i++) { const a = Math.random() * Math.PI * 2, s = 2 + Math.random() * 6; particles.push({ x: innerWidth / 2, y: innerHeight * 0.46, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 2, life: 30 + Math.random() * 25 }); }
+    }
+    L.reset = () => { catching = 0; particles = []; };
+
+    const loop = () => {
+      if (dead) return;
+      const W = innerWidth, H = innerHeight, cx = W / 2, cy = H * 0.46;
+      ctx.clearRect(0, 0, W, H);
+      sm.h += wrap(heading - sm.h) * 0.18; sm.p += (pitch - sm.p) * 0.18;
+      const ppd = W / 62;
+      const real = L.mode === "real";
+      let bearing = practiceBearing, elev = practiceElev, dist = null, close = true, show = true;
+      if (real) {
+        if (L.target && fix) { const db = distBearing(fix, L.target); bearing = db.b; dist = db.d; elev = 4; close = dist <= L.target.radius_m + Math.min(fix.acc || 0, 30) && (fix.acc || 0) <= 120; }
+        else { show = false; close = false; }
+      }
+      const dx = wrap(bearing - sm.h) * ppd, dy = (sm.p - elev) * ppd;
+      const x = cx + dx, y = cy + dy;
+      const size = real && dist != null ? Math.max(24, Math.min(70, 1500 / Math.max(dist, 12))) : 58;
+      spin += 0.045;
+      if (catching) {
+        catching += 1;
+        const k = Math.min(1, catching / 22);
+        drawStar(ctx, x + (cx - x) * k, y + (cy - y) * k, size * (1 + k * 0.9), spin * 3, Math.max(0, 1 - Math.max(0, (catching - 22) / 14)));
+      } else if (show && x > -120 && x < W + 120 && y > -120 && y < H + 120) {
+        drawStar(ctx, x, y, size, spin, close ? 1 : 0.5);
+      }
+      particles = particles.filter((p) => (p.life -= 1) > 0);
+      for (const p of particles) { p.x += p.vx; p.y += p.vy; p.vy += 0.12; ctx.fillStyle = `rgba(255,${200 + (p.life % 50)},40,${p.life / 50})`; ctx.fillRect(p.x, p.y, 4, 4); }
+
+      const inSight = show && Math.abs(dx) < 75 && Math.abs(dy) < 90;
+      const ready = inSight && close && !catching;
+      $("ret").classList.toggle("lock", ready);
+      $("catch").disabled = !ready;
+      const rel = wrap(bearing - sm.h);
+      $("arrow").style.transform = `rotate(${rel}deg)`;
+      if (real) {
+        if (!L.target) { $("dist").textContent = fix ? "No stars left" : "Finding you…"; $("dir").textContent = fix ? "Check the map for new drops" : "Allow location to hunt real stars"; }
+        else if (dist == null) { $("dist").textContent = "Finding you…"; $("dir").textContent = "Step outside for a better GPS fix"; }
+        else {
+          $("dist").textContent = fmtDist(dist) + " away";
+          $("dir").textContent = close ? (inSight ? "It's right there. Catch it!" : turnText(rel)) : (dist > 2000 ? "Head towards " + L.target.area : turnText(rel).replace("Turn ", "Walk ").replace("Straight ahead", "Walk straight ahead"));
+        }
+        $("sub").textContent = L.target ? `${L.target.name} · ${L.target.pips} pips` : "Real stars around Lagos";
+        if (!$("hint").dataset.err) $("hint").textContent = L.target && dist != null && !close ? `Get within ${L.target.radius_m} m to catch it` : hasMotion ? "Move your phone to look around" : "Drag to look around";
+      } else {
+        $("dist").textContent = inSight ? "Got it in sight" : Math.abs(rel) > 90 ? "Behind you" : "Close by";
+        $("dir").textContent = inSight ? "Tap the star button" : turnText(rel);
+        $("sub").textContent = "Practice · no pips";
+        $("hint").textContent = hasMotion ? "Move your phone to look around" : "Drag to look around";
+      }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => {
+      dead = true; cancelAnimationFrame(raf);
+      removeEventListener("resize", resize);
+      removeEventListener("deviceorientationabsolute", onOrient, true);
+      removeEventListener("deviceorientation", onOrient, true);
+      if (geo != null) navigator.geolocation.clearWatch(geo);
+      if (stream) stream.getTracks().forEach((t) => t.stop());
+      cv.removeEventListener("pointerdown", down); cv.removeEventListener("pointermove", move); cv.removeEventListener("pointerup", up);
+    };
+  }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const esc = (e) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", esc);
+    document.body.style.overflow = "hidden";
+    return () => { document.removeEventListener("keydown", esc); document.body.style.overflow = ""; };
+  }, [onClose]);
+
+  const allow = async () => {
+    try { await DeviceOrientationEvent.requestPermission(); } catch { /* drag to look around instead */ }
+    setPhase("run");
+  };
+  const again = () => { setWon(null); live.current.reset?.(); if (mode === "practice") live.current.newPractice?.(); else onTarget(null); };
+
+  return (
+    <div className="sh-hunt" ref={root} role="dialog" aria-modal="true" aria-label="Star hunt camera">
+      <video ref={video} playsInline muted autoPlay hidden={!camOk} />
+      {camOk ? null : <div className="fake" />}
+      <canvas ref={canvas} />
+      <div className="sh-ret" data-k="ret"><i /><i /><i /><i /></div>
+      <div className="sh-top">
+        <button className="sh-btn" onClick={onClose} aria-label="Close the camera"><Icon n="close" size={20} /></button>
+        <div className="sh-title"><b>Star hunt</b><small data-k="sub">Real stars around Lagos</small></div>
+        <div className="sh-modes" role="group" aria-label="Mode">
+          <button aria-pressed={mode === "real"} onClick={() => setMode("real")}>Real stars</button>
+          <button aria-pressed={mode === "practice"} onClick={() => { setMode("practice"); live.current.newPractice?.(); }}>Practice</button>
+        </div>
+      </div>
+      {mode === "real" ? (
+        <StarMap className="sh-mini" interactive={false} zoom={me && target ? 14 : 11} stars={stars || []} me={me} target={target} center={me || (target ? { lat: target.lat, lon: target.lon } : null)}>
+          <button className="tap" onClick={onOpenMap} aria-label="Open the Lagos star map" /><span className="lbl">Map</span>
+        </StarMap>
+      ) : null}
+      <div className="sh-bottom">
+        <div className="sh-radar">
+          <div className="sh-dial"><svg data-k="arrow" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l6 18-6-4-6 4z" fill="oklch(88% .18 95)" /></svg></div>
+          <div><b data-k="dist">Finding you…</b><small data-k="dir">Move your phone to look around</small></div>
+        </div>
+        <button className="sh-catch" data-k="catch" disabled aria-label="Catch the star" onClick={() => live.current.doCatch?.()}><Icon n="star" size={30} /></button>
+        <div className="sh-hint" data-k="hint" />
+      </div>
+      {won ? (
+        <div className="sh-layer dim"><div className="sh-box">
+          <div className="eyebrow">{won.real ? "Star caught" : "Practice catch"}</div>
+          <div className="big">{won.real ? `+${won.pips} pips` : "Nice!"}</div>
+          <p className="muted" style={{ margin: 0 }}>{won.real ? `${won.name}. That's ${won.me.caught} star${won.me.caught === 1 ? "" : "s"} and ${won.me.pips} star pips in total.` : "That one was just practice. Real stars are on the Lagos map, worth 20 to 50 pips."}</p>
+          <button className="btn block" onClick={again}>{won.real ? "Find the next star" : "Again"}</button>
+          {won.real ? null : <button className="btn block ghost" onClick={() => { setWon(null); live.current.reset?.(); setMode("real"); }}>Hunt real stars</button>}
+        </div></div>
+      ) : null}
+      {phase === "ask" ? (
+        <div className="sh-layer solid"><div className="sh-box" style={{ background: "transparent", border: 0 }}>
+          <h2>Camera, motion and location</h2>
+          <p className="muted" style={{ margin: 0 }}>Star hunt uses your camera and motion sensor so the star stays put as you look around, and your location to check you're at the star. Nothing is recorded, and your location is never saved.</p>
+          <button className="btn block" onClick={allow}>Allow and start</button>
+          <button className="btn block ghost" onClick={onClose}>Not now</button>
+        </div></div>
+      ) : null}
+    </div>
+  );
+}

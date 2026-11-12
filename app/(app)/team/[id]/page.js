@@ -32,7 +32,7 @@ function Room({ d, reload }) {
   const [hunting, setHunting] = useState(null);
   const [picked, setPicked] = useState(null);
   const base = `/teams/${m.id}`;
-  if (m.phase === "cancelled") return <Empty icon="🚫" title="This match was called off" text="Start a new one whenever you're ready."><Link className="btn" href="/teams">Back to Team vs</Link></Empty>;
+  if (m.phase === "cancelled") return <Empty icon="🚫" title="This match was called off" text="Start a new one whenever you're ready."><Link className="btn" href="/vs#team">Back to Team vs</Link></Empty>;
   const started = ["live", "judging", "finished"].includes(m.phase);
   const tab = picked || (m.phase === "finished" ? "finds" : "hunt");
   const vs = `${m.size}v${m.size}`;
@@ -44,7 +44,7 @@ function Room({ d, reload }) {
   } : null;
   return (
     <>
-      <Link href="/teams" className="link" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><Icon n="back" size={16} />All team matches</Link>
+      <Link href="/vs#team" className="link" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><Icon n="back" size={16} />All team matches</Link>
       <Plate>
         <div className={"eyebrow" + (m.phase === "live" ? " live" : "")}>{vs} · {PHASE_LABEL[m.phase] || m.phase}</div>
         <div className="week">{us.name} <span style={{ color: "var(--muted-fg)" }}>vs</span> {them.name}</div>
@@ -184,12 +184,12 @@ function Links({ d, reload }) {
   const leave = async () => {
     if (!confirm("Leave this team?")) return;
     setBusy(true);
-    try { await api(`/teams/${m.id}/leave`, { method: "POST" }); router.push("/teams"); } catch (e) { toast(e.message, "bad"); setBusy(false); reload(); }
+    try { await api(`/teams/${m.id}/leave`, { method: "POST" }); router.push("/vs#team"); } catch (e) { toast(e.message, "bad"); setBusy(false); reload(); }
   };
   const cancel = async () => {
     if (!confirm("Call off this match for everyone? The links will stop working.")) return;
     setBusy(true);
-    try { await api(`/teams/${m.id}/cancel`, { method: "POST" }); router.push("/teams"); } catch (e) { toast(e.message, "bad"); setBusy(false); reload(); }
+    try { await api(`/teams/${m.id}/cancel`, { method: "POST" }); router.push("/vs#team"); } catch (e) { toast(e.message, "bad"); setBusy(false); reload(); }
   };
   return (
     <section className="card stack">

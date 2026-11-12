@@ -12,7 +12,7 @@ export default function Page() {
       <header className="top"><Brand href="/login" /><div className="acts"><ThemeToggle /></div></header>
       <main className="policy" style={{ paddingTop: 18 }}>
         <h1>Terms and safety</h1>
-        <p className="muted">Last updated 6 November 2026 · Version {PRIVACY_VERSION}</p>
+        <p className="muted">Last updated 12 November 2026 · Version {PRIVACY_VERSION}</p>
 
         <div className="card mist">
           <b>The short version.</b> PrimaHunt is a game. Play it safely and legally. Never put anything dangerous or illegal on a hunt,
@@ -31,6 +31,7 @@ export default function Page() {
           <li>Violence, threats, harassment, bullying, hate, or embarrassing someone against their will.</li>
           <li>Photos of other people without their permission, any photo of a child, nudity or sexual content.</li>
           <li>Harm or cruelty to animals.</li>
+          <li>For the star hunt: stars are only placed in public places. Hunt in daylight, stay on the pavement, never step into traffic or onto a road, bridge or railway to reach a star, and never enter private, restricted or unsafe places. If getting to a star isn't safe, leave it.</li>
           <li>Personal information about others (addresses, phone numbers, ID, bank details).</li>
         </ul>
         <p>If an item can't be completed safely and legally, skip it. No pips are worth it.</p>

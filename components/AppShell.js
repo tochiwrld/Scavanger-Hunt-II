@@ -8,12 +8,14 @@ import Icon from "./icons.js";
 import { Avatar, Empty, RoleBadge, Skel } from "./ui.js";
 import { colorFor, pad2 } from "../lib/client.js";
 import ConsentGate from "./Consent.js";
+import StarHunt from "./StarHunt.js";
+import StarSheet from "./StarSheet.js";
 
 const OWNER_TABS = [["", "Overview"], ["feed", "Feed"], ["review", "Review"], ["challenges", "Challenges"], ["subs", "Submissions"], ["players", "Players"], ["invite", "Invite"], ["ranks", "Leaderboard"], ["weeks", "Past weeks"], ["prize", "Prize"], ["audit", "Log"], ["settings", "Settings"]];
 const PLAYER_TABS = [["", "Home"], ["hunt", "Hunt"], ["feed", "Feed"], ["ranks", "Leaderboard"], ["mine", "My submissions"], ["weeks", "Past weeks"], ["people", "Players"]];
 
 export default function AppShell({ children }) {
-  const { me, ready, groups, refreshGroups, unread } = useApp();
+  const { me, ready, groups, refreshGroups, unread, stars, loadStars, starTarget, setStarTarget, starHuntOpen, setStarHuntOpen, openStarHunt, starMapOpen, setStarMapOpen, starCaught } = useApp();
   const router = useRouter();
   const path = usePathname();
   const m = path.match(/^\/g\/(\d+)(?:\/([^/]*))?/);
@@ -23,11 +25,13 @@ export default function AppShell({ children }) {
 
   useEffect(() => { if (ready && !me) router.replace("/login?next=" + encodeURIComponent(path)); }, [ready, me, path, router]);
   useEffect(() => { if (me?.privacy_ok && (path === "/" || gid || groups === null)) refreshGroups(); }, [me, path]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (me?.privacy_ok && !stars) loadStars(); }, [me]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!ready || !me) return <main style={{ paddingTop: 80 }}><Skel /></main>;
   if (!me.privacy_ok) return <ConsentGate />;
 
   const owner = g?.role === "owner";
+  const liveStars = (stars || []).filter((x) => !x.caught).length;
   const tabs = owner ? OWNER_TABS : PLAYER_TABS;
   const dot = (n) => (n ? <span className="dot">{n > 9 ? "9+" : n}</span> : null);
   const A = ({ href, icon, label, on, badge }) => <Link href={href} className={on ? "on" : ""} aria-current={on ? "page" : undefined}><Icon n={icon} size={21} />{label}{badge}</Link>;
@@ -73,11 +77,18 @@ export default function AppShell({ children }) {
       <nav className="nav" aria-label="Main">
         {/* App-wide only, and the same everywhere. Everything about one hunt (Hunt, Feed, Leaderboard, Review...) lives in that hunt's tab row, so nothing appears twice. */}
         <A href="/" icon="users" label="Hunts" on={path === "/" || Boolean(gid)} />
-        <A href="/duels" icon="swords" label="1v1" on={path.startsWith("/duel")} />
-        <A href="/teams" icon="team" label="Team vs" on={path.startsWith("/team")} />
+        <A href="/vs" icon="swords" label="VS" on={path === "/vs" || path.startsWith("/duel") || path.startsWith("/team")} />
+        <div className="star-slot">
+          <button className={"star-btn" + (liveStars ? " ping" : "")} onClick={() => openStarHunt(null)} aria-label={`Star hunt: open the camera${liveStars ? `, ${liveStars} stars to catch` : ""}`}>
+            <Icon n="star" size={30} />{liveStars ? <span className="badge">{liveStars > 9 ? "9+" : liveStars}</span> : null}
+          </button>
+          <span className="lbl">Stars</span>
+        </div>
         <A href="/join" icon="key" label="Join" on={path === "/join"} />
         <A href="/profile" icon="user" label="Profile" on={path === "/profile"} />
       </nav>
+      {starHuntOpen ? <StarHunt stars={stars} target={starTarget} onTarget={setStarTarget} onClose={() => setStarHuntOpen(false)} onOpenMap={() => setStarMapOpen(true)} onCaught={starCaught} /> : null}
+      {starMapOpen ? <StarSheet /> : null}
     </>
   );
 }

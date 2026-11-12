@@ -22,6 +22,7 @@ export const metadata = {
     images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "PrimaHunt: Hunt it. Snap it. Win the week." }],
   },
   twitter: { card: "summary_large_image", images: ["/og.jpg"] },
+  appleWebApp: { capable: true, title: "PrimaHunt", statusBarStyle: "black-translucent" },
 };
 export const viewport = {
   width: "device-width", initialScale: 1, viewportFit: "cover",

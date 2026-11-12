@@ -11,6 +11,8 @@ PrimaHunt has no infrastructure in Nigeria. All personal data leaves Nigeria.
 | **Supabase Inc.** (USA), on Amazon Web Services | Postgres database, private Storage bucket `hunt-photos`, public bucket `site` (hero image only), pg_cron | **eu-west-3, Paris, France** | Everything: accounts (nickname, email, password hash), game data, consent records, photos | Project ref `iwljafkilkizabmgczjn`. RLS on, no policies; only the server role reads data. Daily backups by Supabase (kept per plan). |
 | **Vercel Inc.** (USA) | Hosts the Next.js app and API (serverless functions), CDN, runtime logs | Functions in **cdg1, Paris, France**; requests pass through Vercel's global edge network | All data in transit; request logs (IP, path, time) | Project `weekly-hunt`, team `wsh8`. Logs retained per Vercel plan. |
 | **Google LLC** (USA) | Gmail SMTP for outgoing email (`SMTP_USER`) | USA / global | Recipient email address, email content (nickname, hunt names, game updates, password-reset links) | Only if emails are on. |
+| **Push services**: Google FCM, Apple Push, Mozilla autopush, Microsoft WNS (USA) | Deliver star alerts (Web Push) | Global | The browser's push endpoint (a random address, stored in `push_subscriptions`) and an end-to-end encrypted payload (RFC 8291) they cannot read | Only for users who switch star alerts on. VAPID key derived from `SESSION_SECRET` (`lib/push.js`). |
+| **OpenStreetMap Foundation** (UK) + **Cloudflare cdnjs** (USA) | Lagos map tiles; Leaflet map library | Global | The viewer's IP address and the map area viewed (browser fetches directly; no user data sent by us) | OSM tile usage policy: attribution shown, light use. Switch to a paid tile provider if traffic grows. |
 | **Resend** (USA), *optional* | Transactional email if `RESEND_API_KEY` is set | USA | Same as Gmail | Not configured today. |
 | **GitHub** (Microsoft, USA) | Source code (`tochiwrld/Scavanger-Hunt-II`, public) | USA | **None.** No user data or secrets in the repo. | Keep it that way. |
 
@@ -24,7 +26,7 @@ PrimaHunt has no infrastructure in Nigeria. All personal data leaves Nigeria.
 
 ## Transfer risk notes
 - US-headquartered providers may receive US government requests for data they hold, even when it is stored in France.
-- Mitigations: minimal data collected (no real names, phone numbers, location or payment data); EXIF/GPS stripped from photos; photos and submissions deleted 7 days after each hunt; passwords hashed; private bucket; secrets only in Vercel env vars.
+- Mitigations: minimal data collected (no real names, phone numbers, stored location or payment data; star catches keep only the distance in metres); EXIF/GPS stripped from photos; photos and submissions deleted 7 days after each hunt; passwords hashed; private bucket; secrets only in Vercel env vars.
 
 ## When this file must be updated
 Adding or changing a provider, moving region, enabling Resend, adding analytics, or the NDPC publishing adequacy decisions or transfer instruments. Update the Privacy Policy at the same time and bump `PRIVACY_VERSION` in `lib/shared.js` if users need to re-consent.

@@ -33,7 +33,7 @@ function Room({ d, reload }) {
   const [hunting, setHunting] = useState(null);
   const [picked, setPicked] = useState(null);
   const base = `/duels/${duel.id}`;
-  if (duel.phase === "cancelled") return <Empty icon="🚫" title="This 1v1 was called off" text="Start a new one whenever you're ready."><Link className="btn" href="/duels">Back to 1v1</Link></Empty>;
+  if (duel.phase === "cancelled") return <Empty icon="🚫" title="This 1v1 was called off" text="Start a new one whenever you're ready."><Link className="btn" href="/vs">Back to 1v1</Link></Empty>;
   const started = ["live", "judging", "finished"].includes(duel.phase);
   // Your hunt while it's running; Finds once it's over. The player's own choice wins after that.
   const tab = picked || (duel.phase === "finished" ? "finds" : "hunt");
@@ -46,7 +46,7 @@ function Room({ d, reload }) {
   } : null;
   return (
     <>
-      <Link href="/duels" className="link" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><Icon n="back" size={16} />All 1v1s</Link>
+      <Link href="/vs" className="link" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><Icon n="back" size={16} />All 1v1s</Link>
       <Plate>
         <div className={"eyebrow" + (duel.phase === "live" ? " live" : "")}>1v1 · {PHASE_LABEL[duel.phase] || duel.phase}</div>
         <div className="week">{me.nickname} <span style={{ color: "var(--muted-fg)" }}>vs</span> {them ? them.nickname : "???"}</div>
@@ -125,7 +125,7 @@ function Waiting({ duel, reload }) {
   const cancel = async () => {
     if (!confirm("Call off this 1v1? The link will stop working.")) return;
     setBusy(true);
-    try { await api(`/duels/${duel.id}/cancel`, { method: "POST" }); router.push("/duels"); } catch (e) { toast(e.message, "bad"); setBusy(false); reload(); }
+    try { await api(`/duels/${duel.id}/cancel`, { method: "POST" }); router.push("/vs"); } catch (e) { toast(e.message, "bad"); setBusy(false); reload(); }
   };
   return (
     <section className="card stack">

@@ -8,6 +8,7 @@ import { Btn, ErrBox, NewPasswordFields, PasswordInput, useForm } from "../../..
 import Icon from "../../../components/icons.js";
 import { RETAIN_DAYS } from "../../../lib/shared.js";
 import BecomeAdmin from "../../../components/BecomeAdmin.js";
+import { AlertsToggle } from "../../../components/StarsCard.js";
 
 export default function Page() {
   const { me, setMe, toast, refreshMe } = useApp();
@@ -54,6 +55,15 @@ export default function Page() {
         </div>
         <Icon n="arrow" size={18} />
       </Link>
+      <Link href="/stars" className="card streak-card" style={{ display: "flex" }}>
+        <span className="flame" aria-hidden="true">⭐</span>
+        <div className="grow">
+          <div className="eyebrow">Star hunt</div>
+          <div style={{ font: "800 26px/1.1 var(--font-head)", marginTop: 4 }}>{me.stars?.caught || 0} star{(me.stars?.caught || 0) === 1 ? "" : "s"}</div>
+          <div className="muted" style={{ fontSize: 14 }}>{me.stars?.pips || 0} star pips · stars are on the Lagos map</div>
+        </div>
+        <Icon n="arrow" size={18} />
+      </Link>
       {me.hunter ? (
         <div className="card hunter-badge" role="status">
           <span className="medal" aria-hidden="true">🏅</span>
@@ -84,9 +94,10 @@ export default function Page() {
           : <Btn className="block ghost" onClick={() => setAsk(true)}>🛡️ Turn on admin tools</Btn>}
         {ask ? <BecomeAdmin onClose={() => setAsk(false)} onDone={() => { setAsk(false); toast("Admin tools are on", "good"); }} /> : null}
       </div>
-      <div className="card"><h3>Emails</h3>
+      <div className="card"><h3>Emails and alerts</h3>
         <div className="sw"><div><b>Game emails</b></div>
           <input type="checkbox" checked={rem} onChange={(e) => toggleRem(e.target.checked)} aria-label="Game emails" /></div>
+        <AlertsToggle />
       </div>
       <div className="card"><h3>Your data</h3>
         <p className="muted">Photos, submissions, comments and 1v1 lists are deleted automatically {RETAIN_DAYS} days after each hunt ends. Only score cards are kept. <Link className="link" href="/privacy">Privacy Policy</Link></p>
