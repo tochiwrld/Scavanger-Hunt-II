@@ -71,6 +71,8 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
   const [won, setWon] = useState(null);
   const [me, setMe] = useState(null);
   const [camOk, setCamOk] = useState(true);
+  // Location: wait (asking/finding) | ask (browser hasn't asked yet) | denied (blocked) | off (device can't find you) | ok
+  const [geo, setGeo] = useState("wait");
   const live = useRef({});
   live.current.mode = mode; live.current.target = target; live.current.stars = stars;
 
@@ -117,13 +119,31 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
     addEventListener("deviceorientationabsolute", onOrient, true);
     addEventListener("deviceorientation", onOrient, true);
 
+    const onPos = (p) => {
+      if (dead) return;
+      fix = { lat: p.coords.latitude, lon: p.coords.longitude, acc: p.coords.accuracy };
+      L.fix = fix; setGeo("ok");
+      setMe((old) => (!old || distBearing(old, fix).d > 8 ? fix : old));
+    };
+    const onErr = (e) => { if (!dead && !fix) setGeo(e && e.code === 1 ? "denied" : "off"); };
+    const geoOpts = { enableHighAccuracy: true, maximumAge: 2000 };
+    const startWatch = () => {
+      if (geo != null) navigator.geolocation.clearWatch(geo);
+      geo = navigator.geolocation.watchPosition(onPos, onErr, geoOpts);
+    };
+    // Called from a tap, so the browser shows its "Allow location" question.
+    L.askGeo = () => {
+      if (!navigator.geolocation) return setGeo("off");
+      setGeo("wait");
+      navigator.geolocation.getCurrentPosition((p) => { onPos(p); startWatch(); }, onErr, { ...geoOpts, timeout: 20000 });
+    };
     if (navigator.geolocation) {
-      geo = navigator.geolocation.watchPosition((p) => {
-        fix = { lat: p.coords.latitude, lon: p.coords.longitude, acc: p.coords.accuracy };
-        L.fix = fix;
-        setMe((old) => (!old || distBearing(old, fix).d > 8 ? fix : old));
-      }, () => { $("sub").textContent = "Location is off. Turn it on to hunt real stars."; }, { enableHighAccuracy: true, maximumAge: 2000 });
-    }
+      startWatch();
+      navigator.permissions?.query({ name: "geolocation" }).then((st) => {
+        const apply = () => { if (dead || fix) return; if (st.state === "denied") setGeo("denied"); else if (st.state === "prompt") setGeo("ask"); else { setGeo("wait"); startWatch(); } };
+        apply(); st.onchange = apply;
+      }).catch(() => {});
+    } else setGeo("off");
 
     // No motion sensor (computers): drag to look around.
     let drag = null;
@@ -191,7 +211,7 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
       const rel = wrap(bearing - sm.h);
       $("arrow").style.transform = `rotate(${rel}deg)`;
       if (real) {
-        if (!L.target) { $("dist").textContent = fix ? "No stars left" : "Finding you…"; $("dir").textContent = fix ? "Check the map for new drops" : "Allow location to hunt real stars"; }
+        if (!L.target) { $("dist").textContent = fix ? "No stars left" : "Finding you…"; $("dir").textContent = fix ? "Check the map for new drops" : "Waiting for your location"; }
         else if (dist == null) { $("dist").textContent = "Finding you…"; $("dir").textContent = "Step outside for a better GPS fix"; }
         else {
           $("dist").textContent = fmtDist(dist) + " away";
@@ -252,6 +272,23 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
         </StarMap>
       ) : null}
       <div className="sh-bottom">
+        {mode === "real" && geo !== "ok" && geo !== "wait" ? (
+          <div className="sh-geo" role="status">
+            {geo === "ask" ? (<>
+              <b>Turn on location to hunt real stars</b>
+              <span>We check you're at the star. Your location is never saved.</span>
+              <button className="btn sm" onClick={() => live.current.askGeo?.()}><Icon n="locate" size={16} />Turn on location</button>
+            </>) : geo === "denied" ? (<>
+              <b>Location is blocked for PrimaHunt</b>
+              <span>On a computer: click the icon left of the web address (🔒 or the slider icon), set <b>Location</b> to <b>Allow</b>, then try again. On a phone: open your browser's site settings for primahunt.com and allow Location.</span>
+              <button className="btn sm" onClick={() => live.current.askGeo?.()}>Try again</button>
+            </>) : (<>
+              <b>Can't find where you are</b>
+              <span>Check that location is on for this device and this browser (on a Mac: System Settings → Privacy &amp; Security → Location Services). Phones work best outside.</span>
+              <button className="btn sm" onClick={() => live.current.askGeo?.()}>Try again</button>
+            </>)}
+          </div>
+        ) : null}
         <div className="sh-radar">
           <div className="sh-dial"><svg data-k="arrow" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l6 18-6-4-6 4z" fill="oklch(88% .18 95)" /></svg></div>
           <div><b data-k="dist">Finding you…</b><small data-k="dir">Move your phone to look around</small></div>
