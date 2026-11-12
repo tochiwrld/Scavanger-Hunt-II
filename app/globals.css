@@ -582,7 +582,7 @@ button.slot.filled{border:1.5px solid var(--primary)}
 .vs-seg button[aria-selected="true"]{background:var(--primary);color:var(--primary-fg)}
 .vs-seg button:active{transform:scale(.97)}
 /* Lagos map */
-.sh-map{position:relative;background:oklch(18% .02 250);overflow:hidden}
+.sh-map{position:relative;background:oklch(18% .02 250);overflow:hidden;isolation:isolate;z-index:0}
 .sh-map .leaflet-container{background:oklch(18% .02 250);font:inherit;height:100%;width:100%}
 .sh-map .leaflet-tile-pane{filter:invert(1) hue-rotate(185deg) brightness(.82) contrast(.92) saturate(.55)}
 html.light .sh-map .leaflet-tile-pane{filter:none}
@@ -628,7 +628,7 @@ html.light .sh-map .leaflet-tile-pane{filter:none}
 .sh-ret i:nth-child(3){left:0;bottom:0;border-left-width:4px;border-bottom-width:4px;border-bottom-left-radius:10px}
 .sh-ret i:nth-child(4){right:0;bottom:0;border-right-width:4px;border-bottom-width:4px;border-bottom-right-radius:10px}
 .sh-ret.lock i{border-color:var(--primary)}
-.sh-mini{position:absolute;right:max(14px,env(safe-area-inset-right,0px));top:calc(72px + env(safe-area-inset-top,0px));width:108px;height:108px;border-radius:20px;border:2px solid oklch(100% 0 0 / .35);z-index:2;box-shadow:0 10px 24px -8px oklch(0% 0 0 / .7)}
+.sh-mini{position:absolute!important;right:max(14px,env(safe-area-inset-right,0px));top:calc(72px + env(safe-area-inset-top,0px));width:108px;height:108px;border-radius:20px;border:2px solid oklch(100% 0 0 / .35);z-index:2;box-shadow:0 10px 24px -8px oklch(0% 0 0 / .7)}
 .sh-mini .lbl{position:absolute;left:0;right:0;bottom:0;z-index:501;font:700 10px/1 var(--font-body);text-transform:uppercase;letter-spacing:.08em;color:#fff;text-align:center;padding:5px 0;background:oklch(0% 0 0 / .55);pointer-events:none}
 .sh-bottom{position:absolute;left:0;right:0;bottom:0;padding:16px max(16px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));background:linear-gradient(transparent,oklch(0% 0 0 / .72));display:flex;flex-direction:column;align-items:center;gap:12px}
 .sh-radar{display:flex;align-items:center;gap:12px;background:oklch(15% .01 275 / .72);border:1px solid oklch(100% 0 0 / .14);border-radius:18px;padding:10px 14px 10px 10px;max-width:100%}
