@@ -143,34 +143,17 @@ function Steps({ p }) {
   );
 }
 
-/** Profile row: add to home screen (or "on your home screen ✓" with the bonus status). */
+/**
+ * No card on Profile: installing is suggested by pop-ups only, and never again once installed.
+ * This only opens the steps when someone taps "Show me how" in Pip's reminder email (/profile?install=1).
+ */
 export function InstallCard() {
   const { me } = useApp();
   const [open, setOpen] = useState(false);
-  const [standalone, setStandalone] = useState(false);
   useEffect(() => {
-    initInstall(); setStandalone(isStandalone());
-    // "Show me how" in Pip's reminder email opens the steps straight away.
-    if (!isStandalone() && new URLSearchParams(window.location.search).get("install") === "1") setOpen("steps");
+    initInstall();
+    if (!isStandalone() && new URLSearchParams(window.location.search).get("install") === "1") setOpen(true);
   }, []);
-  if (!me) return null;
-  if (standalone || me.installed) {
-    return (
-      <div className="card inst-card on">
-        <span className="ico"><Icon n="phone" size={22} /></span>
-        <div className="grow"><b>PrimaHunt is on your home screen</b>
-          <div className="muted" style={{ fontSize: 14 }}>{me.install_bonus ? `+${me.install_bonus} bonus pips earned 🎁` : "Open it from there for the full app feel."}</div></div>
-      </div>
-    );
-  }
-  return (
-    <>
-      <button className="card inst-card" onClick={() => setOpen("pip")}>
-        <span className="ico"><Icon n="addsq" size={22} /></span>
-        <div className="grow"><b>Add PrimaHunt to your home screen</b><div className="muted" style={{ fontSize: 14 }}>Opens like an app, one tap away</div></div>
-        <Icon n="arrow" size={18} />
-      </button>
-      {open ? <InstallSheet variant={open} onClose={() => setOpen(false)} /> : null}
-    </>
-  );
+  if (!me || me.installed || !open) return null;
+  return <InstallSheet variant="steps" onClose={() => setOpen(false)} />;
 }
