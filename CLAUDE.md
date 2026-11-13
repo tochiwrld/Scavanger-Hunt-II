@@ -61,7 +61,7 @@ Live site: https://weekly-hunt.vercel.app (brand: **PrimaHunt**, wordmark PRIMA<
 - A 1v1 finishes when time is up and nothing is pending, or as soon as both players have every item approved. Winner: most approved items, ties to whoever finished first. Only the winner sees the "YOU WIN" animation (`public/img/you-win.mp4|webm|jpg`), full-screen once and then in the result card.
 - Pending 1v1 photos are auto-approved 60 minutes after the timer ends (`REVIEW_GRACE_MINUTES`); `runDuelLifecycle()` (part of the cron) finishes duels and alerts both players. 1v1 notifications have `group_id` NULL.
 - Players can join a hunt at any time, including mid-week: they can submit right away and appear on that week's leaderboard. The invite page and join responses include `live` so the UI says so.
-- Global ranking = all-time points from groups with `is_public = true`. Public groups can be joined without an invite; removed members still can't rejoin.
+- Global ranking = all-time points from groups with `is_public = true` plus star-catch pips (`star_catches.pips`), active accounts only. Public groups can be joined without an invite; removed members still can't rejoin.
 
 ## Team vs, daily hunt, wording
 - **Pips**: the UI calls points "pips" everywhere ("15 pips", `PIPS`); code, DB columns, SQL aliases and the `.pts` CSS class still say points/pts.

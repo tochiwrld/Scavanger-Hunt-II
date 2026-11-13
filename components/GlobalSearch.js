@@ -23,7 +23,7 @@ export default function GlobalSearch() {
   };
   return (
     <section className="stack" style={{ gap: 14, marginTop: 14 }}>
-      <div className="page-head"><h1 style={{ display: "flex", alignItems: "center", gap: 12 }}><Icon n="globe" size={30} className="c-primary" />Global Hunt</h1><p>Open hunts anyone can join, even mid-week. Every pip you earn in them counts toward your global rank.</p></div>
+      <div className="page-head"><h1 style={{ display: "flex", alignItems: "center", gap: 12 }}><Icon n="globe" size={30} className="c-primary" />Global Hunt</h1><p>Open hunts anyone can join, even mid-week. Every pip you earn in them, and every star you catch, counts toward your global rank.</p></div>
       <Async st={st}>{(d) => {
         const t = tierFor(d.me.points);
         const pct = t.next ? Math.round(((d.me.points - t.min) / (t.next.at - t.min)) * 100) : 100;
