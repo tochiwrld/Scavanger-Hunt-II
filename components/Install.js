@@ -70,9 +70,6 @@ export function InstallSheet({ variant = "pip", onClose }) {
     setSteps(true);
   };
 
-  const bonus = (
-    <div className="inst-bonus"><Icon n="gift" size={18} /><span><b>+{INSTALL_BONUS} bonus pips</b> when your first find is approved after you add PrimaHunt. They count on the global board.</span></div>
-  );
 
   return (
     <Sheet onClose={() => onClose(true)}>
@@ -87,14 +84,12 @@ export function InstallSheet({ variant = "pip", onClose }) {
               <li><Icon n="check" size={16} />Get back to your live challenges faster</li>
               <li><Icon n="check" size={16} />Never lose track of a hunt, with alerts on your phone</li>
             </ul>
-            {bonus}
           </>
         ) : (
           <>
             <div className="eyebrow">Pip has a suggestion!</div>
             <h2 className="inst-h" style={{ marginTop: 8 }}>Hey hunter! Why not keep PrimaHunt closer?</h2>
             <p className="muted inst-lead">Add us to your home screen and get straight into your next adventure.</p>
-            {bonus}
           </>
         )}
         {steps ? (
@@ -140,7 +135,7 @@ function Steps({ p }) {
       <ol className="inst-steps">
         {list.map(([ico, text], i) => <li key={i}><span className="n">{i + 1}</span><span className="ico">{ico}</span><span>{text}</span></li>)}
       </ol>
-      {p === "ios" ? <p className="muted" style={{ fontSize: 13, margin: "0 0 4px" }}>Then open PrimaHunt from your home screen. That's where your alerts and bonus live.</p> : null}
+      {p === "ios" ? <p className="muted" style={{ fontSize: 13, margin: "0 0 4px" }}>Then open PrimaHunt from your home screen. That's where your alerts live.</p> : null}
     </>
   );
 }
@@ -150,25 +145,29 @@ export function InstallCard() {
   const { me } = useApp();
   const [open, setOpen] = useState(false);
   const [standalone, setStandalone] = useState(false);
-  useEffect(() => { initInstall(); setStandalone(isStandalone()); }, []);
+  useEffect(() => {
+    initInstall(); setStandalone(isStandalone());
+    // "Show me how" in Pip's reminder email opens the steps straight away.
+    if (!isStandalone() && new URLSearchParams(window.location.search).get("install") === "1") setOpen("steps");
+  }, []);
   if (!me) return null;
   if (standalone || me.installed) {
     return (
       <div className="card inst-card on">
         <span className="ico"><Icon n="phone" size={22} /></span>
         <div className="grow"><b>PrimaHunt is on your home screen</b>
-          <div className="muted" style={{ fontSize: 14 }}>{me.install_bonus ? `+${me.install_bonus} bonus pips earned 🎁` : `Get a find approved to collect your +${INSTALL_BONUS} bonus pips.`}</div></div>
+          <div className="muted" style={{ fontSize: 14 }}>{me.install_bonus ? `+${me.install_bonus} bonus pips earned 🎁` : "Open it from there for the full app feel."}</div></div>
       </div>
     );
   }
   return (
     <>
-      <button className="card inst-card" onClick={() => setOpen(true)}>
+      <button className="card inst-card" onClick={() => setOpen("pip")}>
         <span className="ico"><Icon n="addsq" size={22} /></span>
-        <div className="grow"><b>Add PrimaHunt to your home screen</b><div className="muted" style={{ fontSize: 14 }}>Opens like an app · +{INSTALL_BONUS} bonus pips</div></div>
+        <div className="grow"><b>Add PrimaHunt to your home screen</b><div className="muted" style={{ fontSize: 14 }}>Opens like an app, one tap away</div></div>
         <Icon n="arrow" size={18} />
       </button>
-      {open ? <InstallSheet variant="pip" onClose={() => setOpen(false)} /> : null}
+      {open ? <InstallSheet variant={open} onClose={() => setOpen(false)} /> : null}
     </>
   );
 }

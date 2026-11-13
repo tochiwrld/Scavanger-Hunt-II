@@ -10,22 +10,25 @@ import { Btn, ErrBox } from "./ui.js";
 
 /** The privacy acknowledgement: every statement is its own unticked box, and all are required. */
 export function useConsent() {
-  const [ticked, setTicked] = useState({});
-  const all = CONSENT_ITEMS.every(([k]) => ticked[k]);
-  const consent = Object.fromEntries(CONSENT_ITEMS.map(([k]) => [k, Boolean(ticked[k])]));
+  // One tick at the end confirms every statement listed above it (each one is still recorded on its own).
+  const [agreed, setAgreed] = useState(false);
+  const all = agreed;
+  const consent = Object.fromEntries(CONSENT_ITEMS.map(([k]) => [k, agreed]));
   const view = (
     <fieldset className="consent">
       <legend>Privacy acknowledgement</legend>
-      <p className="muted">Please read the <Link className="link" href="/privacy" target="_blank">Privacy Policy</Link> and the <Link className="link" href="/terms" target="_blank">Terms</Link>, then tick each box. You need all of them to use PrimaHunt.</p>
-      {CONSENT_ITEMS.map(([k, label]) => (
-        <label key={k} className="consent-row">
-          <input type="checkbox" checked={!!ticked[k]} onChange={(e) => setTicked((t) => ({ ...t, [k]: e.target.checked }))} required />
-          <span>{k === "policy" ? <>I have read and agree to the <Link className="link" href="/privacy" target="_blank">Privacy Policy</Link>.</>
+      <p className="muted">Please read the <Link className="link" href="/privacy" target="_blank">Privacy Policy</Link> and the <Link className="link" href="/terms" target="_blank">Terms</Link>. By ticking the box below you confirm that:</p>
+      <ul className="consent-list">
+        {CONSENT_ITEMS.map(([k, label]) => (
+          <li key={k}>{k === "policy" ? <>I have read and agree to the <Link className="link" href="/privacy" target="_blank">Privacy Policy</Link>.</>
             : k === "terms" ? <>I agree to the <Link className="link" href="/terms" target="_blank">Terms</Link>: I play at my own risk, I'll stay safe and within the law, I won't post or set anything dangerous or illegal, and PrimaHunt isn't responsible for what players or hunt admins do.</>
-            : label}</span>
-        </label>
-      ))}
-      <button type="button" className="link sm-link" onClick={() => setTicked(all ? {} : Object.fromEntries(CONSENT_ITEMS.map(([k]) => [k, true])))}>{all ? "Untick all" : "I've read each statement. Tick all"}</button>
+            : label}</li>
+        ))}
+      </ul>
+      <label className="consent-row consent-all">
+        <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} required />
+        <span><b>I've read all of the above and I agree.</b></span>
+      </label>
     </fieldset>
   );
   return { all, consent, view };
@@ -51,7 +54,7 @@ function Gate() {
     <main style={{ paddingTop: 24 }}>
       <div style={{ marginBottom: 14 }}><Brand /></div>
       <h1>Before you keep hunting</h1>
-      <p className="muted">Hi {me?.nickname}. We've updated our Privacy Policy and added Terms covering safety: no dangerous or illegal items, and you play at your own risk. Please read them and tick each box to keep playing.</p>
+      <p className="muted">Hi {me?.nickname}. We've updated our Privacy Policy and added Terms covering safety: no dangerous or illegal items, and you play at your own risk. Please read them and tick the box to keep playing.</p>
       <div className="card"><ErrBox error={err} />{c.view}
         <Btn className="block" busy={busy} disabled={!c.all} onClick={accept}>Accept and continue</Btn></div>
       <p className="muted" style={{ textAlign: "center" }}>Don't agree? <button className="link" onClick={logout}>Log out</button>, or accept and delete your account from your profile.</p>
