@@ -55,7 +55,7 @@ export default function GlobalSearch() {
                   {g.description ? <div className="muted">{g.description}</div> : null}
                   <div className="row wrap" style={{ gap: 8 }}>
                     <span className="muted" style={{ fontSize: 13 }}>{g.members} player{g.members === 1 ? "" : "s"}</span>
-                    {g.live_title ? <span className="st approved"><Icon n="flame" size={12} />Live: {g.live_title}</span> : <span className="st draft">No hunt live</span>}
+                    {g.live_title ? <span className="st approved st-wrap"><Icon n="flame" size={12} /><span>Live: {g.live_title}</span></span> : <span className="st draft">No hunt live</span>}
                   </div>
                   <div style={{ marginTop: 6 }}>
                     {g.joined ? <Link className="btn sm ghost" href={`/g/${g.id}`}>{g.role === "owner" ? "Open (you run this)" : "Joined · Open"}<Icon n="arrow" size={15} /></Link>

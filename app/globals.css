@@ -668,3 +668,8 @@ html.light .sh-map .leaflet-tile-pane{filter:none}
   .ghead select option{color:var(--fg);background:var(--card)}
   .gname{font-size:19px}
 }
+/* Status pills never run past their card: long text (a live hunt's title) wraps inside the pill */
+.st{max-width:100%}
+.st-wrap{white-space:normal;line-height:1.3;text-align:left;align-items:flex-start;border-radius:14px;padding:6px 11px}
+.st-wrap svg{flex:none;margin-top:1px}
+.gcard .grow{min-width:0}
