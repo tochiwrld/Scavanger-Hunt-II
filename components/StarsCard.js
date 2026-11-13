@@ -23,7 +23,6 @@ export default function StarsCard() {
       </StarMap>
       <div style={{ padding: "12px 18px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
         <p className="muted" style={{ margin: 0 }}>Stars drop at spots around Lagos. Go there, point your camera, catch it for pips.{starMe?.caught ? ` You've caught ${starMe.caught} (${starMe.pips} star pips).` : ""}</p>
-        <AlertsToggle compact />
         <Link href="/stars" className="link" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><Icon n="map" size={16} />All stars and how it works</Link>
       </div>
     </div>

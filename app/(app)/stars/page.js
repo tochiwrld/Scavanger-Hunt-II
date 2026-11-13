@@ -5,7 +5,6 @@ import { Suspense } from "react";
 import { api } from "../../../lib/client.js";
 import { useApp } from "../../../components/Providers.js";
 import StarMap from "../../../components/StarMap.js";
-import { AlertsToggle } from "../../../components/StarsCard.js";
 import Icon from "../../../components/icons.js";
 import { Btn, Skel } from "../../../components/ui.js";
 import { distBearing, fmtDist, whereAmI } from "../../../lib/stars-client.js";
@@ -34,7 +33,6 @@ function Stars() {
         <div><div className="pts" style={{ fontSize: 24 }}>{starMe?.pips || 0}</div><div className="muted" style={{ fontSize: 12 }}>Star pips</div></div>
         <div><div className="pts" style={{ fontSize: 24 }}>{stars.filter((s) => !s.caught).length}</div><div className="muted" style={{ fontSize: 12 }}>Left to catch</div></div>
       </div>
-      <div className="card"><AlertsToggle /></div>
       <button className="btn block" onClick={() => setStarMapOpen(true)}><Icon n="map" size={18} />Open the Lagos map</button>
       <div className="sec-title"><h2>{me ? "Nearest first" : "All stars"}</h2></div>
       <div className="sh-list">
@@ -45,7 +43,7 @@ function Stars() {
             <span className="pts">{s.pips} PIPS</span>
           </button>
         ))}
-        {!stars.length ? <p className="muted">No stars right now. Switch alerts on and we'll ping you when one drops.</p> : null}
+        {!stars.length ? <p className="muted">No stars right now. We'll ping you when one drops.</p> : null}
       </div>
       <div className="card mist" style={{ fontSize: 14 }}>
         <b>Stay safe.</b> Stars are only placed in public places. Hunt in daylight, never step into traffic, and don't go into private property or anywhere you feel unsafe. No star is worth it.
@@ -76,7 +74,7 @@ function DropStar({ stars, me, onDone }) {
   };
   return (
     <section className="card stack" style={{ borderColor: "color-mix(in oklch,var(--primary) 40%,var(--border))" }}>
-      <div><div className="eyebrow">PrimaHunt admin</div><h2 style={{ marginTop: 6 }}>Drop a star</h2><p className="muted" style={{ margin: "6px 0 0" }}>Tap the map where the star goes. Pick public, safe places people can walk to. Everyone with alerts on (and Star drops kept on) gets a notification straight away.</p></div>
+      <div><div className="eyebrow">PrimaHunt admin</div><h2 style={{ marginTop: 6 }}>Drop a star</h2><p className="muted" style={{ margin: "6px 0 0" }}>Tap the map where the star goes. Pick public, safe places people can walk to. Everyone gets a notification on their phone straight away.</p></div>
       <StarMap stars={stars} me={me} pending={spot} onMapTap={setSpot} center={spot ? { ...spot, zoom: 15 } : null} style={{ height: 320, borderRadius: 16 }} />
       <div className="row wrap" style={{ gap: 8 }}>
         <button className="btn ghost" type="button" onClick={() => me ? setSpot({ lat: me.lat, lon: me.lon }) : toast("Turn on location first", "bad")}><Icon n="locate" size={16} />Use where I am</button>

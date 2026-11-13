@@ -10,6 +10,7 @@ import { colorFor, pad2 } from "../lib/client.js";
 import ConsentGate from "./Consent.js";
 import StarHunt from "./StarHunt.js";
 import StarSheet from "./StarSheet.js";
+import { autoPush } from "../lib/stars-client.js";
 
 const OWNER_TABS = [["", "Overview"], ["feed", "Feed"], ["review", "Review"], ["challenges", "Challenges"], ["subs", "Submissions"], ["players", "Players"], ["invite", "Invite"], ["ranks", "Leaderboard"], ["weeks", "Past weeks"], ["prize", "Prize"], ["audit", "Log"], ["settings", "Settings"]];
 const PLAYER_TABS = [["", "Home"], ["hunt", "Hunt"], ["feed", "Feed"], ["ranks", "Leaderboard"], ["mine", "My submissions"], ["weeks", "Past weeks"], ["people", "Players"]];
@@ -26,6 +27,8 @@ export default function AppShell({ children }) {
   useEffect(() => { if (ready && !me) router.replace("/login?next=" + encodeURIComponent(path)); }, [ready, me, path, router]);
   useEffect(() => { if (me?.privacy_ok && (path === "/" || gid || groups === null)) refreshGroups(); }, [me, path]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (me?.privacy_ok && !stars) loadStars(); }, [me]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Phone alerts are on for everyone: the browser asks once (on a tap), then this phone is connected quietly.
+  useEffect(() => (me?.privacy_ok ? autoPush() : undefined), [me?.id, me?.privacy_ok]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!ready || !me) return <main style={{ paddingTop: 80 }}><Skel /></main>;
   if (!me.privacy_ok) return <ConsentGate />;
