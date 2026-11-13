@@ -95,6 +95,9 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
     let rawPose = null, pose = null, hasMotion = false, hasAbs = false, northOffset = null, dragH = 0, dragP = 0;
     let practiceBearing = 120, practiceElev = 5, spin = 0, particles = [], catching = 0, fix = null;
     let anchor = null, sizeS = 40; // when you're close, the star stays put instead of following jumpy GPS
+    // Lock-on: once the star has been in your sights for a moment (and you're in catch range), it snaps to the
+    // middle of the screen and stays there, so small hand movements don't make it bob up and down.
+    let lock = null, sightT = 0, lockX = 0, lockY = 0;
     L.fix = null; L.trail = null;
 
     const resize = () => { const dpr = Math.min(2, window.devicePixelRatio || 1); cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
@@ -196,7 +199,7 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
     cv.addEventListener("pointerdown", down); cv.addEventListener("pointermove", move); cv.addEventListener("pointerup", up);
     cv.addEventListener("click", () => { if (!$("catch").disabled) L.doCatch(); });
 
-    L.newPractice = () => { practiceBearing = ((pose ? poseHeading(pose) : dragH) + 60 + Math.random() * 120) % 360; practiceElev = 2 + Math.random() * 8; };
+    L.newPractice = () => { lock = null; sightT = 0; practiceBearing = ((pose ? poseHeading(pose) : dragH) + 60 + Math.random() * 120) % 360; practiceElev = 2 + Math.random() * 8; };
     L.doCatch = async () => {
       if (catching) return;
       const fx = catchFx(); // made inside the tap, so iPhones allow the sound
@@ -240,14 +243,14 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
         } catch { /* no sound, no problem */ }
       };
     }
-    L.reset = () => { catching = 0; particles = []; };
+    L.reset = () => { catching = 0; particles = []; lock = null; sightT = 0; };
 
     const loop = (now) => {
       if (dead) return;
       const dt = Math.min(0.1, Math.max(0, (now - lastT) / 1000)); lastT = now;
       const W = innerWidth, H = innerHeight, cx = W / 2, cy = H * 0.46;
       ctx.clearRect(0, 0, W, H);
-      pose = smoothPose(pose, hasMotion && rawPose ? rawPose : poseFromHeadingPitch(dragH, dragP), dt);
+      pose = smoothPose(pose, hasMotion && rawPose ? rawPose : poseFromHeadingPitch(dragH, dragP), dt, hasMotion ? 0.12 : 0.05);
       const camH = poseHeading(pose);
       const v = video.current;
       const focal = focalFor(W, H, camOkRef.current && v ? v.videoWidth : 0, camOkRef.current && v ? v.videoHeight : 0);
@@ -265,20 +268,28 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
       }
       sizeS += (wantSize - sizeS) * (1 - Math.exp(-dt / 0.25));
       const pr = project(pose, dirFrom(bearing, elev), cx, cy, focal);
-      const x = pr.x, y = pr.y;
+      // Lock-on bookkeeping: what we're locked to (practice, or a real star you're close enough to catch).
+      const lockKey = real ? (L.target && close ? "star-" + L.target.id : null) : "practice";
+      const seen = show && pr.ahead && Math.abs(pr.x - cx) < 75 && Math.abs(pr.y - cy) < 90;
+      const turnedAway = !pr.ahead || Math.abs(pr.x - cx) > W * 0.9 || Math.abs(pr.y - cy) > H * 0.9; // you really looked elsewhere
+      if (!lockKey || (lock && lock !== lockKey) || (lock && turnedAway)) { lock = null; sightT = 0; }
+      if (!lock && lockKey) { sightT = seen ? sightT + dt : 0; if (sightT > 0.35) { lock = lockKey; lockX = pr.x; lockY = pr.y; navigator.vibrate?.(15); } }
+      // Locked: glide to the centre and stay put (a gentle float, nothing from the hand).
+      if (lock) { const k = 1 - Math.exp(-dt / 0.15); lockX += (cx - lockX) * k; lockY += (cy - lockY) * k; }
+      const x = lock ? lockX : pr.x, y = lock ? lockY + Math.sin(spin * 1.6) * 3 : pr.y;
       spin += 2.7 * dt;
       if (catching) {
         catching += 1;
         const k = Math.min(1, catching / 22);
-        const sx = pr.ahead ? x : cx, sy = pr.ahead ? y : cy;
+        const sx = lock || pr.ahead ? x : cx, sy = lock || pr.ahead ? y : cy;
         drawStar(ctx, sx + (cx - sx) * k, sy + (cy - sy) * k, sizeS * (1 + k * 0.9), spin * 3, Math.max(0, 1 - Math.max(0, (catching - 22) / 14)));
-      } else if (show && pr.ahead && x > -120 && x < W + 120 && y > -120 && y < H + 120) {
+      } else if (show && (lock || pr.ahead) && x > -120 && x < W + 120 && y > -120 && y < H + 120) {
         drawStar(ctx, x, y, sizeS, spin, close ? 1 : 0.5);
       }
       particles = particles.filter((p) => (p.life -= 1) > 0);
       for (const p of particles) { p.x += p.vx; p.y += p.vy; p.vy += 0.12; ctx.fillStyle = `rgba(255,${200 + (p.life % 50)},40,${p.life / 50})`; ctx.fillRect(p.x, p.y, 4, 4); }
 
-      const inSight = show && pr.ahead && Math.abs(x - cx) < 75 && Math.abs(y - cy) < 90;
+      const inSight = Boolean(lock) || seen;
       const ready = inSight && close && !catching;
       $("ret").classList.toggle("lock", ready);
       $("catch").disabled = !ready;
@@ -291,13 +302,13 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
         else if (dist == null) { $("dist").textContent = "Finding you…"; $("dir").textContent = "Step outside for a better GPS fix"; }
         else {
           $("dist").textContent = fmtDist(dist) + " away";
-          $("dir").textContent = close ? (inSight ? "It's right there. Catch it!" : turnText(rel)) : anchor ? "Almost there. Keep walking" : (dist > 2000 ? "Head towards " + L.target.area : turnText(rel).replace("Turn ", "Walk ").replace("Straight ahead", "Walk straight ahead"));
+          $("dir").textContent = close ? (lock ? "Locked on! Tap the star to catch it" : inSight ? "Hold steady…" : turnText(rel)) : anchor ? "Almost there. Keep walking" : (dist > 2000 ? "Head towards " + L.target.area : turnText(rel).replace("Turn ", "Walk ").replace("Straight ahead", "Walk straight ahead"));
         }
         $("sub").textContent = L.target ? `${L.target.name} · ${L.target.pips} pips` : "Real stars around Lagos";
         if (!$("hint").dataset.err) $("hint").textContent = L.target && dist != null && !close ? `Get within ${L.target.radius_m} m to catch it` : hasMotion ? "Move your phone to look around" : "Drag to look around";
       } else {
         $("dist").textContent = inSight ? "Got it in sight" : Math.abs(rel) > 90 ? "Behind you" : "Close by";
-        $("dir").textContent = inSight ? "Tap the star button" : turnText(rel);
+        $("dir").textContent = lock ? "Locked on! Tap the star button" : inSight ? "Hold steady…" : turnText(rel);
         $("sub").textContent = "Practice · no pips";
         $("hint").textContent = hasMotion ? "Move your phone to look around" : "Drag to look around";
       }
