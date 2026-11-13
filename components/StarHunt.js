@@ -24,15 +24,25 @@ const sub3 = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
 const norm = (v) => { const l = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / l, v[1] / l, v[2] / l]; };
 const LIGHT = norm([-0.45, -0.7, 0.9]), HALF = norm([LIGHT[0], LIGHT[1], LIGHT[2] + 1]);
-function drawStar(ctx, x, y, size, t, alpha) {
+/**
+ * light: how bright the camera scene is (0 = dark room, 1 = Lagos midday sun). In the dark the star glows wide and
+ * lights itself up; in bright sun the glow pulls in and the gold gets deeper so it still reads against the sky.
+ */
+function drawStar(ctx, x, y, size, t, alpha, light = 0.4) {
+  const dark = Math.max(0, Math.min(1, 1 - light));
   const ry = t, rx = Math.sin(t * 0.7) * 0.28 - 0.12;
   const cy = Math.cos(ry), sy = Math.sin(ry), cx = Math.cos(rx), sx = Math.sin(rx);
   const rot = (p) => { const x1 = p[0] * cy + p[2] * sy, z1 = -p[0] * sy + p[2] * cy; return [x1, p[1] * cx - z1 * sx, p[1] * sx + z1 * cx]; };
   const camZ = 4.2, f = size * camZ;
   ctx.save(); ctx.globalAlpha = alpha;
-  const glow = ctx.createRadialGradient(x, y, size * 0.2, x, y, size * 2.3);
-  glow.addColorStop(0, "rgba(255,214,40,.5)"); glow.addColorStop(1, "rgba(255,214,40,0)");
-  ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y, size * 2.3, 0, Math.PI * 2); ctx.fill();
+  const gR = size * (1.7 + 1.9 * dark), gA = 0.22 + 0.5 * dark;
+  const glow = ctx.createRadialGradient(x, y, size * 0.15, x, y, gR);
+  glow.addColorStop(0, `rgba(255,${Math.round(206 + 30 * dark)},${Math.round(40 + 60 * dark)},${gA})`);
+  glow.addColorStop(0.45, `rgba(255,200,40,${gA * 0.35})`);
+  glow.addColorStop(1, "rgba(255,200,40,0)");
+  if (dark > 0.55) ctx.globalCompositeOperation = "lighter"; // in the dark the glow adds light to the picture
+  ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y, gR, 0, Math.PI * 2); ctx.fill();
+  ctx.globalCompositeOperation = "source-over";
   const faces = [];
   for (const tri of STAR_TRIS) {
     const v = tri.map(rot);
@@ -41,7 +51,7 @@ function drawStar(ctx, x, y, size, t, alpha) {
     const pts = v.map((p) => { const k = f / (camZ - p[2]); return [x + p[0] * k, y + p[1] * k]; });
     const diff = Math.max(0, n[0] * LIGHT[0] + n[1] * LIGHT[1] + n[2] * LIGHT[2]);
     const spec = Math.pow(Math.max(0, n[0] * HALF[0] + n[1] * HALF[1] + n[2] * HALF[2]), 28);
-    const k = 0.32 + 0.78 * diff;
+    const k = 0.3 + 0.16 * dark + 0.78 * diff; // the star gives off its own light, more noticeable in the dark
     faces.push({ pts, z: (v[0][2] + v[1][2] + v[2][2]) / 3, c: `rgb(${Math.round(Math.min(255, 255 * k + 255 * spec))},${Math.round(Math.min(255, 186 * k + 245 * spec))},${Math.round(Math.min(255, 18 * k + 200 * spec))})` });
   }
   faces.sort((a, b) => a.z - b.z);
@@ -54,8 +64,26 @@ function drawStar(ctx, x, y, size, t, alpha) {
   for (let i = 0; i < 6; i++) {
     const a = t * 1.3 + (i * Math.PI) / 3, rr = size * (1.45 + 0.15 * Math.sin(t * 3 + i));
     const s2 = 2 + 1.5 * Math.sin(t * 4 + i);
-    ctx.fillStyle = `rgba(255,255,255,${0.55 * alpha})`; ctx.beginPath(); ctx.arc(x + Math.cos(a) * rr, y + Math.sin(a) * rr * 0.55, Math.max(0.5, s2), 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = `rgba(255,255,255,${(0.3 + 0.55 * dark) * alpha})`; ctx.beginPath(); ctx.arc(x + Math.cos(a) * rr, y + Math.sin(a) * rr * 0.55, Math.max(0.5, s2), 0, Math.PI * 2); ctx.fill();
   }
+}
+/**
+ * Soft contact shadow on the "ground" under the floating star. It sits in the direction of real-world down on the
+ * screen (so it follows when you tilt the phone), shrinks and fades as the star floats up, and is darker and
+ * crisper in bright light, faint and soft in the dark.
+ */
+function drawShadow(ctx, x, y, size, lift, light, down, alpha) {
+  const dist = size * (1.25 + 0.35 * lift);
+  const sx = x + down[0] * dist, sy = y + down[1] * dist;
+  const w = size * (1.05 - 0.25 * lift), h = w * 0.3;
+  const a = (0.16 + 0.36 * light) * (1 - 0.35 * lift) * alpha;
+  const soft = 0.55 - 0.3 * light; // inner solid part grows in strong light
+  ctx.save();
+  ctx.translate(sx, sy); ctx.rotate(Math.atan2(down[1], down[0]) - Math.PI / 2); ctx.scale(1, h / w);
+  const g = ctx.createRadialGradient(0, 0, 0, 0, 0, w);
+  g.addColorStop(0, `rgba(10,8,4,${a})`); g.addColorStop(Math.max(0.05, soft), `rgba(10,8,4,${a * 0.75})`); g.addColorStop(1, "rgba(10,8,4,0)");
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, w, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
 }
 const turnText = (rel) => (Math.abs(rel) < 12 ? "Straight ahead" : rel > 0 ? "Turn right" : "Turn left");
 const needsMotionTap = () => typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function";
@@ -98,6 +126,24 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
     // Lock-on: once the star has been in your sights for a moment (and you're in catch range), it snaps to the
     // middle of the screen and stays there, so small hand movements don't make it bob up and down.
     let lock = null, sightT = 0, lockX = 0, lockY = 0;
+    // Scene light: a tiny copy of the camera picture is averaged a few times a second.
+    const probe = document.createElement("canvas"); probe.width = 24; probe.height = 32;
+    const pctx = probe.getContext("2d", { willReadFrequently: true });
+    let light = 0.4, lightT = 0;
+    const readLight = (now) => {
+      if (now - lightT < 400) return;
+      lightT = now;
+      const v = video.current;
+      if (!camOkRef.current || !v || v.readyState < 2 || !pctx) { light += (0.4 - light) * 0.2; return; }
+      try {
+        pctx.drawImage(v, 0, 0, 24, 32);
+        const d = pctx.getImageData(0, 0, 24, 32).data;
+        let sum = 0;
+        for (let i = 0; i < d.length; i += 4) sum += 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
+        const luma = sum / (d.length / 4) / 255;
+        light += (Math.min(1, luma * 1.25) - light) * 0.35;
+      } catch { /* picture not readable yet */ }
+    };
     L.fix = null; L.trail = null;
 
     const resize = () => { const dpr = Math.min(2, window.devicePixelRatio || 1); cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
@@ -259,6 +305,7 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
       const dt = Math.min(0.1, Math.max(0, (now - lastT) / 1000)); lastT = now;
       const W = innerWidth, H = innerHeight, cx = W / 2, cy = H * 0.46;
       ctx.clearRect(0, 0, W, H);
+      readLight(now);
       pose = smoothPose(pose, hasMotion && rawPose ? rawPose : poseFromHeadingPitch(dragH, dragP), dt, hasMotion ? 0.12 : 0.05);
       const camH = poseHeading(pose);
       const v = video.current;
@@ -285,15 +332,21 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
       if (!lock && lockKey) { sightT = seen ? sightT + dt : 0; if (sightT > 0.35) { lock = lockKey; lockX = pr.x; lockY = pr.y; navigator.vibrate?.(15); } }
       // Locked: glide to the centre and stay put (a gentle float, nothing from the hand).
       if (lock) { const k = 1 - Math.exp(-dt / 0.15); lockX += (cx - lockX) * k; lockY += (cy - lockY) * k; }
-      const x = lock ? lockX : pr.x, y = lock ? lockY + Math.sin(spin * 1.6) * 3 : pr.y;
+      // The star floats: a slow bob, with its shadow on the "ground" below.
+      const bob = Math.sin(spin * 0.9), lift = (bob + 1) / 2;
+      const x = lock ? lockX : pr.x, y = (lock ? lockY : pr.y) - bob * sizeS * 0.08;
+      const sdLen = Math.hypot(pose.r[2], pose.u[2]) || 1;
+      const down = [-pose.r[2] / sdLen, pose.u[2] / sdLen]; // real-world down, as seen on the screen
       spin += 2.7 * dt;
       if (catching) {
         catching += 1;
         const k = Math.min(1, catching / 22);
         const sx = lock || pr.ahead ? x : cx, sy = lock || pr.ahead ? y : cy;
-        drawStar(ctx, sx + (cx - sx) * k, sy + (cy - sy) * k, sizeS * (1 + k * 0.9), spin * 3, Math.max(0, 1 - Math.max(0, (catching - 22) / 14)));
-      } else if (show && (lock || pr.ahead) && x > -120 && x < W + 120 && y > -120 && y < H + 120) {
-        drawStar(ctx, x, y, sizeS, spin, close ? 1 : 0.5);
+        drawStar(ctx, sx + (cx - sx) * k, sy + (cy - sy) * k, sizeS * (1 + k * 0.9), spin * 3, Math.max(0, 1 - Math.max(0, (catching - 22) / 14)), light);
+      } else if (show && (lock || pr.ahead) && x > -160 && x < W + 160 && y > -160 && y < H + 160) {
+        const a = close ? 1 : 0.5;
+        drawShadow(ctx, x, y, sizeS, lift, light, down, a);
+        drawStar(ctx, x, y, sizeS, spin, a, light);
       }
       particles = particles.filter((p) => (p.life -= 1) > 0);
       for (const p of particles) { p.x += p.vx; p.y += p.vy; p.vy += 0.12; ctx.fillStyle = `rgba(255,${200 + (p.life % 50)},40,${p.life / 50})`; ctx.fillRect(p.x, p.y, 4, 4); }
