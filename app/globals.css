@@ -694,3 +694,8 @@ html.light .sh-map .leaflet-tile-pane{filter:none}
 .inst-card.on .ico{background:color-mix(in oklch,var(--primary) 16%,transparent);color:var(--primary)}
 .consent-list{margin:0 0 6px;padding:0 0 0 18px;display:flex;flex-direction:column;gap:7px;font-size:14px;line-height:1.45;color:var(--muted-fg)}
 .consent-all{border-top:1px solid var(--border);margin-top:8px;padding-top:12px;font-size:15px}
+/* Star catch: gold flash (iPhones can't vibrate from a web page) */
+.sh-flash{position:absolute;inset:0;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 46%,oklch(95% .16 95 / .95),oklch(88% .18 95 / .55) 40%,transparent 75%);z-index:3}
+.sh-flash.go{animation:shFlash .55s var(--ease-out) both}
+@keyframes shFlash{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.sh-flash.go{animation-duration:.2s}}

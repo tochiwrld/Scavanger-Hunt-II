@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "../lib/client.js";
 import { distBearing, fmtDist } from "../lib/stars-client.js";
+import { dirFrom, focalFor, poseFromHeadingPitch, poseFromOrientation, poseHeading, project, smoothPose, wrap180 } from "../lib/ar.js";
 import StarMap from "./StarMap.js";
 import Icon from "./icons.js";
 
@@ -56,7 +57,6 @@ function drawStar(ctx, x, y, size, t, alpha) {
     ctx.fillStyle = `rgba(255,255,255,${0.55 * alpha})`; ctx.beginPath(); ctx.arc(x + Math.cos(a) * rr, y + Math.sin(a) * rr * 0.55, Math.max(0.5, s2), 0, Math.PI * 2); ctx.fill();
   }
 }
-const wrap = (a) => ((a + 540) % 360) - 180;
 const turnText = (rel) => (Math.abs(rel) < 12 ? "Straight ahead" : rel > 0 ? "Turn right" : "Turn left");
 const needsMotionTap = () => typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function";
 
@@ -71,6 +71,8 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
   const [won, setWon] = useState(null);
   const [me, setMe] = useState(null);
   const [camOk, setCamOk] = useState(true);
+  const camOkRef = useRef(true);
+  camOkRef.current = camOk;
   // Location: wait (asking/finding) | ask (browser hasn't asked yet) | denied (blocked) | off (device can't find you) | ok
   const [geo, setGeo] = useState("wait");
   const live = useRef({});
@@ -88,36 +90,49 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
     if (phase !== "run") return undefined;
     const L = live.current, el = root.current, cv = canvas.current, ctx = cv.getContext("2d");
     const $ = (k) => el.querySelector(`[data-k="${k}"]`);
-    let stream = null, raf = 0, geo = null, dead = false;
-    let heading = 0, pitch = 0, hasMotion = false, hasAbs = false;
-    const sm = { h: 0, p: 0 };
+    let stream = null, raf = 0, geo = null, dead = false, wake = null, pingT = 0, lastT = performance.now();
+    // Pose: where the back camera points. From the motion sensor on phones, from dragging on computers.
+    let rawPose = null, pose = null, hasMotion = false, hasAbs = false, northOffset = null, dragH = 0, dragP = 0;
     let practiceBearing = 120, practiceElev = 5, spin = 0, particles = [], catching = 0, fix = null;
-    L.fix = null;
+    let anchor = null, sizeS = 40; // when you're close, the star stays put instead of following jumpy GPS
+    L.fix = null; L.trail = null;
 
     const resize = () => { const dpr = Math.min(2, window.devicePixelRatio || 1); cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
     resize(); addEventListener("resize", resize);
+
+    // Keep the screen awake while hunting (walking to a star takes a while).
+    const lockScreen = async () => { try { if (document.visibilityState === "visible" && navigator.wakeLock) wake = await navigator.wakeLock.request("screen"); } catch { /* not supported */ } };
+    const onVis = () => { if (document.visibilityState === "visible") lockScreen(); };
+    lockScreen(); document.addEventListener("visibilitychange", onVis);
 
     // Camera first, location after: phones show one permission question at a time, and a location
     // request made while the camera question is open can come back as "denied" without the person ever seeing it.
     (async () => {
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false });
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false });
         if (dead) { stream.getTracks().forEach((t) => t.stop()); return; }
         video.current.srcObject = stream; setCamOk(true);
       } catch { setCamOk(false); }
       if (!dead) startGeo();
     })();
 
+    const screenAngle = () => (screen.orientation && screen.orientation.angle) || window.orientation || 0;
     const onOrient = (e) => {
-      let h = null;
-      if (typeof e.webkitCompassHeading === "number") h = e.webkitCompassHeading;
-      else if (e.absolute && e.alpha != null) h = 360 - e.alpha;
-      else if (e.alpha != null && e.type === "deviceorientation" && !hasAbs) h = 360 - e.alpha;
-      if (e.type === "deviceorientationabsolute" && e.alpha != null) hasAbs = true;
-      if (h == null || e.beta == null) return;
-      const ang = (screen.orientation && screen.orientation.angle) || window.orientation || 0;
-      heading = (h + ang + 360) % 360; pitch = e.beta - 90;
-      if (!hasMotion) { hasMotion = true; sm.h = heading; sm.p = pitch; practiceBearing = (heading + 75) % 360; }
+      if (e.alpha == null || e.beta == null || e.gamma == null) return;
+      if (e.type === "deviceorientationabsolute") hasAbs = true;
+      else if (hasAbs) return; // Android: once true-north readings arrive, ignore the relative ones
+      let alpha = e.alpha;
+      if (typeof e.webkitCompassHeading === "number" && e.webkitCompassHeading >= 0) {
+        // iPhone: alpha starts at an arbitrary direction. Learn the offset to true north from the compass while the
+        // phone isn't held upright (the compass reading gets unreliable then) and keep using it when it is.
+        const off = wrap180(e.webkitCompassHeading - (360 - e.alpha));
+        const flatEnough = Math.abs(e.beta) < 55;
+        if (northOffset == null) northOffset = off;
+        else if (flatEnough) northOffset += wrap180(off - northOffset) * 0.1;
+        alpha = e.alpha - northOffset;
+      }
+      rawPose = poseFromOrientation(alpha, e.beta, e.gamma, screenAngle());
+      if (!hasMotion) { hasMotion = true; practiceBearing = (poseHeading(rawPose) + 75) % 360; }
     };
     addEventListener("deviceorientationabsolute", onOrient, true);
     addEventListener("deviceorientation", onOrient, true);
@@ -160,77 +175,123 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
       }).catch(() => {});
     }
 
+    // While you're within 300 m of the star, the phone checks in every few seconds. The server signs a short trail
+    // of these check-ins, and a catch needs a believable one (time near the star, natural GPS wobble, walking speed).
+    const ping = async () => {
+      const t = L.target, f = L.fix;
+      if (dead || L.mode !== "real" || !t || !f) return;
+      if (distBearing(f, t).d > 300) return;
+      try {
+        const r = await api(`/stars/${t.id}/ping`, { method: "POST", json: { lat: f.lat, lon: f.lon, acc: f.acc, trail: L.trail && L.trail.star === t.id ? L.trail.token : null } });
+        if (!dead && L.target && L.target.id === t.id) L.trail = { star: t.id, token: r.trail };
+      } catch { /* try again on the next tick */ }
+    };
+    pingT = setInterval(ping, 5000);
+
     // No motion sensor (computers): drag to look around.
     let drag = null;
-    const down = (e) => { if (hasMotion) return; drag = { x: e.clientX, y: e.clientY, h: heading, p: pitch }; cv.setPointerCapture?.(e.pointerId); };
-    const move = (e) => { if (!drag) return; heading = (drag.h - (e.clientX - drag.x) * 0.25 + 360) % 360; pitch = Math.max(-60, Math.min(60, drag.p + (e.clientY - drag.y) * 0.25)); };
+    const down = (e) => { if (hasMotion) return; drag = { x: e.clientX, y: e.clientY, h: dragH, p: dragP }; cv.setPointerCapture?.(e.pointerId); };
+    const move = (e) => { if (!drag) return; dragH = (drag.h - (e.clientX - drag.x) * 0.25 + 360) % 360; dragP = Math.max(-60, Math.min(60, drag.p + (e.clientY - drag.y) * 0.25)); };
     const up = () => (drag = null);
     cv.addEventListener("pointerdown", down); cv.addEventListener("pointermove", move); cv.addEventListener("pointerup", up);
     cv.addEventListener("click", () => { if (!$("catch").disabled) L.doCatch(); });
 
-    L.newPractice = () => { practiceBearing = (heading + 60 + Math.random() * 120) % 360; practiceElev = 2 + Math.random() * 8; };
+    L.newPractice = () => { practiceBearing = ((pose ? poseHeading(pose) : dragH) + 60 + Math.random() * 120) % 360; practiceElev = 2 + Math.random() * 8; };
     L.doCatch = async () => {
       if (catching) return;
+      const fx = catchFx(); // made inside the tap, so iPhones allow the sound
       const real = L.mode === "real" && L.target;
       if (real) {
         const f = L.fix;
         try {
-          const r = await api(`/stars/${L.target.id}/catch`, { method: "POST", json: { lat: f.lat, lon: f.lon, acc: f.acc } });
-          burst(); setTimeout(() => !dead && setWon({ pips: r.pips, name: r.name, me: r.me, real: true }), 650);
+          await ping(); // one last check-in right at the star
+          const r = await api(`/stars/${L.target.id}/catch`, { method: "POST", json: { lat: f.lat, lon: f.lon, acc: f.acc, trail: L.trail && L.trail.star === L.target.id ? L.trail.token : null } });
+          burst(); fx(); setTimeout(() => !dead && setWon({ pips: r.pips, name: r.name, me: r.me, real: true }), 650);
           onCaught?.(L.target.id, r.me);
         } catch (e) {
           const h = $("hint"); h.textContent = e.message; h.dataset.err = "1";
-          setTimeout(() => { delete h.dataset.err; }, 5000);
+          setTimeout(() => { delete h.dataset.err; }, 6000);
         }
         return;
       }
-      burst(); setTimeout(() => !dead && setWon({ pips: 0, real: false }), 650);
+      burst(); fx(); setTimeout(() => !dead && setWon({ pips: 0, real: false }), 650);
     };
     function burst() {
       catching = 1;
       navigator.vibrate?.([30, 40, 60]);
       for (let i = 0; i < 70; i++) { const a = Math.random() * Math.PI * 2, s = 2 + Math.random() * 6; particles.push({ x: innerWidth / 2, y: innerHeight * 0.46, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 2, life: 30 + Math.random() * 25 }); }
     }
+    // A catch you can feel without vibration (iPhones don't allow it): a gold screen flash and a short chime.
+    function catchFx() {
+      let ac = null;
+      try { const AC = window.AudioContext || window.webkitAudioContext; ac = AC ? new AC() : null; ac?.resume?.(); } catch { ac = null; }
+      return () => {
+        const fl = $("flash"); if (fl) { fl.classList.remove("go"); void fl.offsetWidth; fl.classList.add("go"); }
+        if (!ac) return;
+        try {
+          const t0 = ac.currentTime;
+          [784, 988, 1319].forEach((hz, i) => {
+            const o = ac.createOscillator(), g = ac.createGain();
+            o.type = "triangle"; o.frequency.value = hz;
+            g.gain.setValueAtTime(0.0001, t0 + i * 0.09); g.gain.exponentialRampToValueAtTime(0.25, t0 + i * 0.09 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t0 + i * 0.09 + 0.35);
+            o.connect(g).connect(ac.destination); o.start(t0 + i * 0.09); o.stop(t0 + i * 0.09 + 0.4);
+          });
+          setTimeout(() => ac.close?.(), 1200);
+        } catch { /* no sound, no problem */ }
+      };
+    }
     L.reset = () => { catching = 0; particles = []; };
 
-    const loop = () => {
+    const loop = (now) => {
       if (dead) return;
+      const dt = Math.min(0.1, Math.max(0, (now - lastT) / 1000)); lastT = now;
       const W = innerWidth, H = innerHeight, cx = W / 2, cy = H * 0.46;
       ctx.clearRect(0, 0, W, H);
-      sm.h += wrap(heading - sm.h) * 0.18; sm.p += (pitch - sm.p) * 0.18;
-      const ppd = W / 62;
+      pose = smoothPose(pose, hasMotion && rawPose ? rawPose : poseFromHeadingPitch(dragH, dragP), dt);
+      const camH = poseHeading(pose);
+      const v = video.current;
+      const focal = focalFor(W, H, camOkRef.current && v ? v.videoWidth : 0, camOkRef.current && v ? v.videoHeight : 0);
       const real = L.mode === "real";
-      let bearing = practiceBearing, elev = practiceElev, dist = null, close = true, show = true;
+      let bearing = practiceBearing, elev = practiceElev, dist = null, close = true, show = true, wantSize = 58;
       if (real) {
-        if (L.target && fix) { const db = distBearing(fix, L.target); bearing = db.b; dist = db.d; elev = 4; close = dist <= L.target.radius_m + Math.min(fix.acc || 0, 30) && (fix.acc || 0) <= 120; }
-        else { show = false; close = false; }
+        if (L.target && fix) {
+          const db = distBearing(fix, L.target); dist = db.d;
+          close = dist <= L.target.radius_m + Math.min(fix.acc || 0, 30) && (fix.acc || 0) <= 120;
+          if (dist <= 45) { if (!anchor || anchor.id !== L.target.id) anchor = { id: L.target.id, b: db.b }; }
+          else if (dist > 70 || (anchor && anchor.id !== L.target.id)) anchor = null;
+          bearing = anchor ? anchor.b : db.b; elev = anchor ? 2 : 4;
+          wantSize = anchor ? 72 : Math.max(24, Math.min(66, 1500 / Math.max(dist, 12)));
+        } else { show = false; close = false; anchor = null; }
       }
-      const dx = wrap(bearing - sm.h) * ppd, dy = (sm.p - elev) * ppd;
-      const x = cx + dx, y = cy + dy;
-      const size = real && dist != null ? Math.max(24, Math.min(70, 1500 / Math.max(dist, 12))) : 58;
-      spin += 0.045;
+      sizeS += (wantSize - sizeS) * (1 - Math.exp(-dt / 0.25));
+      const pr = project(pose, dirFrom(bearing, elev), cx, cy, focal);
+      const x = pr.x, y = pr.y;
+      spin += 2.7 * dt;
       if (catching) {
         catching += 1;
         const k = Math.min(1, catching / 22);
-        drawStar(ctx, x + (cx - x) * k, y + (cy - y) * k, size * (1 + k * 0.9), spin * 3, Math.max(0, 1 - Math.max(0, (catching - 22) / 14)));
-      } else if (show && x > -120 && x < W + 120 && y > -120 && y < H + 120) {
-        drawStar(ctx, x, y, size, spin, close ? 1 : 0.5);
+        const sx = pr.ahead ? x : cx, sy = pr.ahead ? y : cy;
+        drawStar(ctx, sx + (cx - sx) * k, sy + (cy - sy) * k, sizeS * (1 + k * 0.9), spin * 3, Math.max(0, 1 - Math.max(0, (catching - 22) / 14)));
+      } else if (show && pr.ahead && x > -120 && x < W + 120 && y > -120 && y < H + 120) {
+        drawStar(ctx, x, y, sizeS, spin, close ? 1 : 0.5);
       }
       particles = particles.filter((p) => (p.life -= 1) > 0);
       for (const p of particles) { p.x += p.vx; p.y += p.vy; p.vy += 0.12; ctx.fillStyle = `rgba(255,${200 + (p.life % 50)},40,${p.life / 50})`; ctx.fillRect(p.x, p.y, 4, 4); }
 
-      const inSight = show && Math.abs(dx) < 75 && Math.abs(dy) < 90;
+      const inSight = show && pr.ahead && Math.abs(x - cx) < 75 && Math.abs(y - cy) < 90;
       const ready = inSight && close && !catching;
       $("ret").classList.toggle("lock", ready);
       $("catch").disabled = !ready;
-      const rel = wrap(bearing - sm.h);
-      $("arrow").style.transform = `rotate(${rel}deg)`;
+      const rel = wrap180(bearing - camH);
+      // Arrow: towards the star on screen when it's in front of you, otherwise left/right by compass.
+      const arrowDeg = pr.ahead && Math.abs(x - cx) < W && Math.abs(y - cy) < H ? Math.atan2(x - cx, cy - y) * 180 / Math.PI : rel;
+      $("arrow").style.transform = `rotate(${arrowDeg}deg)`;
       if (real) {
         if (!L.target) { $("dist").textContent = fix ? "No stars left" : "Finding you…"; $("dir").textContent = fix ? "Check the map for new drops" : "Waiting for your location"; }
         else if (dist == null) { $("dist").textContent = "Finding you…"; $("dir").textContent = "Step outside for a better GPS fix"; }
         else {
           $("dist").textContent = fmtDist(dist) + " away";
-          $("dir").textContent = close ? (inSight ? "It's right there. Catch it!" : turnText(rel)) : (dist > 2000 ? "Head towards " + L.target.area : turnText(rel).replace("Turn ", "Walk ").replace("Straight ahead", "Walk straight ahead"));
+          $("dir").textContent = close ? (inSight ? "It's right there. Catch it!" : turnText(rel)) : anchor ? "Almost there. Keep walking" : (dist > 2000 ? "Head towards " + L.target.area : turnText(rel).replace("Turn ", "Walk ").replace("Straight ahead", "Walk straight ahead"));
         }
         $("sub").textContent = L.target ? `${L.target.name} · ${L.target.pips} pips` : "Real stars around Lagos";
         if (!$("hint").dataset.err) $("hint").textContent = L.target && dist != null && !close ? `Get within ${L.target.radius_m} m to catch it` : hasMotion ? "Move your phone to look around" : "Drag to look around";
@@ -244,8 +305,10 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
     };
     raf = requestAnimationFrame(loop);
     return () => {
-      dead = true; cancelAnimationFrame(raf);
+      dead = true; cancelAnimationFrame(raf); clearInterval(pingT);
       removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", onVis);
+      wake?.release?.().catch?.(() => {});
       removeEventListener("deviceorientationabsolute", onOrient, true);
       removeEventListener("deviceorientation", onOrient, true);
       if (geo != null) navigator.geolocation.clearWatch(geo);
@@ -272,6 +335,7 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
       <video ref={video} playsInline muted autoPlay hidden={!camOk} />
       {camOk ? null : <div className="fake" />}
       <canvas ref={canvas} />
+      <div className="sh-flash" data-k="flash" aria-hidden="true" />
       <div className="sh-ret" data-k="ret"><i /><i /><i /><i /></div>
       <div className="sh-top">
         <button className="sh-btn" onClick={onClose} aria-label="Close the camera"><Icon n="close" size={20} /></button>
