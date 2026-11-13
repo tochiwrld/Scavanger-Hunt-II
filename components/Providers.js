@@ -1,4 +1,5 @@
 "use client";
+import { initInstall, installMoment } from "../lib/install.js";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { api, burst } from "../lib/client.js";
 
@@ -50,6 +51,12 @@ export default function Providers({ children }) {
   }, []);
 
   useEffect(() => { refreshMe(); }, [refreshMe]);
+  // Catch Android's install prompt early (it fires once, soon after load) so "Add to home screen" can use it later.
+  useEffect(() => {
+    initInstall();
+    // The service worker makes PrimaHunt installable, shows the offline page and receives push alerts.
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => {});
+  }, []);
 
   // Poll for new alerts: celebrate approvals, announce new weeks.
   useEffect(() => {
@@ -66,7 +73,7 @@ export default function Providers({ children }) {
         const fresh = d.notifications.filter((n) => !n.read_at && n.id > last).reverse();
         if (d.notifications[0]) localStorage.setItem("lastNid", String(Math.max(last, d.notifications[0].id)));
         fresh.slice(-3).forEach((n) => toast(`${n.title}: ${n.message}`, n.type === "approved" ? "good" : n.type === "rejected" ? "bad" : ""));
-        if (fresh.some((n) => n.type === "approved")) burst();
+        if (fresh.some((n) => n.type === "approved")) { burst(); installMoment("approved"); }
         if (fresh.length) window.dispatchEvent(new Event("hunt:refresh"));
       } catch {}
     };

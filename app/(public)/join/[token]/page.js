@@ -1,4 +1,5 @@
 "use client";
+import { installMoment } from "../../../../lib/install.js";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -20,6 +21,7 @@ export default function Page() {
     try {
       const r = await api(`/invite/${encodeURIComponent(token)}/join`, { method: "POST" });
       await refreshGroups();
+      if (!r.already) installMoment("join");
       toast(r.already ? "You're already in this hunt" : r.live ? "You're in! This week is already live, so start hunting now." : "You're in! Happy hunting.", "good");
       router.push("/g/" + r.group_id + (r.live && !r.already ? "/hunt" : ""));
     } catch (e) { toast(e.message, "bad"); setBusy(false); }

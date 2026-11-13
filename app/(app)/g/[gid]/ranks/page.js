@@ -1,4 +1,6 @@
 "use client";
+import { useEffect } from "react";
+import { installMoment } from "../../../../../lib/install.js";
 import { useParams } from "next/navigation";
 import { fmtDate } from "../../../../../lib/client.js";
 import Icon from "../../../../../components/icons.js";
@@ -9,6 +11,7 @@ export default function Page() {
   const { gid } = useParams();
   // Updates itself every 60 seconds while open (paused when the phone is locked or the tab is hidden). No refresh button needed.
   const st = useApi(`/groups/${gid}/leaderboard`, { poll: 60_000 });
+  useEffect(() => { installMoment("ranks"); }, []);
   return (
     <Async st={st}>{(d) => {
       if (d.phase === "none") return <Empty icon="🏆" title="No leaderboard yet" text="It appears when the first hunt goes live." />;

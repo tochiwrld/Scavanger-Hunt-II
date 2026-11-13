@@ -1,4 +1,5 @@
 "use client";
+import { installMoment } from "../lib/install.js";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -18,7 +19,7 @@ export default function GlobalSearch() {
   const st = useApi("/global" + (query ? "?q=" + encodeURIComponent(query) : ""));
   const join = async (g) => {
     setBusy(g.id);
-    try { const r = await api(`/global/${g.id}/join`, { method: "POST" }); await refreshGroups(); toast(r.live ? `You're in ${g.name}! This week is live, so start hunting now.` : `You're in ${g.name}!`, "good"); router.push(`/g/${g.id}${r.live ? "/hunt" : ""}`); }
+    try { const r = await api(`/global/${g.id}/join`, { method: "POST" }); await refreshGroups(); installMoment("join"); toast(r.live ? `You're in ${g.name}! This week is live, so start hunting now.` : `You're in ${g.name}!`, "good"); router.push(`/g/${g.id}${r.live ? "/hunt" : ""}`); }
     catch (e) { toast(e.message, "bad"); setBusy(null); }
   };
   return (

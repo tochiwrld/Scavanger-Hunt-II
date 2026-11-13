@@ -11,6 +11,7 @@ import ConsentGate from "./Consent.js";
 import StarHunt from "./StarHunt.js";
 import StarSheet from "./StarSheet.js";
 import { autoPush } from "../lib/stars-client.js";
+import InstallManager from "./Install.js";
 
 const OWNER_TABS = [["", "Overview"], ["feed", "Feed"], ["review", "Review"], ["challenges", "Challenges"], ["subs", "Submissions"], ["players", "Players"], ["invite", "Invite"], ["ranks", "Leaderboard"], ["weeks", "Past weeks"], ["prize", "Prize"], ["audit", "Log"], ["settings", "Settings"]];
 const PLAYER_TABS = [["", "Home"], ["hunt", "Hunt"], ["feed", "Feed"], ["ranks", "Leaderboard"], ["mine", "My submissions"], ["weeks", "Past weeks"], ["people", "Players"]];
@@ -92,6 +93,7 @@ export default function AppShell({ children }) {
       </nav>
       {starHuntOpen ? <StarHunt stars={stars} target={starTarget} onTarget={setStarTarget} onClose={() => setStarHuntOpen(false)} onOpenMap={() => setStarMapOpen(true)} onCaught={starCaught} /> : null}
       {starMapOpen ? <StarSheet /> : null}
+      <InstallManager />
     </>
   );
 }

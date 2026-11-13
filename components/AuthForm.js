@@ -1,4 +1,5 @@
 "use client";
+import { installMoment } from "../lib/install.js";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
@@ -54,6 +55,7 @@ function Inner({ mode: startMode }) {
     await api(mode === "login" ? "/auth/login" : "/auth/register", { method: "POST", json: mode === "login" ? v : { ...v, consent: consent.consent } });
     await refreshMe();
     toast(mode === "login" ? "Welcome back, hunter! 🎯" : "Welcome to PrimaHunt! 🎯", "good");
+    if (mode === "register") installMoment("register");
     router.push(next || "/");
   });
   // The header button takes you down to the form instead of leaving you at the top of the page.

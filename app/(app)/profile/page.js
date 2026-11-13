@@ -6,6 +6,7 @@ import { useApp } from "../../../components/Providers.js";
 import Link from "next/link";
 import { Btn, ErrBox, NewPasswordFields, PasswordInput, useForm } from "../../../components/ui.js";
 import Icon from "../../../components/icons.js";
+import { InstallCard } from "../../../components/Install.js";
 import { RETAIN_DAYS } from "../../../lib/shared.js";
 import BecomeAdmin from "../../../components/BecomeAdmin.js";
 
@@ -54,6 +55,7 @@ export default function Page() {
         </div>
         <Icon n="arrow" size={18} />
       </Link>
+      <InstallCard />
       <Link href="/stars" className="card streak-card" style={{ display: "flex" }}>
         <span className="flame" aria-hidden="true">⭐</span>
         <div className="grow">

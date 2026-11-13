@@ -1,4 +1,5 @@
 "use client";
+import { installMoment } from "../lib/install.js";
 import { useState } from "react";
 import { api, extOf, makeThumb, shrink } from "../lib/client.js";
 import { useApp } from "./Providers.js";
@@ -37,7 +38,7 @@ export default function SubmitSheet({ gid, it, endpoint = `/groups/${gid}/items/
     const fd = new FormData();
     files.forEach((f, k) => fd.append("photo" + (k + 1), f, `photo${k + 1}.${extOf(f)}`));
     thumbs.forEach((t, k) => { if (t) fd.append("thumb" + (k + 1), t, `thumb${k + 1}.${extOf(t)}`); });
-    try { await api(endpoint, { method: "POST", form: fd }); onDone(); }
+    try { await api(endpoint, { method: "POST", form: fd }); installMoment("submit"); onDone(); }
     catch (e) { setErr(e.message); setBusy(false); }
   };
 

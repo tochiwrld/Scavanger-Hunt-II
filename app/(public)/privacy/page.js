@@ -41,6 +41,7 @@ export default function Page() {
             <tr><td><b>Security data:</b> a signed login cookie, short-lived rate-limit counters keyed to your network address, password-reset tokens (stored only as a hash), an admin action log per hunt</td><td>Generated automatically</td></tr>
             <tr><td><b>Notifications:</b> in-app alerts, and game emails from Pip (see below)</td><td>Generated automatically</td></tr>
             <tr><td><b>Star hunt:</b> which stars you caught, when, the pips and how many metres from the star you were. <b>Not your location.</b> To check you're at a star, your phone sends its position once when you tap Catch; we compare it with the star and throw the position away</td><td>You, when you catch a star</td></tr>
+            <tr><td><b>Home screen:</b> whether and when you first opened PrimaHunt from your phone's home screen, and any bonus pips that earned you</td><td>Your phone, when you open the installed app</td></tr>
             <tr><td><b>Phone alerts (push):</b> if you allow notifications, the address your browser gives us for sending notifications to that phone, and when one last arrived</td><td>Your browser, only if you allow notifications</td></tr>
             <tr><td><b>Activity:</b> when you last opened the app, and when we last sent you a game email</td><td>Generated automatically</td></tr>
           </tbody>

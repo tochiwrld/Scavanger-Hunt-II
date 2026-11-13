@@ -53,6 +53,9 @@ const P = {
   download: <><path d="M12 15V3" /><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="m7 10 5 5 5-5" /></>,
   team: <><circle cx="8" cy="7" r="3" /><circle cx="16" cy="7" r="3" /><path d="M2 20c0-3.3 2.7-6 6-6s6 2.7 6 6" /><path d="M16 14c3.3 0 6 2.7 6 6" /></>,
   streak: <><path d="M12 22c4.4 0 7-2.9 7-6.5 0-4-3-6.5-4-10.5-2 2-2.5 4-2.5 5.5C11 9 9 7.5 8.5 5 6 7.5 5 11 5 15.5 5 19.1 7.6 22 12 22Z" /></>,
+  dotsv: <><circle cx="12" cy="5" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="12" cy="19" r="1" /></>,
+  addsq: <><rect x="3" y="3" width="18" height="18" rx="4" /><path d="M12 8v8" /><path d="M8 12h8" /></>,
+  phone: <><rect x="6" y="2" width="12" height="20" rx="3" /><path d="M11 18h2" /></>,
   gift: <><rect x="3" y="8" width="18" height="4" rx="1" /><path d="M12 8v13" /><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7" /><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5" /></>,
 };
 export default function Icon({ n, size = 18, className = "", ...rest }) {
