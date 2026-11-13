@@ -38,7 +38,7 @@ function PlayerHome({ gid }) {
               <div className="tile score"><div className="label">Your score</div><div className="n"><CountUp to={d.score} /><small>pips</small></div></div>
               <div className="tile rank"><div className="label">Your rank</div><div className="n">{d.rank ? "#" + d.rank : "–"}<small>/ {d.total}</small>{bump ? <span className="bump">▲{bump}</span> : null}</div></div>
             </div>
-            {d.rank > 1 && d.gap ? <p className="gap-note"><b>{d.gap} point{d.gap === 1 ? "" : "s"}</b> to pass {d.above}</p> : null}
+            {d.rank > 1 && d.gap ? <p className="gap-note"><b>{d.gap} pip{d.gap === 1 ? "" : "s"}</b> to pass {d.above}</p> : null}
             <Link className="btn block" style={{ marginTop: 16 }} href={active ? `/g/${gid}/hunt` : `/g/${gid}/week/${c.id}`}>{active ? "View challenge" : "See the final results"}<Icon n="arrow" size={18} /></Link>
           </Plate>
           {up}

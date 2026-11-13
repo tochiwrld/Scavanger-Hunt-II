@@ -97,12 +97,15 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
     const resize = () => { const dpr = Math.min(2, window.devicePixelRatio || 1); cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
     resize(); addEventListener("resize", resize);
 
+    // Camera first, location after: phones show one permission question at a time, and a location
+    // request made while the camera question is open can come back as "denied" without the person ever seeing it.
     (async () => {
       try {
         stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false });
         if (dead) { stream.getTracks().forEach((t) => t.stop()); return; }
         video.current.srcObject = stream; setCamOk(true);
       } catch { setCamOk(false); }
+      if (!dead) startGeo();
     })();
 
     const onOrient = (e) => {
@@ -125,25 +128,37 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
       L.fix = fix; setGeo("ok");
       setMe((old) => (!old || distBearing(old, fix).d > 8 ? fix : old));
     };
-    const onErr = (e) => { if (!dead && !fix) setGeo(e && e.code === 1 ? "denied" : "off"); };
     const geoOpts = { enableHighAccuracy: true, maximumAge: 2000 };
+    let retried = false;
+    const onErr = (e) => {
+      if (dead || fix) return;
+      if (e && e.code === 1) {
+        // A "denied" can be a clash with another permission question; try once more before saying it's blocked.
+        if (!retried) { retried = true; setTimeout(() => !dead && !fix && startWatch(), 1200); return; }
+        setGeo("denied");
+      } else if (e && e.code === 3) {
+        startWatch(); // timed out: keep waiting quietly, GPS can be slow indoors
+      } else setGeo("off");
+    };
     const startWatch = () => {
+      if (!navigator.geolocation) return setGeo("off");
       if (geo != null) navigator.geolocation.clearWatch(geo);
       geo = navigator.geolocation.watchPosition(onPos, onErr, geoOpts);
     };
     // Called from a tap, so the browser shows its "Allow location" question.
     L.askGeo = () => {
       if (!navigator.geolocation) return setGeo("off");
-      setGeo("wait");
-      navigator.geolocation.getCurrentPosition((p) => { onPos(p); startWatch(); }, onErr, { ...geoOpts, timeout: 20000 });
+      setGeo("wait"); retried = true;
+      navigator.geolocation.getCurrentPosition((p) => { onPos(p); startWatch(); }, (e) => { if (!dead && !fix) setGeo(e && e.code === 1 ? "denied" : e && e.code === 3 ? "wait" : "off"); if (e && e.code === 3) startWatch(); }, { ...geoOpts, timeout: 20000 });
     };
-    if (navigator.geolocation) {
+    function startGeo() {
+      if (!navigator.geolocation) return setGeo("off");
       startWatch();
       navigator.permissions?.query({ name: "geolocation" }).then((st) => {
-        const apply = () => { if (dead || fix) return; if (st.state === "denied") setGeo("denied"); else if (st.state === "prompt") setGeo("ask"); else { setGeo("wait"); startWatch(); } };
+        const apply = () => { if (dead || fix) return; if (st.state === "prompt") setTimeout(() => { if (!dead && !fix && st.state === "prompt") setGeo("ask"); }, 4000); else if (st.state === "granted") { setGeo("wait"); startWatch(); } };
         apply(); st.onchange = apply;
       }).catch(() => {});
-    } else setGeo("off");
+    }
 
     // No motion sensor (computers): drag to look around.
     let drag = null;
@@ -279,9 +294,13 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
               <span>We check you're at the star. Your location is never saved.</span>
               <button className="btn sm" onClick={() => live.current.askGeo?.()}><Icon n="locate" size={16} />Turn on location</button>
             </>) : geo === "denied" ? (<>
-              <b>Location is blocked for PrimaHunt</b>
-              <span>On a computer: click the icon left of the web address (🔒 or the slider icon), set <b>Location</b> to <b>Allow</b>, then try again. On a phone: open your browser's site settings for primahunt.com and allow Location.</span>
-              <button className="btn sm" onClick={() => live.current.askGeo?.()}>Try again</button>
+              <b>Your phone isn't sharing location</b>
+              <span><b>iPhone:</b> Settings → Privacy &amp; Security → Location Services → turn it on, then Safari Websites (or Chrome) → While Using.<br /><b>Android:</b> turn Location on, then Chrome → site settings → primahunt.com → Location → Allow.<br /><b>Computer:</b> click the icon left of the web address → Location → Allow.</span>
+              <span>Then reload the page so the browser picks up the change.</span>
+              <div className="row" style={{ gap: 8, justifyContent: "center" }}>
+                <button className="btn sm" onClick={() => window.location.reload()}>Reload</button>
+                <button className="btn sm ghost" onClick={() => live.current.askGeo?.()}>Try again</button>
+              </div>
             </>) : (<>
               <b>Can't find where you are</b>
               <span>Check that location is on for this device and this browser (on a Mac: System Settings → Privacy &amp; Security → Location Services). Phones work best outside.</span>

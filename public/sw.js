@@ -1,4 +1,4 @@
-// PrimaHunt service worker: shows push alerts (new stars) and opens the right page when tapped.
+// PrimaHunt service worker: shows push alerts (game updates and new stars) and opens the right page when tapped.
 // It caches nothing, so the site always loads fresh.
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (e) => e.waitUntil(self.clients.claim()));

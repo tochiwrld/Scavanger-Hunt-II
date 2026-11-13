@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useApp } from "./Providers.js";
 import StarMap from "./StarMap.js";
 import Icon from "./icons.js";
+import { api } from "../lib/client.js";
 import { disablePush, enablePush, needsHomeScreen, pushState } from "../lib/stars-client.js";
 
 /** Home: the Lagos map with live stars. Tap it for the full map. */
@@ -29,34 +30,48 @@ export default function StarsCard() {
   );
 }
 
-/** "Star alerts on this phone": web push, asked only when tapped. */
-export function AlertsToggle({ compact = false }) {
-  const { toast, refreshMe } = useApp();
+/** "Alerts on this phone": web push, asked only when tapped. `prefs` adds the Star drops / Game updates switches. */
+export function AlertsToggle({ compact = false, prefs = false }) {
+  const { toast, refreshMe, me, setMe } = useApp();
   const [st, setSt] = useState("…");
   const [busy, setBusy] = useState(false);
   useEffect(() => { pushState().then(setSt).catch(() => setSt("unsupported")); }, []);
   const turnOn = async () => {
     setBusy(true);
-    try { await enablePush(); setSt("on"); toast("Star alerts are on for this phone ⭐", "good"); refreshMe(); }
+    try { await enablePush(); setSt("on"); toast("Alerts are on for this phone 🎯", "good"); refreshMe(); }
     catch (e) { toast(e.message, "bad"); setSt(await pushState().catch(() => "off")); }
     setBusy(false);
   };
   const turnOff = async () => {
     setBusy(true);
-    try { await disablePush(); setSt("off"); toast("Star alerts are off for this phone"); refreshMe(); } catch (e) { toast(e.message, "bad"); }
+    try { await disablePush(); setSt("off"); toast("Alerts are off for this phone"); refreshMe(); } catch (e) { toast(e.message, "bad"); }
     setBusy(false);
+  };
+  const p = me?.push_prefs || { stars: true, games: true };
+  const setPref = async (k, v) => {
+    const next = { ...p, [k]: v };
+    setMe((m) => (m ? { ...m, push_prefs: next } : m));
+    try { await api("/me/push-prefs", { method: "PUT", json: next }); } catch (e) { toast(e.message, "bad"); refreshMe(); }
   };
   if (st === "…") return null;
   if (st === "unsupported") {
     return needsHomeScreen()
-      ? <p className="muted" style={{ margin: 0, fontSize: 14 }}>📲 <b>Want star alerts on iPhone?</b> Tap Share → <b>Add to Home Screen</b>, open PrimaHunt from there, then switch alerts on.</p>
+      ? <p className="muted" style={{ margin: 0, fontSize: 14 }}>📲 <b>Want alerts on iPhone?</b> Tap Share → <b>Add to Home Screen</b>, open PrimaHunt from there, then switch alerts on.</p>
       : compact ? null : <p className="muted" style={{ margin: 0, fontSize: 14 }}>This browser can't show notifications.</p>;
   }
-  if (st === "blocked") return <p className="muted" style={{ margin: 0, fontSize: 14 }}>🔕 Notifications are blocked for PrimaHunt. Allow them in your browser settings to get star alerts.</p>;
+  if (st === "blocked") return <p className="muted" style={{ margin: 0, fontSize: 14 }}>🔕 Notifications are blocked for PrimaHunt. Allow them in your browser settings to get alerts.</p>;
   return (
-    <div className="sw" style={compact ? { padding: 0, border: 0 } : undefined}>
-      <div><b>Star alerts on this phone</b>{compact ? null : <div className="muted" style={{ fontSize: 13 }}>A ping when a new star drops in Lagos</div>}</div>
-      <input type="checkbox" checked={st === "on"} disabled={busy} onChange={(e) => (e.target.checked ? turnOn() : turnOff())} aria-label="Star alerts on this phone" />
-    </div>
+    <>
+      <div className="sw" style={compact ? { padding: 0, border: 0 } : undefined}>
+        <div><b>Alerts on this phone</b>{compact ? null : <div className="muted" style={{ fontSize: 13 }}>Your hunts, 1v1s, team games and new stars</div>}</div>
+        <input type="checkbox" checked={st === "on"} disabled={busy} onChange={(e) => (e.target.checked ? turnOn() : turnOff())} aria-label="Alerts on this phone" />
+      </div>
+      {prefs && st === "on" ? (<>
+        <div className="sw"><div><b>Game updates</b><div className="muted" style={{ fontSize: 13 }}>New weeks, approvals, lead changes, 1v1 and team moves, comments</div></div>
+          <input type="checkbox" checked={p.games} onChange={(e) => setPref("games", e.target.checked)} aria-label="Game updates" /></div>
+        <div className="sw"><div><b>Star drops</b><div className="muted" style={{ fontSize: 13 }}>When a new star lands in Lagos</div></div>
+          <input type="checkbox" checked={p.stars} onChange={(e) => setPref("stars", e.target.checked)} aria-label="Star drops" /></div>
+      </>) : null}
+    </>
   );
 }

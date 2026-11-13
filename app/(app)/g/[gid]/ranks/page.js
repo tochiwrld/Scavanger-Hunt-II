@@ -25,7 +25,7 @@ export default function Page() {
               <div className="tile rank"><div className="label">Your pips</div><div className="n">{m.points}<small>pips</small></div></div>
             </div>
           ) : null}
-          {m ? <p className="gap-note" style={{ margin: 0 }}>{m.above ? <><b>{m.gap} point{m.gap === 1 ? "" : "s"}</b> to pass {m.above}</> : m.points > 0 ? <b style={{ color: "var(--primary)" }}>You're in front. Hold on to it.</b> : "Get your first item approved to get on the board."}</p> : null}
+          {m ? <p className="gap-note" style={{ margin: 0 }}>{m.above ? <><b>{m.gap} pip{m.gap === 1 ? "" : "s"}</b> to pass {m.above}</> : m.points > 0 ? <b style={{ color: "var(--primary)" }}>You're in front. Hold on to it.</b> : "Get your first item approved to get on the board."}</p> : null}
           <section className="card">
             <div className="card-title" style={{ alignItems: "flex-start" }}>
               <div><div className={"eyebrow" + (live ? " live" : "")}>{live ? "Live" : settling ? "Closed · reviews still counting" : "Final standings"}</div><h2 style={{ marginTop: 8 }}>{c.title}</h2></div>

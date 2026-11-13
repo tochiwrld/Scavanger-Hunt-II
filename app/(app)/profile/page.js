@@ -97,7 +97,7 @@ export default function Page() {
       <div className="card"><h3>Emails and alerts</h3>
         <div className="sw"><div><b>Game emails</b></div>
           <input type="checkbox" checked={rem} onChange={(e) => toggleRem(e.target.checked)} aria-label="Game emails" /></div>
-        <AlertsToggle />
+        <AlertsToggle prefs />
       </div>
       <div className="card"><h3>Your data</h3>
         <p className="muted">Photos, submissions, comments and 1v1 lists are deleted automatically {RETAIN_DAYS} days after each hunt ends. Only score cards are kept. <Link className="link" href="/privacy">Privacy Policy</Link></p>

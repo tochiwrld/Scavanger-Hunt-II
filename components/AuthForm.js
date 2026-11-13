@@ -53,8 +53,8 @@ function Inner({ mode: startMode }) {
   const form = useForm(async (v) => {
     await api(mode === "login" ? "/auth/login" : "/auth/register", { method: "POST", json: mode === "login" ? v : { ...v, consent: consent.consent } });
     await refreshMe();
-    if (mode === "login") toast("Welcome back, hunter! 🎯", "good");
-    router.push(next || (mode === "register" ? "/start" : "/"));
+    toast(mode === "login" ? "Welcome back, hunter! 🎯" : "Welcome to PrimaHunt! 🎯", "good");
+    router.push(next || "/");
   });
   // The header button takes you down to the form instead of leaving you at the top of the page.
   const q = next ? "?next=" + encodeURIComponent(next) : "";

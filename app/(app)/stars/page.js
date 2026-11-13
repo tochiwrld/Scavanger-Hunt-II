@@ -76,7 +76,7 @@ function DropStar({ stars, me, onDone }) {
   };
   return (
     <section className="card stack" style={{ borderColor: "color-mix(in oklch,var(--primary) 40%,var(--border))" }}>
-      <div><div className="eyebrow">PrimaHunt admin</div><h2 style={{ marginTop: 6 }}>Drop a star</h2><p className="muted" style={{ margin: "6px 0 0" }}>Tap the map where the star goes. Pick public, safe places people can walk to. Everyone with star alerts on gets a notification straight away.</p></div>
+      <div><div className="eyebrow">PrimaHunt admin</div><h2 style={{ marginTop: 6 }}>Drop a star</h2><p className="muted" style={{ margin: "6px 0 0" }}>Tap the map where the star goes. Pick public, safe places people can walk to. Everyone with alerts on (and Star drops kept on) gets a notification straight away.</p></div>
       <StarMap stars={stars} me={me} pending={spot} onMapTap={setSpot} center={spot ? { ...spot, zoom: 15 } : null} style={{ height: 320, borderRadius: 16 }} />
       <div className="row wrap" style={{ gap: 8 }}>
         <button className="btn ghost" type="button" onClick={() => me ? setSpot({ lat: me.lat, lon: me.lon }) : toast("Turn on location first", "bad")}><Icon n="locate" size={16} />Use where I am</button>

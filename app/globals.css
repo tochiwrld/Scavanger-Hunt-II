@@ -569,10 +569,11 @@ button.slot.filled{border:1.5px solid var(--primary)}
 /* Bottom bar: Hunts · VS · [star] · Join · Profile */
 .nav{align-items:flex-end}
 .nav .star-slot{flex:1;min-width:0;height:60px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;position:relative}
-.nav .star-slot .lbl{font-size:12px;font-weight:700;color:var(--primary);padding-bottom:6px}
-.star-btn{position:absolute;bottom:18px;width:64px;height:64px;border-radius:22px;border:4px solid var(--bg);background:var(--primary);color:var(--primary-fg);display:grid;place-items:center;cursor:pointer;
+.nav .star-slot .lbl{font-size:12px;line-height:16px;font-weight:700;color:var(--primary);padding-bottom:8px}
+.star-btn{position:absolute;left:50%;bottom:26px;margin-left:-29px;width:58px;height:58px;border-radius:20px;border:4px solid var(--bg);background:var(--primary);color:var(--primary-fg);display:grid;place-items:center;cursor:pointer;
   box-shadow:0 10px 26px -6px oklch(88% .18 95 / .55);transition:transform 160ms var(--ease-out)}
 .star-btn:active{transform:scale(.94)}
+.star-btn svg{display:block;transform:translateY(.5px)}
 .star-btn .badge{position:absolute;top:-8px;right:-8px;min-width:20px;height:20px;border-radius:99px;background:var(--danger);color:#fff;font:700 11px/20px var(--font-body);border:3px solid var(--bg);box-sizing:content-box;padding:0 3px}
 @keyframes starPulse{0%{box-shadow:0 0 0 0 oklch(88% .18 95 / .5)}100%{box-shadow:0 0 0 16px oklch(88% .18 95 / 0)}}
 .star-btn.ping{animation:starPulse 1.6s var(--ease-out) infinite}
@@ -655,3 +656,12 @@ html.light .sh-map .leaflet-tile-pane{filter:none}
 .sh-geo b{font-size:15px}
 .sh-geo span{opacity:.85}
 .sh-geo .btn{margin-top:4px}
+/* Hunt header on phones: the hunt switcher shrinks to a chevron so the name gets the room and never breaks mid-word */
+.ghead .grow{min-width:0}
+.gname{overflow-wrap:break-word;hyphens:manual}
+@media (max-width:480px){
+  .ghead{gap:12px}
+  .ghead select{flex:none;width:44px;max-width:44px;padding:0;color:transparent;background-position:center;text-indent:-999px}
+  .ghead select option{color:var(--fg);background:var(--card)}
+  .gname{font-size:19px}
+}
