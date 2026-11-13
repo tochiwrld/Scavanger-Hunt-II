@@ -197,24 +197,33 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
     const move = (e) => { if (!drag) return; dragH = (drag.h - (e.clientX - drag.x) * 0.25 + 360) % 360; dragP = Math.max(-60, Math.min(60, drag.p + (e.clientY - drag.y) * 0.25)); };
     const up = () => (drag = null);
     cv.addEventListener("pointerdown", down); cv.addEventListener("pointermove", move); cv.addEventListener("pointerup", up);
-    cv.addEventListener("click", () => { if (!$("catch").disabled) L.doCatch(); });
+    cv.addEventListener("click", () => { if (L.ready) L.doCatch(); });
 
     L.newPractice = () => { lock = null; sightT = 0; practiceBearing = ((pose ? poseHeading(pose) : dragH) + 60 + Math.random() * 120) % 360; practiceElev = 2 + Math.random() * 8; };
+    const say = (msg, ms = 5000) => {
+      const h = $("hint"); if (!h) return;
+      h.textContent = msg; h.dataset.err = "1";
+      clearTimeout(say.t); say.t = setTimeout(() => { delete h.dataset.err; }, ms);
+    };
+    let busy = false;
     L.doCatch = async () => {
-      if (catching) return;
+      if (catching || busy) return;
+      if (!L.ready) { say(L.why || "Point your camera at the star first.", 3500); navigator.vibrate?.(40); return; }
       const fx = catchFx(); // made inside the tap, so iPhones allow the sound
       const real = L.mode === "real" && L.target;
       if (real) {
         const f = L.fix;
+        busy = true; say("Catching…", 15000);
         try {
           await ping(); // one last check-in right at the star
           const r = await api(`/stars/${L.target.id}/catch`, { method: "POST", json: { lat: f.lat, lon: f.lon, acc: f.acc, trail: L.trail && L.trail.star === L.target.id ? L.trail.token : null } });
+          const h = $("hint"); if (h) delete h.dataset.err;
           burst(); fx(); setTimeout(() => !dead && setWon({ pips: r.pips, name: r.name, me: r.me, real: true }), 650);
           onCaught?.(L.target.id, r.me);
         } catch (e) {
-          const h = $("hint"); h.textContent = e.message; h.dataset.err = "1";
-          setTimeout(() => { delete h.dataset.err; }, 6000);
+          say(e.message || "That didn't work. Try again.", 7000);
         }
+        busy = false;
         return;
       }
       burst(); fx(); setTimeout(() => !dead && setWon({ pips: 0, real: false }), 650);
@@ -291,8 +300,14 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
 
       const inSight = Boolean(lock) || seen;
       const ready = inSight && close && !catching;
+      // The button is never switched off (a tap must always do something); it lights up when a catch will work,
+      // and otherwise the tap explains what's missing.
+      L.ready = ready;
+      L.why = real
+        ? (!L.target ? "No star picked yet. Open the map and choose one." : !fix ? "Still finding your location…" : !close ? `You're ${fmtDist(dist)} away. Get within ${L.target.radius_m} m to catch it.` : "Point your camera at the star first, so it's in the middle.")
+        : "Point your camera at the star first, so it's in the middle.";
       $("ret").classList.toggle("lock", ready);
-      $("catch").disabled = !ready;
+      $("catch").classList.toggle("on", ready);
       const rel = wrap180(bearing - camH);
       // Arrow: towards the star on screen when it's in front of you, otherwise left/right by compass.
       const arrowDeg = pr.ahead && Math.abs(x - cx) < W && Math.abs(y - cy) < H ? Math.atan2(x - cx, cy - y) * 180 / Math.PI : rel;
@@ -310,7 +325,7 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
         $("dist").textContent = inSight ? "Got it in sight" : Math.abs(rel) > 90 ? "Behind you" : "Close by";
         $("dir").textContent = lock ? "Locked on! Tap the star button" : inSight ? "Hold steady…" : turnText(rel);
         $("sub").textContent = "Practice · no pips";
-        $("hint").textContent = hasMotion ? "Move your phone to look around" : "Drag to look around";
+        if (!$("hint").dataset.err) $("hint").textContent = hasMotion ? "Move your phone to look around" : "Drag to look around";
       }
       raf = requestAnimationFrame(loop);
     };
@@ -387,7 +402,7 @@ export default function StarHunt({ stars, target, onTarget, onClose, onOpenMap, 
           <div className="sh-dial"><svg data-k="arrow" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l6 18-6-4-6 4z" fill="oklch(88% .18 95)" /></svg></div>
           <div><b data-k="dist">Finding you…</b><small data-k="dir">Move your phone to look around</small></div>
         </div>
-        <button className="sh-catch" data-k="catch" disabled aria-label="Catch the star" onClick={() => live.current.doCatch?.()}><Icon n="star" size={30} /></button>
+        <button type="button" className="sh-catch" data-k="catch" aria-label="Catch the star" onClick={() => live.current.doCatch?.()}><Icon n="star" size={30} /></button>
         <div className="sh-hint" data-k="hint" />
       </div>
       {won ? (
