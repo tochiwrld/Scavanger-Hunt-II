@@ -42,9 +42,90 @@ const STEPS = [
   ["trophy", "Top the board by Sunday", WEEK_END_RULE],
 ];
 
+// What's inside, for people who haven't signed up yet.
+const FEATURES = [
+  ["hunt", "The weekly hunt", "A fresh list every Monday. Find it, snap it, top the board by Sunday."],
+  ["star", "Star hunt", "Stars hidden at real spots around Lagos. Get there, point your camera, catch it."],
+  ["swords", "1v1", "Send a friend a link. You each write a list for the other. Fastest finder wins."],
+  ["team", "Team vs", "Squad up, 2 to 6 a side, and race another crew's list."],
+  ["flame", "Daily streak", "One new item every day. Keep the streak alive."],
+  ["globe", "Global rank", "Every pip counts on the all-Lagos leaderboard. Hunter of the week gets a badge."],
+];
+// A made-up week, labelled as an example, so newcomers can see what playing looks like.
+const SAMPLE_ITEMS = [
+  ["A keke with a name painted on it", "hard", 15],
+  ["A mural you've never noticed before", "medium", 10],
+  ["Suya spot with a queue", "easy", 5],
+  ["Someone in full agbada on a weekday", "hard", 15],
+  ["A danfo sticker that made you laugh", "medium", 10],
+];
+const SAMPLE_BOARD = [["Zainab", 85], ["Tobi", 70], ["Chidi", 65], ["You?", 0]];
+
+function Showcase({ onStart }) {
+  return (
+    <div className="showcase">
+      <section>
+        <div className="eyebrow">What's inside</div>
+        <h2 className="sc-h">More than a weekly list</h2>
+        <div className="feat-grid">
+          {FEATURES.map(([ic, t, d]) => (
+            <div key={t} className="card feat"><span className="ico"><Icon n={ic} size={20} /></span><b>{t}</b><span className="muted">{d}</span></div>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <div className="eyebrow">A peek inside <span className="ex-tag">Example</span></div>
+        <h2 className="sc-h">This is what a week looks like</h2>
+        <div className="card peek">
+          <div className="peek-hd"><span>THIS WEEK'S LIST</span><span className="mono">5 items</span></div>
+          {SAMPLE_ITEMS.map(([t, diff, p]) => (
+            <div key={t} className="peek-row"><span className={"dot " + diff} aria-hidden="true" /><span className="grow">{t}</span><span className="pts">{p} PIPS</span></div>
+          ))}
+        </div>
+        <div className="peek-two">
+          <div className="card peek">
+            <div className="peek-hd"><span>LEADERBOARD</span><Icon n="trophy" size={16} /></div>
+            {SAMPLE_BOARD.map(([n, p], i) => (
+              <div key={n} className={"peek-row" + (n === "You?" ? " you" : "")}><span className="rank mono">#{i + 1}</span><span className="grow">{n}</span><span className="pts">{n === "You?" ? "—" : p}</span></div>
+            ))}
+          </div>
+          <div className="card peek post">
+            <div className="peek-hd"><span>HUNT FEED</span><Icon n="chat" size={16} /></div>
+            <div className="post-ph" aria-hidden="true"><Icon n="camera" size={28} /></div>
+            <div className="post-t"><b>Ada</b> found “A keke with a name painted on it”</div>
+            <div className="muted" style={{ fontSize: 13 }}>+15 pips · 💬 Tobi: “Where was this??”</div>
+          </div>
+        </div>
+      </section>
+
+      <section className="card stakes">
+        <div className="ico"><Icon n="trophy" size={22} /></div>
+        <div>
+          <h3>Play for real stakes</h3>
+          <p className="muted">Friends' hunts can put up a <b>cash prize</b>, set and paid by the hunt's admin. Every week someone takes the crown, and the best hunter in PRIMAHUNT OFFICIAL wins the <b>Hunter of the week</b> badge.</p>
+        </div>
+      </section>
+
+      <section className="card own">
+        <div className="eyebrow">For the organiser in your crew</div>
+        <h2 className="sc-h" style={{ marginTop: 6 }}>Run a hunt for your friends</h2>
+        <ul>
+          <li><Icon n="pencil" size={16} />Write the list: easy, medium, hard and extreme finds</li>
+          <li><Icon n="check" size={16} />Review the photos and approve the pips</li>
+          <li><Icon n="link" size={16} />Invite your crew with one link</li>
+          <li><Icon n="gift" size={16} />Put up a prize if you like. It's free to run.</li>
+        </ul>
+        <button type="button" className="btn block" onClick={onStart}><Icon n="plus" size={18} />Start your own hunt</button>
+      </section>
+    </div>
+  );
+}
+
 function Inner({ mode: startMode }) {
   // Switching between Log in and Create account happens in place (no page change), so the page never jumps back to the top.
   const [mode, setMode] = useState(startMode);
+  const [goAfter, setGoAfter] = useState(null); // "Start your own hunt" sends new admins to set up after sign-up
   const router = useRouter();
   const sp = useSearchParams();
   const next = safeNext(sp.get("next"));
@@ -56,7 +137,7 @@ function Inner({ mode: startMode }) {
     await refreshMe();
     toast(mode === "login" ? "Welcome back, hunter! 🎯" : "Welcome to PrimaHunt! 🎯", "good");
     if (mode === "register") installMoment("register");
-    router.push(next || "/");
+    router.push(next || (mode === "register" && goAfter) || "/");
   });
   // The header button takes you down to the form instead of leaving you at the top of the page.
   const q = next ? "?next=" + encodeURIComponent(next) : "";
@@ -64,6 +145,11 @@ function Inner({ mode: startMode }) {
     e.preventDefault();
     if (m !== mode) { setMode(m); try { window.history.replaceState(null, "", "/" + m + q); } catch {} }
     if (toForm) document.getElementById("account")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+  const startOwn = () => {
+    setGoAfter("/start");
+    if (mode !== "register") { setMode("register"); try { window.history.replaceState(null, "", "/register" + q); } catch {} }
+    document.getElementById("account")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
   const invited = next && next.startsWith("/join/");
   const challenged = next && next.startsWith("/vs/");
@@ -81,15 +167,21 @@ function Inner({ mode: startMode }) {
           <h1 className="headline">Hunt it.<br />Snap <em>it.</em><br />Win the week.</h1>
           <p className="lede">Your city is the game board. Race your crew to the wildest finds, snap the proof, and watch the leaderboard flip in real time. A fresh list drops every Monday — and by Sunday, someone owns the bragging rights.</p>
           {invited || challenged ? null : <InviteBox />}
+          <div className="hero-ctas">
+            <a className="btn" href={"/register" + q} onClick={switchTo("register", true)}>Create free account<Icon n="arrow" size={17} /></a>
+            <a className="btn ghost" href={"/login" + q} onClick={switchTo("login", true)}>Log in</a>
+          </div>
           <div className="closes"><div className="label" style={{ color: "oklch(85% .015 275)" }}>Free to play</div><div className="v">No entry fees, ever. Just friends, phones and bragging rights.</div></div>
         </div>
       </section>
 
       <div className="auth-body">
+        {invited || challenged ? null : <Showcase onStart={startOwn} />}
         <section className="card" id="account">
           {deleted ? <div className="card mist flat" style={{ marginBottom: 16 }}>Your account and its data have been deleted.</div> : null}
           {invited ? <div className="card mist flat" style={{ marginBottom: 16 }}>You've been invited to a hunt. {mode === "login" ? "Log in" : "Create an account"} to join it.</div> : null}
           {challenged ? <div className="card mist flat" style={{ marginBottom: 16 }}>You've been challenged to a 1v1. {mode === "login" ? "Log in" : "Create an account"} to accept it.</div> : null}
+          {goAfter && mode === "register" && !invited && !challenged ? <div className="card mist flat" style={{ marginBottom: 16 }}>Create your account, then you'll set up your hunt.</div> : null}
           <div className="tabs" style={{ marginBottom: 18 }}>
             <Link className={"tab" + (mode === "login" ? " on" : "")} href={"/login" + q} onClick={switchTo("login")}>Log in</Link>
             <Link className={"tab" + (mode === "register" ? " on" : "")} href={"/register" + q} onClick={switchTo("register")}>Create account</Link>

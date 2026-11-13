@@ -17,17 +17,20 @@ export function useConsent() {
   const view = (
     <fieldset className="consent">
       <legend>Privacy acknowledgement</legend>
-      <p className="muted">Please read the <Link className="link" href="/privacy" target="_blank">Privacy Policy</Link> and the <Link className="link" href="/terms" target="_blank">Terms</Link>. By ticking the box below you confirm that:</p>
-      <ul className="consent-list">
-        {CONSENT_ITEMS.map(([k, label]) => (
-          <li key={k}>{k === "policy" ? <>I have read and agree to the <Link className="link" href="/privacy" target="_blank">Privacy Policy</Link>.</>
-            : k === "terms" ? <>I agree to the <Link className="link" href="/terms" target="_blank">Terms</Link>: I play at my own risk, I'll stay safe and within the law, I won't post or set anything dangerous or illegal, and PrimaHunt isn't responsible for what players or hunt admins do.</>
-            : label}</li>
-        ))}
-      </ul>
+      <p className="consent-sum">You're 18+, you play safely, your photos are seen by your hunt and deleted {RETAIN_DAYS} days after it ends, you join PRIMAHUNT OFFICIAL (leave any time), and your data is stored with our providers abroad. See the <Link className="link" href="/privacy" target="_blank">Privacy Policy</Link> and <Link className="link" href="/terms" target="_blank">Terms</Link>.</p>
+      <details className="consent-more">
+        <summary>Read all {CONSENT_ITEMS.length} statements</summary>
+        <ul className="consent-list">
+          {CONSENT_ITEMS.map(([k, label]) => (
+            <li key={k}>{k === "policy" ? <>I have read and agree to the <Link className="link" href="/privacy" target="_blank">Privacy Policy</Link>.</>
+              : k === "terms" ? <>I agree to the <Link className="link" href="/terms" target="_blank">Terms</Link>: I play at my own risk, I'll stay safe and within the law, I won't post or set anything dangerous or illegal, and PrimaHunt isn't responsible for what players or hunt admins do.</>
+              : label}</li>
+          ))}
+        </ul>
+      </details>
       <label className="consent-row consent-all">
         <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} required />
-        <span><b>I've read all of the above and I agree.</b></span>
+        <span><b>I agree to all {CONSENT_ITEMS.length} statements, the Privacy Policy and the Terms.</b></span>
       </label>
     </fieldset>
   );
