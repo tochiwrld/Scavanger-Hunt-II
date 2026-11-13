@@ -5,7 +5,7 @@ import { useApp } from "./Providers.js";
 import Icon from "./icons.js";
 import { Sheet } from "./ui.js";
 import {
-  canPromptInstall, countVisit, initInstall, isStandalone, markShown, mayAsk, onInstallChange,
+  canPromptInstall, countVisit, initInstall, isStandalone, markInstalled, markShown, mayAsk, onInstallChange,
   platform, promptInstall, snooze, takeMoment,
 } from "../lib/install.js";
 
@@ -32,11 +32,13 @@ export default function InstallManager() {
 
   useEffect(() => {
     if (!me?.id) return undefined;
+    // Installed on any phone: no more home screen suggestions anywhere, even in a normal browser tab.
+    if (me.installed || isStandalone()) { markInstalled(); takeMoment(); return undefined; }
     let t = 0;
     const show = (kind) => {
       clearTimeout(t);
       t = setTimeout(() => {
-        if (!mayAsk() || busyScreen()) return;
+        if (!mayAsk() || busyScreen() || me.installed) return;
         markShown();
         setOpen(kind === "register" || kind === "join" ? "welcome" : "pip");
       }, kind === "register" || kind === "join" ? 900 : 1600);
@@ -47,7 +49,8 @@ export default function InstallManager() {
     const on = (e) => { takeMoment(); show(e.detail); };
     window.addEventListener("ph:moment", on);
     return () => { clearTimeout(t); window.removeEventListener("ph:moment", on); };
-  }, [me?.id]);
+  }, [me?.id, me?.installed]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (me?.installed) setOpen(null); }, [me?.installed]);
 
   if (!open) return null;
   return <InstallSheet variant={open} onClose={(later) => { if (later) snooze(); setOpen(null); }} />;
