@@ -2,6 +2,10 @@
 const nextConfig = {
   serverExternalPackages: ["pg", "nodemailer"],
   poweredByHeader: false,
+  // The old vercel.app address sends visitors (and Google) to primahunt.com. The API is left alone so the cron keeps working.
+  async redirects() {
+    return [{ source: "/:path((?!api/).*)", has: [{ type: "host", value: "weekly-hunt.vercel.app" }], destination: "https://primahunt.com/:path", permanent: true }];
+  },
   async headers() {
     return [{ source: "/sw.js", headers: [{ key: "Cache-Control", value: "no-cache" }, { key: "Service-Worker-Allowed", value: "/" }] }, { source: "/(.*)", headers: [
       { key: "X-Content-Type-Options", value: "nosniff" },

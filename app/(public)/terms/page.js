@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Brand, ThemeToggle } from "../../../components/Brand.js";
 import { PRIVACY_CONTACT, PRIVACY_VERSION, WEEK_END_RULE } from "../../../lib/shared.js";
 
-export const metadata = { title: "Terms and safety · PrimaHunt", description: "The rules for playing and running hunts on PrimaHunt, and who is responsible for what." };
+export const metadata = { title: "Terms and safety · PrimaHunt", description: "The rules for playing and running hunts on PrimaHunt, and who is responsible for what.", alternates: { canonical: "/terms" } };
 
 const Mail = () => <a className="link" href={`mailto:${PRIVACY_CONTACT}?subject=PrimaHunt%20report`}>{PRIVACY_CONTACT}</a>;
 

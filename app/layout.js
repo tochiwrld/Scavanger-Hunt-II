@@ -9,12 +9,17 @@ const bodyFont = Inter({ subsets: ["latin"], variable: "--nf-body", display: "sw
 const mono = Space_Mono({ subsets: ["latin"], weight: ["400", "700"], variable: "--nf-mono", display: "swap" });
 import Providers from "../components/Providers.js";
 
-const SITE = (process.env.APP_URL || "https://weekly-hunt.vercel.app").replace(/\/$/, "");
+// The real address. Search engines and link previews always get primahunt.com, even on the old vercel.app address.
+const SITE = "https://primahunt.com";
 // Link previews (WhatsApp, iMessage, X, Slack...). Invite and 1v1 links override the title and description.
 export const metadata = {
   metadataBase: new URL(SITE),
-  title: "PrimaHunt",
-  description: "The weekly scavenger hunt for your crew. Hunt it. Snap it. Win the week.",
+  title: { default: "PrimaHunt · Weekly scavenger hunt game in Lagos", template: "%s" },
+  description: "PrimaHunt is a free weekly scavenger hunt game for friends in Lagos. Snap photos of the week's items, catch stars around the city, challenge friends 1v1 and climb the leaderboard. Hunt it. Snap it. Win the week.",
+  applicationName: "PrimaHunt",
+  keywords: ["PrimaHunt", "scavenger hunt", "scavenger hunt game", "Lagos", "Nigeria", "photo hunt", "weekly challenge", "games with friends"],
+  alternates: { canonical: "/" },
+  verification: { google: "geE_ONWqRPdxdkiQEiblLaxrIaRlsa5_gdSdWG9lgmA" },
   openGraph: {
     type: "website", siteName: "PrimaHunt", url: "/", locale: "en_NG",
     title: "PrimaHunt · Hunt it. Snap it. Win the week.",

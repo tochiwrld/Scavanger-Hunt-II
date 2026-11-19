@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Brand, ThemeToggle } from "../../../components/Brand.js";
 import { PRIVACY_CONTACT, PRIVACY_VERSION, RETAIN_DAYS, WEEK_END_RULE } from "../../../lib/shared.js";
 
-export const metadata = { title: "Privacy Policy · PrimaHunt", description: "How PrimaHunt collects, uses, stores and deletes your data." };
+export const metadata = { title: "Privacy Policy · PrimaHunt", description: "How PrimaHunt collects, uses, stores and deletes your data.", alternates: { canonical: "/privacy" } };
 
 const UPDATED = "13 November 2026";
 const Mail = () => <a className="link" href={`mailto:${PRIVACY_CONTACT}?subject=Hunt%20Week%20privacy`}>{PRIVACY_CONTACT}</a>;
