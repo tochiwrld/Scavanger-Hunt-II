@@ -21,7 +21,9 @@ export default function StarMap({ stars = [], me = null, target = null, pending 
       if (dead || !box.current || map.current) return;
       const m = L.map(box.current, { zoomControl: interactive, attributionControl: interactive, dragging: interactive, touchZoom: interactive, scrollWheelZoom: interactive, doubleClickZoom: interactive, boxZoom: false, keyboard: interactive, tap: false })
         .setView(center ? [center.lat, center.lon] : LAGOS, zoom);
-      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(m);
+      // OpenStreetMap refuses tiles without a Referer, and the site sends none by default (Referrer-Policy: same-origin).
+      // Send just our origin (https://primahunt.com/) with tile requests: no page path, nothing about the player.
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, referrerPolicy: "strict-origin-when-cross-origin", attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(m);
       layer.current = L.layerGroup().addTo(m);
       m.on("click", (e) => tapRef.current?.({ lat: e.latlng.lat, lon: e.latlng.lng }));
       map.current = m;
