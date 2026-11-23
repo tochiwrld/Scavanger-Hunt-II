@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { api, burst, fmtDate, fmtMinutes, pad2 } from "../../../../lib/client.js";
 import { useApp } from "../../../../components/Providers.js";
 import Icon from "../../../../components/icons.js";
+import QrButton from "../../../../components/Qr.js";
 import ReviewCard from "../../../../components/ReviewCard.js";
 import SubmitSheet from "../../../../components/SubmitSheet.js";
 import FindPost from "../../../../components/FindPost.js";
@@ -158,7 +159,7 @@ function NameTeam({ m, current, onClose, onSaved }) {
   );
 }
 
-function ShareLink({ title, link, text, note }) {
+function ShareLink({ title, link, text, note, qrTitle, qrSub }) {
   const { toast } = useApp();
   const copy = async () => { try { await navigator.clipboard.writeText(link); toast("Link copied", "good"); } catch { window.prompt("Copy this link:", link); } };
   const share = async () => { if (navigator.share) { try { await navigator.share({ title: "PrimaHunt Team vs", text, url: link }); } catch {} } else copy(); };
@@ -170,6 +171,7 @@ function ShareLink({ title, link, text, note }) {
       <div className="row" style={{ gap: 8 }}>
         <button className="btn grow" onClick={copy}><Icon n="copy" size={18} />Copy</button>
         <button className="btn grow ghost" onClick={share}><Icon n="share" size={18} />Share</button>
+        <QrButton link={link} title={qrTitle} sub={qrSub} className="btn ghost" label="QR" />
       </div>
     </div>
   );
@@ -194,8 +196,10 @@ function Links({ d, reload }) {
   return (
     <section className="card stack">
       {m.rival_token ? <ShareLink title="1. Send the rival link" link={`${origin}/t/${m.rival_token}`} text={`I challenge your team to a ${m.size}v${m.size}!`}
+        qrTitle="Team vs: captain wanted" qrSub="Scan to captain the rival team. First scan only."
         note="Send this to the other team's captain. It works for one person only: whoever accepts first captains the other team." /> : null}
       {m.mate_token ? <ShareLink title={`${m.rival_token ? "2. " : ""}Bring in your teammates`} link={`${origin}/t/${m.mate_token}`} text={`Join my team for a ${m.size}v${m.size} on PrimaHunt!`}
+        qrTitle={`Join ${us.name}`} qrSub={`Scan to join ${us.name} for the ${m.size}v${m.size}`}
         note={`Only for ${us.name}. ${m.size - us.members.length} spot${m.size - us.members.length === 1 ? "" : "s"} left. The link stops working once the team is full.`} /> : null}
       {!m.mate_token ? <p className="muted" style={{ margin: 0 }}>✅ {us.name} is full.</p> : null}
       {m.captain ? <Btn busy={busy} className="block ghost" onClick={cancel} style={{ color: "var(--danger)" }}>Call off the match</Btn>

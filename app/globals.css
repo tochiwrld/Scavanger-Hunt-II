@@ -740,3 +740,10 @@ html.light .sh-map .leaflet-tile-pane{filter:none}
 .consent-more{margin:0 0 4px}
 .consent-more summary{cursor:pointer;font-size:14px;font-weight:600;color:var(--primary);padding:4px 0;list-style:revert}
 .consent-more .consent-list{margin-top:8px}
+
+/* QR invite sheet: always black on white so any camera reads it, in dark or light mode */
+.qr-sheet{text-align:center;padding-top:6px}
+.qr-box{background:#fff;border-radius:20px;padding:14px;margin:18px auto 12px;width:fit-content;max-width:100%;box-shadow:0 0 0 1px var(--border)}
+.qr-svg{display:block;width:min(300px,72vw);height:auto;image-rendering:pixelated}
+.qr-note{font-size:13px;margin:0 auto 14px;max-width:360px}
+.qr-sheet .btn+.btn{margin-top:8px}

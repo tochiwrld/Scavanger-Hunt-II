@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { api, burst, fmtDate, fmtMinutes, pad2 } from "../../../../lib/client.js";
 import { useApp } from "../../../../components/Providers.js";
 import Icon from "../../../../components/icons.js";
+import QrButton from "../../../../components/Qr.js";
 import ReviewCard from "../../../../components/ReviewCard.js";
 import SubmitSheet from "../../../../components/SubmitSheet.js";
 import FindPost from "../../../../components/FindPost.js";
@@ -134,6 +135,7 @@ function Waiting({ duel, reload }) {
       <div className="inset mono" style={{ wordBreak: "break-all", fontSize: 13 }}>{link}</div>
       <button className="btn block" onClick={copy}><Icon n="copy" size={18} />Copy link</button>
       <button className="btn block ghost" onClick={share}><Icon n="share" size={18} />Share</button>
+      <QrButton link={link} title="1v1 me on PrimaHunt" sub="Scan to accept the 1v1. First scan only." />
       <Btn busy={busy} className="block ghost" onClick={cancel} style={{ color: "var(--danger)" }}>Call it off</Btn>
     </section>
   );

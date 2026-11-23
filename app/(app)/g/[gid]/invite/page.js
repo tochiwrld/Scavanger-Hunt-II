@@ -4,6 +4,7 @@ import { useState } from "react";
 import { api, fmtDate } from "../../../../../lib/client.js";
 import { useApp } from "../../../../../components/Providers.js";
 import { Async, Btn, useApi } from "../../../../../components/ui.js";
+import QrButton from "../../../../../components/Qr.js";
 
 export default function Page() {
   const { gid } = useParams();
@@ -28,7 +29,8 @@ export default function Page() {
             <div className="card flat" style={{ wordBreak: "break-all", fontWeight: 700 }}>{link}</div>
             <span className={`st ${state === "Active" ? "approved" : "rejected"}`}>{state}{d.expires_at && state === "Active" ? " · expires " + fmtDate(d.expires_at) : ""}</span>
             <button className="btn block" onClick={() => copy(link)}>📋 Copy invite link</button>
-            <button className="btn block ghost" onClick={() => share(link)}>📤 Share</button></div>
+            <button className="btn block ghost" onClick={() => share(link)}>📤 Share</button>
+            {state === "Active" ? <QrButton link={link} title={`Join ${g?.name || "my hunt"}`} sub="Scan to join the hunt on PrimaHunt" /> : null}</div>
           {state === "Active" ? (
             <form className="card stack" onSubmit={(e) => { e.preventDefault(); act("mail", async () => { await api(`/groups/${gid}/invite/email`, { method: "POST", json: { email: to } }); toast(`Invite sent to ${to}`, "good"); setTo(""); }); }}>
               <h3>Invite by email</h3><p className="muted">Pip sends them your invite link. We use the address for this one email and don't keep it.</p>
