@@ -5,7 +5,7 @@ import { useApp } from "./Providers.js";
 import Icon from "./icons.js";
 import { Sheet } from "./ui.js";
 import { isFestive, seasonGreeting } from "../lib/client.js";
-import { drawSnow, loadImg } from "./Share.js";
+import { drawSnow, hatOnLetter, loadImg } from "./Share.js";
 
 /** The code itself: black on white with the standard quiet zone, so any phone camera reads it in any theme. */
 export function QrCode({ text, size = 280 }) {
@@ -39,7 +39,7 @@ export async function qrPicture(text, title, sub) {
     drawSnow(x, W, 300, { flakes: 0 });
     x.fillStyle = "#fff"; x.font = `800 64px ${font}`; x.fillText("PrimaHunt", W / 2, 150);
     const hat = await loadImg("/festive/hat.svg");
-    if (hat) { const w = x.measureText("PrimaHunt").width; x.save(); x.translate(W / 2 - w / 2 - 50, 64); x.rotate(-0.28); x.drawImage(hat, 0, 0, 80, 67); x.restore(); }
+    if (hat) { const w = x.measureText("PrimaHunt").width; hatOnLetter(x, hat, "P", W / 2 - w / 2, 150); }
     x.font = `800 50px ${font}`; x.fillText(t, W / 2, 240);
     const holly = (cx, cy, flip) => {
       x.save(); x.translate(cx, cy); x.scale(flip, 1); x.fillStyle = "#1F9D55";

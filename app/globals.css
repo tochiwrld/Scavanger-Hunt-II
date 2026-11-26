@@ -776,8 +776,9 @@ html.festive .top::after{content:"";position:absolute;left:0;right:0;bottom:-8px
 @keyframes ph-twinkle{50%{filter:brightness(1.45) saturate(1.25)}}
 @media (prefers-reduced-motion:reduce){html.festive .top::after{animation:none}}
 /* Santa hat on the logo mark. */
-.brand{position:relative}
-html.festive .brand::before{content:"";position:absolute;left:6px;top:-12px;width:28px;height:23px;background:url(/festive/hat.svg) center/contain no-repeat;transform:rotate(-14deg);pointer-events:none}
+.mk-hat{display:none}
+html.festive .mk-hat{display:inline}
+html.festive .brand .mk{overflow:visible}
 /* Festive touches on the bottom bar and cards. */
 html.festive .star-btn{box-shadow:0 0 0 3px var(--xmas-red),0 0 18px oklch(60% .21 25 / .55)}
 html.festive .tab.on{background:var(--xmas-red);border-color:var(--xmas-red);color:#fff}

@@ -5,6 +5,8 @@ import { isLight, toggleTheme } from "../lib/client.js";
 import Icon from "./icons.js";
 
 /** App mark: brand-colour rounded square, bold P, viewfinder corners framing it. */
+const HAT = '<path d="M14 74C22 40 46 14 78 12c18-1 30 10 30 26-6-8-14-12-22-10 2 16 4 30 6 46z" fill="#D7263D"/><path d="M78 12c18-1 30 10 30 26-6-8-14-12-22-10-2-8-5-12-8-16z" fill="#A31328"/><rect x="6" y="66" width="96" height="22" rx="11" fill="#FFF8EC"/><circle cx="106" cy="42" r="12" fill="#FFF8EC"/>';
+
 export function Mark({ size = 34 }) {
   return (
     <svg className="mk" width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
@@ -13,6 +15,8 @@ export function Mark({ size = 34 }) {
         <path d="M11 22V12h10M43 12h10v10M53 42v10H43M21 52H11V42" />
       </g>
       <text x="32" y="44" textAnchor="middle" fontFamily="var(--font-head)" fontWeight="800" fontSize="34" fill="var(--primary-fg)">P</text>
+      {/* Christmas season only (html.festive): Santa hat with its brim resting on the top of the P. */}
+      <g className="mk-hat" transform="rotate(-10 32 18) translate(16 -6) scale(.29)" dangerouslySetInnerHTML={{ __html: HAT }} />
     </svg>
   );
 }

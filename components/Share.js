@@ -10,6 +10,23 @@ const SNOW = "#FFF8EC";
 /** Loads a picture for the canvas (resolves null if it can't). */
 export const loadImg = (src) => new Promise((r) => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = src; });
 
+/**
+ * Seats the Santa hat on the first letter of a word drawn with fillText at (left, baseline) in the current font:
+ * brim centred on the letter, resting just over its top, tilted a little. Uses the letter's measured size.
+ */
+export function hatOnLetter(x, hat, letter, left, baseline) {
+  const m = x.measureText(letter);
+  const lw = m.width, top = baseline - (m.actualBoundingBoxAscent || lw * 1.2);
+  const capH = baseline - top;
+  const w = lw * 1.55, h = w * (100 / 120);           // hat picture is 120 x 100; brim spans x 6-102, y 66-88
+  const brimX = (54 / 120) * w, brimBottom = (88 / 100) * h;
+  x.save();
+  x.translate(left + lw * 0.52, top + capH * 0.08); // brim centre sits on the letter, just over its top edge
+  x.rotate(-0.17);
+  x.drawImage(hat, -brimX, -brimBottom, w, h);
+  x.restore();
+}
+
 /** Snow cap along the top edge and a sprinkle of snowflakes (Christmas season pictures). */
 export function drawSnow(x, W, H, { cap = true, flakes = 30, color = SNOW } = {}) {
   let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
@@ -54,7 +71,7 @@ export async function resultCard({ kicker, title, line, big, sub }) {
   x.fillStyle = YELLOW; x.fillText("Hunt", 120 + pw, 200);
   if (xmas) {
     const hat = await loadImg("/festive/hat.svg");
-    if (hat) { x.save(); x.translate(104, 112); x.rotate(-0.25); x.drawImage(hat, 0, 0, 96, 80); x.restore(); }
+    if (hat) { x.font = `800 64px ${head}`; hatOnLetter(x, hat, "P", 120, 200); }
   }
   const wrap = (text, font, size, maxW, y, color, lh = 1.08) => {
     x.font = `${font} ${size}px ${font.includes("800") ? head : body}`;
