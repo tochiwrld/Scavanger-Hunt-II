@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import FestiveBanner from "./Festive.js";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useApp } from "./Providers.js";
@@ -53,6 +54,7 @@ export default function AppShell({ children }) {
         </div>
       </header>
       <main id="view">
+        {path === "/" ? <FestiveBanner /> : null}
         {gid && g ? (
           <>
             <section className="ghead" style={{ "--gc": colorFor(g.id) }}>

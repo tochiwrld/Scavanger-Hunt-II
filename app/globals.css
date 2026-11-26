@@ -747,3 +747,43 @@ html.light .sh-map .leaflet-tile-pane{filter:none}
 .qr-svg{display:block;width:min(300px,72vw);height:auto;image-rendering:pixelated}
 .qr-note{font-size:13px;margin:0 auto 14px;max-width:360px}
 .qr-sheet .btn+.btn{margin-top:8px}
+
+/* ---------- Christmas season: html.festive (1 Dec – 7 Jan, Lagos time; set before first paint in app/layout.js) ---------- */
+html.festive{--xmas-red:oklch(60% .21 25);--xmas-green:oklch(64% .15 150);--snow:oklch(98% .01 90 / .85)}
+html.light.festive{--snow:oklch(78% .04 245 / .7)}
+html.festive body{background-image:radial-gradient(var(--dots) 1px,transparent 1px),
+  radial-gradient(70vmax 45vmax at 0% 0%,oklch(60% .21 25 / .11),transparent 70%),
+  radial-gradient(70vmax 45vmax at 100% 100%,oklch(64% .15 150 / .11),transparent 70%);
+  background-size:22px 22px,100% 100%,100% 100%}
+/* Gentle snowfall: one fixed layer, no clicks blocked, still for anyone who prefers less motion. */
+html.festive body::after{content:"";position:fixed;left:0;right:0;top:-320px;bottom:0;pointer-events:none;z-index:25;opacity:.55;
+  background-image:radial-gradient(circle,var(--snow) 1.6px,transparent 2.2px),radial-gradient(circle,var(--snow) 1.2px,transparent 1.8px),radial-gradient(circle,var(--snow) 2px,transparent 2.6px),
+    radial-gradient(circle,var(--snow) 1.3px,transparent 1.9px),radial-gradient(circle,var(--snow) 1.7px,transparent 2.3px);
+  background-size:310px 310px,230px 230px,410px 410px,170px 170px,270px 270px;
+  background-position:20px 40px,140px 90px,260px 10px,60px 150px,200px 220px;
+  animation:ph-snow 26s linear infinite}
+@keyframes ph-snow{to{background-position:80px 350px,100px 320px,330px 420px,40px 320px,250px 490px}}
+@media (prefers-reduced-motion:reduce){html.festive body::after{animation:none}}
+/* String of lights under the header. */
+html.festive .top{border-bottom-color:transparent}
+html.festive .top::after{content:"";position:absolute;left:0;right:0;bottom:-8px;height:14px;pointer-events:none;
+  background:linear-gradient(var(--border),var(--border)) 0 2px/100% 1px no-repeat,
+    radial-gradient(circle at 50% 62%,var(--xmas-red) 3.4px,transparent 4.2px) 0 0/56px 14px repeat-x,
+    radial-gradient(circle at 50% 62%,var(--primary) 3.4px,transparent 4.2px) 14px 0/56px 14px repeat-x,
+    radial-gradient(circle at 50% 62%,var(--xmas-green) 3.4px,transparent 4.2px) 28px 0/56px 14px repeat-x,
+    radial-gradient(circle at 50% 62%,var(--info) 3.4px,transparent 4.2px) 42px 0/56px 14px repeat-x;
+  animation:ph-twinkle 1.8s steps(1) infinite}
+@keyframes ph-twinkle{50%{filter:brightness(1.45) saturate(1.25)}}
+@media (prefers-reduced-motion:reduce){html.festive .top::after{animation:none}}
+/* Santa hat on the logo mark. */
+.brand{position:relative}
+html.festive .brand::before{content:"";position:absolute;left:6px;top:-12px;width:28px;height:23px;background:url(/festive/hat.svg) center/contain no-repeat;transform:rotate(-14deg);pointer-events:none}
+/* Festive touches on the bottom bar and cards. */
+html.festive .star-btn{box-shadow:0 0 0 3px var(--xmas-red),0 0 18px oklch(60% .21 25 / .55)}
+html.festive .tab.on{background:var(--xmas-red);border-color:var(--xmas-red);color:#fff}
+/* Pip's greeting on My hunts. */
+.xmas-banner{display:flex;align-items:center;gap:12px;margin:0 0 14px;padding:14px 14px 14px 16px;border-radius:var(--r);
+  background:linear-gradient(120deg,oklch(60% .21 25 / .22),oklch(64% .15 150 / .18));border:1px solid oklch(60% .21 25 / .45)}
+.xmas-banner b{display:block;font:800 17px/1.15 var(--font-head);letter-spacing:-.02em}
+.xmas-banner span{display:block;color:var(--muted-fg);font-size:14px;margin-top:3px}
+.xmas-banner .x{flex:none;width:34px;height:34px;border-radius:10px;background:var(--raised);border:1px solid var(--border);color:var(--fg);font-size:20px;line-height:1;cursor:pointer}

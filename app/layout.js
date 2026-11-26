@@ -8,6 +8,7 @@ const head = Bricolage_Grotesque({ subsets: ["latin"], weight: ["600", "800"], v
 const bodyFont = Inter({ subsets: ["latin"], variable: "--nf-body", display: "swap" });
 const mono = Space_Mono({ subsets: ["latin"], weight: ["400", "700"], variable: "--nf-mono", display: "swap" });
 import Providers from "../components/Providers.js";
+import { FESTIVE_JS } from "../lib/season.js";
 
 // The real address. Search engines and link previews always get primahunt.com, even on the old vercel.app address.
 const SITE = "https://primahunt.com";
@@ -36,7 +37,8 @@ export const viewport = {
 
 const HERO = "https://iwljafkilkizabmgczjn.supabase.co/storage/v1/object/public/site/hero.jpg";
 // Runs before first paint so the saved theme never flashes. Dark is the default.
-const THEME = `try{var t=localStorage.getItem('theme');if(t==='light')document.documentElement.classList.add('light')}catch(e){}`;
+// Also switches on the Christmas look (html.festive) from 1 Dec to 7 Jan; ?festive=1 / ?festive=0 previews or hides it, ?festive=auto resets.
+const THEME = `try{var h=document.documentElement,t=localStorage.getItem('theme');if(t==='light')h.classList.add('light');var q=new URLSearchParams(location.search).get('festive');if(q==='1'||q==='0'){localStorage.setItem('ph-festive',q);document.cookie='ph-festive='+q+';path=/;max-age=2592000;samesite=lax'}if(q==='auto'){localStorage.removeItem('ph-festive');document.cookie='ph-festive=;path=/;max-age=0'}var f=localStorage.getItem('ph-festive');if(f==='1'||(f!=='0'&&(${FESTIVE_JS})()))h.classList.add('festive')}catch(e){}`;
 
 export default function RootLayout({ children }) {
   return (
