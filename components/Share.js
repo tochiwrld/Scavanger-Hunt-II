@@ -2,8 +2,28 @@
 import { useState } from "react";
 import { useApp } from "./Providers.js";
 import Icon from "./icons.js";
+import { isFestive, seasonGreeting } from "../lib/client.js";
 
 const YELLOW = "#FFD21F", INK = "#16141F", PAPER = "#F5F3FF", MUTE = "#A8A3BF";
+const SNOW = "#FFF8EC";
+
+/** Loads a picture for the canvas (resolves null if it can't). */
+export const loadImg = (src) => new Promise((r) => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = src; });
+
+/** Snow cap along the top edge and a sprinkle of snowflakes (Christmas season pictures). */
+export function drawSnow(x, W, H, { cap = true, flakes = 30, color = SNOW } = {}) {
+  let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  x.fillStyle = color; x.globalAlpha = 0.6;
+  for (let i = 0; i < flakes; i++) { // only in the side margins, so they never sit behind text
+    const side = rnd() < 0.5, px = side ? 14 + rnd() * 80 : W - 94 + rnd() * 80;
+    x.beginPath(); x.arc(px, 120 + rnd() * (H - 260), 3 + rnd() * 5, 0, Math.PI * 2); x.fill();
+  }
+  x.globalAlpha = 1;
+  if (!cap) return;
+  x.beginPath(); x.moveTo(0, 0); x.lineTo(W, 0); x.lineTo(W, 46);
+  for (let px = W; px > 0; px -= 90) { x.quadraticCurveTo(px - 22, 46 + (px / 90 % 2 ? 34 : 18), px - 45, 46); x.quadraticCurveTo(px - 68, 30, px - 90, 46); }
+  x.closePath(); x.fill();
+}
 
 /** Finished result as a 1080x1350 picture (Instagram/WhatsApp status size) in PrimaHunt's colours. */
 export async function resultCard({ kicker, title, line, big, sub }) {
@@ -18,6 +38,8 @@ export async function resultCard({ kicker, title, line, big, sub }) {
   const g = x.createRadialGradient(W * 0.85, H * 0.1, 40, W * 0.85, H * 0.1, 900);
   g.addColorStop(0, "rgba(255,210,31,.22)"); g.addColorStop(1, "rgba(255,210,31,0)");
   x.fillStyle = g; x.fillRect(0, 0, W, H);
+  const xmas = isFestive();
+  if (xmas) drawSnow(x, W, H);
   // Viewfinder corners: the brand frame.
   x.strokeStyle = YELLOW; x.lineWidth = 12; x.lineCap = "square";
   const m = 56, L = 110;
@@ -30,6 +52,10 @@ export async function resultCard({ kicker, title, line, big, sub }) {
   x.fillStyle = PAPER; x.fillText("Prima", 120, 200);
   const pw = x.measureText("Prima").width;
   x.fillStyle = YELLOW; x.fillText("Hunt", 120 + pw, 200);
+  if (xmas) {
+    const hat = await loadImg("/festive/hat.svg");
+    if (hat) { x.save(); x.translate(104, 112); x.rotate(-0.25); x.drawImage(hat, 0, 0, 96, 80); x.restore(); }
+  }
   const wrap = (text, font, size, maxW, y, color, lh = 1.08) => {
     x.font = `${font} ${size}px ${font.includes("800") ? head : body}`;
     x.fillStyle = color;
@@ -47,7 +73,7 @@ export async function resultCard({ kicker, title, line, big, sub }) {
   if (sub) wrap(sub, "500", 34, W - 240, y + 20, MUTE, 1.3);
   x.font = `700 36px ${body}`; x.fillStyle = MUTE; x.fillText("primahunt.com", 120, H - 130);
   x.fillStyle = YELLOW; x.font = `700 36px ${body}`;
-  const tag = "Hunt it. Snap it. Win the week.";
+  const tag = xmas ? `${seasonGreeting()}, hunter ${seasonGreeting() === "Merry Christmas" ? "🎄" : "🎆"}` : "Hunt it. Snap it. Win the week.";
   x.fillText(tag, W - 120 - x.measureText(tag).width, H - 130);
   return new Promise((r) => c.toBlob(r, "image/png"));
 }

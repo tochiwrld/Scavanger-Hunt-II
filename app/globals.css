@@ -787,3 +787,5 @@ html.festive .tab.on{background:var(--xmas-red);border-color:var(--xmas-red);col
 .xmas-banner b{display:block;font:800 17px/1.15 var(--font-head);letter-spacing:-.02em}
 .xmas-banner span{display:block;color:var(--muted-fg);font-size:14px;margin-top:3px}
 .xmas-banner .x{flex:none;width:34px;height:34px;border-radius:10px;background:var(--raised);border:1px solid var(--border);color:var(--fg);font-size:20px;line-height:1;cursor:pointer}
+/* Christmas win pop-up */
+html.festive .win-box{box-shadow:0 0 0 3px var(--xmas-red),0 0 46px oklch(64% .15 150 / .45)}

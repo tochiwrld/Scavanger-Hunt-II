@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { burst } from "../lib/client.js";
+import { burst, isFestive, jingle } from "../lib/client.js";
 import Icon from "./icons.js";
 import { ShareResult } from "./Share.js";
 
@@ -23,7 +23,7 @@ export function WinOverlay({ storageKey, title, line, result = "won", share }) {
   useEffect(() => {
     let seen = false;
     try { seen = localStorage.getItem(storageKey) === "1"; localStorage.setItem(storageKey, "1"); } catch {}
-    if (!seen) { setOpen(true); if (result === "won") burst(); }
+    if (!seen) { setOpen(true); if (result === "won") { burst(); if (isFestive()) jingle(); } }
   }, [storageKey, result]);
   useEffect(() => {
     if (!open) return undefined;

@@ -4,6 +4,8 @@ import { qrMatrix, qrPath } from "../lib/qr.js";
 import { useApp } from "./Providers.js";
 import Icon from "./icons.js";
 import { Sheet } from "./ui.js";
+import { isFestive, seasonGreeting } from "../lib/client.js";
+import { drawSnow, loadImg } from "./Share.js";
 
 /** The code itself: black on white with the standard quiet zone, so any phone camera reads it in any theme. */
 export function QrCode({ text, size = 280 }) {
@@ -18,27 +20,47 @@ export function QrCode({ text, size = 280 }) {
   );
 }
 
-/** A printable picture of the code (for a stand, a table card or a phone wallpaper at events). */
-async function qrPicture(text, title, sub) {
+/** A printable picture of the code (for a stand, a table card or a phone wallpaper at events). Festive in the Christmas season. */
+export async function qrPicture(text, title, sub) {
   const m = qrMatrix(text);
   const W = 1080, H = 1350, c = document.createElement("canvas");
   c.width = W; c.height = H;
   const x = c.getContext("2d");
-  const font = getComputedStyle(document.documentElement).getPropertyValue("--nf-head").trim() || "sans-serif";
-  const body = getComputedStyle(document.documentElement).getPropertyValue("--nf-body").trim() || "sans-serif";
+  const css = getComputedStyle(document.documentElement);
+  const font = css.getPropertyValue("--nf-head").trim() || "sans-serif";
+  const body = css.getPropertyValue("--nf-body").trim() || "sans-serif";
+  const xmas = isFestive();
   x.fillStyle = "#fff"; x.fillRect(0, 0, W, H);
-  x.textAlign = "center"; x.fillStyle = "#16141f";
-  x.font = `800 64px ${font}`; x.fillText("PrimaHunt", W / 2, 130);
-  x.font = `800 52px ${font}`;
+  x.textAlign = "center";
   const t = title.length > 30 ? title.slice(0, 29) + "…" : title;
-  x.fillText(t, W / 2, 230);
-  const n = m.length + 8, cell = Math.floor(820 / n), size = cell * n, ox = (W - size) / 2, oy = 290;
+  if (xmas) {
+    // Green header with a snow cap, Santa hat on the wordmark, holly sprigs and a candy-cane stripe at the bottom.
+    x.fillStyle = "#1A7F47"; x.fillRect(0, 0, W, 300);
+    drawSnow(x, W, 300, { flakes: 0 });
+    x.fillStyle = "#fff"; x.font = `800 64px ${font}`; x.fillText("PrimaHunt", W / 2, 150);
+    const hat = await loadImg("/festive/hat.svg");
+    if (hat) { const w = x.measureText("PrimaHunt").width; x.save(); x.translate(W / 2 - w / 2 - 50, 64); x.rotate(-0.28); x.drawImage(hat, 0, 0, 80, 67); x.restore(); }
+    x.font = `800 50px ${font}`; x.fillText(t, W / 2, 240);
+    const holly = (cx, cy, flip) => {
+      x.save(); x.translate(cx, cy); x.scale(flip, 1); x.fillStyle = "#1F9D55";
+      for (const r of [-0.5, 0.5]) { x.save(); x.rotate(r); x.beginPath(); x.ellipse(-34, 0, 34, 14, 0, 0, Math.PI * 2); x.fill(); x.restore(); }
+      x.fillStyle = "#D7263D"; [[-6, -6], [8, -2], [0, 9]].forEach(([a, b]) => { x.beginPath(); x.arc(a, b, 9, 0, Math.PI * 2); x.fill(); });
+      x.restore();
+    };
+    holly(96, 1180, 1); holly(W - 96, 1180, -1);
+    for (let px = 0, i = 0; px < W; px += 40, i++) { x.fillStyle = i % 2 ? "#1F9D55" : "#D7263D"; x.fillRect(px, H - 22, 40, 22); }
+  } else {
+    x.fillStyle = "#16141f";
+    x.font = `800 64px ${font}`; x.fillText("PrimaHunt", W / 2, 130);
+    x.font = `800 52px ${font}`; x.fillText(t, W / 2, 230);
+  }
+  const n = m.length + 8, cell = Math.floor((xmas ? 760 : 820) / n), size = cell * n, ox = (W - size) / 2, oy = xmas ? 330 : 290;
   x.fillStyle = "#000";
   m.forEach((row, r) => row.forEach((on, col) => { if (on) x.fillRect(ox + (col + 4) * cell, oy + (r + 4) * cell, cell, cell); }));
   x.fillStyle = "#3a3646"; x.font = `500 40px ${body}`;
-  x.fillText(sub, W / 2, oy + size + 80);
+  x.fillText(sub, W / 2, oy + size + 70);
   x.font = `500 32px ${body}`; x.fillStyle = "#6b6778";
-  x.fillText("primahunt.com", W / 2, H - 60);
+  x.fillText(xmas ? `${seasonGreeting()} from PrimaHunt ${seasonGreeting() === "Merry Christmas" ? "🎄" : "🎆"} · primahunt.com` : "primahunt.com", W / 2, H - (xmas ? 70 : 60));
   return new Promise((r) => c.toBlob(r, "image/png"));
 }
 
@@ -66,6 +88,7 @@ export default function QrButton({ link, title, sub = "Point your phone camera h
       {open ? (
         <Sheet onClose={() => setOpen(false)}>
           <div className="qr-sheet">
+            {isFestive() ? <div className="eyebrow" style={{ color: "var(--xmas-red)" }}>🎄 Christmas hunt</div> : null}
             <h2>{title}</h2>
             <p className="muted" style={{ margin: "6px 0 0" }}>{sub}</p>
             <div className="qr-box"><QrCode text={link} /></div>

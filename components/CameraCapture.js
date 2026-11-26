@@ -1,22 +1,27 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { PHOTO_EDGE, TZ, encodeCanvas } from "../lib/client.js";
+import { PHOTO_EDGE, TZ, encodeCanvas, isFestive } from "../lib/client.js";
 import Icon from "./icons.js";
 
 const MAX_EDGE = PHOTO_EDGE; // 1280px keeps each photo around 150-300 KB
 
 /** Burns "nickname · item · Sun 1 Nov, 18:48" into the bottom of a photo so admins can see when and for what it was taken. */
-function stamp(ctx, w, h, label) {
+export function stamp(ctx, w, h, label) {
   const when = new Date().toLocaleString("en-NG", { timeZone: TZ, weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false });
   const size = Math.max(14, Math.round(w / 38));
   const pad = Math.round(size * 0.7);
   const barH = size + pad * 2;
   ctx.fillStyle = "rgba(10,10,20,0.62)";
   ctx.fillRect(0, h - barH, w, barH);
+  const xmas = isFestive();
+  if (xmas) { // Christmas season: a red-and-green candy stripe on top of the bar
+    const sh = Math.max(3, Math.round(size / 5)), seg = sh * 4;
+    for (let x = 0, i = 0; x < w; x += seg, i++) { ctx.fillStyle = i % 2 ? "#1F9D55" : "#D7263D"; ctx.fillRect(x, h - barH - sh, seg, sh); }
+  }
   ctx.font = `700 ${size}px system-ui, -apple-system, "Segoe UI", sans-serif`;
   ctx.textBaseline = "middle";
   ctx.fillStyle = "#FFD21F";
-  const tag = "PrimaHunt";
+  const tag = xmas ? "🎄 PrimaHunt" : "PrimaHunt";
   ctx.fillText(tag, pad, h - barH / 2);
   const tagW = ctx.measureText(tag + "  ").width;
   ctx.fillStyle = "#ffffff";
