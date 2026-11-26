@@ -58,6 +58,13 @@ export default function Providers({ children }) {
     if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => {});
   }, []);
 
+  // Number on the home screen icon = unread alerts. Cleared when signed out. Ignored where browsers don't support it.
+  useEffect(() => {
+    const n = typeof navigator !== "undefined" ? navigator : null;
+    if (!n?.setAppBadge) return;
+    (me && unread > 0 ? n.setAppBadge(unread) : n.clearAppBadge()).catch(() => {});
+  }, [me, unread]);
+
   // Poll for new alerts: celebrate approvals, announce new weeks.
   useEffect(() => {
     if (!me) return undefined;

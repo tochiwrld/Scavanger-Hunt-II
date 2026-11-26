@@ -26,6 +26,10 @@ self.addEventListener("push", (e) => {
   let d = {};
   try { d = e.data ? e.data.json() : {}; } catch { d = { body: e.data && e.data.text() }; }
   const title = d.title || "PrimaHunt";
+  // Number on the app icon = unread alerts (iPhone 16.4+ home screen app, Android, computers).
+  if (typeof d.count === "number" && self.navigator.setAppBadge) {
+    e.waitUntil((d.count > 0 ? self.navigator.setAppBadge(d.count) : self.navigator.clearAppBadge()).catch(() => {}));
+  }
   e.waitUntil(self.registration.showNotification(title, {
     body: d.body || "",
     icon: "/icon-192.png",
